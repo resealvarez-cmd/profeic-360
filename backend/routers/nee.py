@@ -1,0 +1,171 @@
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from typing import List, Dict
+import google.generativeai as genai
+import os
+import json
+import re
+import io
+from docx import Document
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from dotenv import load_dotenv
+
+load_dotenv()
+router = APIRouter()
+
+# Configuración API
+api_key = os.getenv("GOOGLE_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
+
+# --- MODELOS DE DATOS ---
+class NeeRequest(BaseModel):
+    grade: str
+    subject: str
+    diagnosis: str      # Ej: TEA, TDAH, FIL
+    barrier: str        # Ej: Le molestan los ruidos, no lee fluido...
+    activity: str       # La actividad original
+
+class Estrategias(BaseModel):
+    acceso: str         # Estrategias previas / ambiente
+    actividad: str      # Adaptación de la tarea
+    evaluacion: str     # Forma de evaluar
+
+class DownloadRequest(BaseModel):
+    grade: str
+    subject: str
+    diagnosis: str
+    barrier: str
+    activity: str
+    estrategias: Estrategias
+    dua_principles: str # Breve explicación de qué principios DUA se usan
+
+# --- PROMPT ESPECIALISTA EN INCLUSIÓN ---
+SYSTEM_PROMPT = """
+ROL: Eres un Experto en Educación Diferencial y DUA (Diseño Universal de Aprendizaje) del 'Colegio Madre Paulina'.
+MISIÓN: Recibes una actividad de clase y un perfil de estudiante (NEE Transitoria o Permanente). Debes generar adecuaciones curriculares prácticas para el aula.
+
+ENTRADA:
+- Curso y Asignatura
+- Diagnóstico (Ej: TEA, TDAH)
+- Barrera Específica (Lo que le cuesta al estudiante)
+- Actividad Original
+
+TU TAREA (JSON Estricto):
+Genera una respuesta estructurada con enfoque de AULA (Práctico, no burocrático):
+
+1. **Principios DUA:** Breve línea citando qué principio aplicas (Representación, Acción/Expresión, Compromiso).
+2. **Estrategia de Acceso (Antes):** ¿Qué cambiar en el ambiente, materiales o ubicación? (Ej: Uso de audífonos, material concreto, anticipación visual).
+3. **Adecuación de la Actividad (Durante):** Modificación de la instrucción o tarea. Si es TEA/Permanente, considera simplificar objetivos si es necesario.
+4. **Evaluación Diversificada (Cierre):** ¿Cómo puede demostrar aprendizaje de otra forma? (Ej: Oral en vez de escrito, dibujo, maqueta).
+
+FORMATO JSON:
+{
+  "dua_principles": "Texto breve...",
+  "estrategias": {
+    "acceso": "Texto detallado...",
+    "actividad": "Texto detallado...",
+    "evaluacion": "Texto detallado..."
+  }
+}
+"""
+
+@router.post("/nee/generate")
+async def generate_nee_strategies(req: NeeRequest):
+    try:
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        
+        prompt = f"""
+        CONTEXTO:
+        - Curso: {req.grade}
+        - Asignatura: {req.subject}
+        - Diagnóstico: {req.diagnosis}
+        - Barrera Principal: "{req.barrier}"
+        - Actividad Original: "{req.activity}"
+
+        Genera las adecuaciones prácticas en JSON. Sé empático y concreto.
+        """
+        
+        response = model.generate_content(SYSTEM_PROMPT + prompt)
+        
+        # Limpieza de JSON
+        texto_limpio = response.text
+        if "```" in texto_limpio:
+            texto_limpio = re.sub(r"```json\s*", "", texto_limpio)
+            texto_limpio = re.sub(r"```\s*$", "", texto_limpio)
+        
+        data = json.loads(texto_limpio.strip())
+        return data
+
+    except Exception as e:
+        print(f"❌ Error NEE: {e}")
+        return {
+            "dua_principles": "Error generando análisis.",
+            "estrategias": {
+                "acceso": "Intenta simplificar la descripción de la barrera.",
+                "actividad": "",
+                "evaluacion": ""
+            }
+        }
+
+# --- EXPORTACIÓN A WORD ---
+@router.post("/nee/download")
+async def download_nee_docx(data: DownloadRequest):
+    try:
+        doc = Document()
+        
+        # Título
+        title = doc.add_heading('Asistente de Inclusión & DUA', 0)
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Datos del Estudiante
+        doc.add_heading('1. Contexto del Estudiante', level=1)
+        doc.add_paragraph(f"Curso: {data.grade} | Asignatura: {data.subject}")
+        p = doc.add_paragraph()
+        p.add_run("Diagnóstico/Condición: ").bold = True
+        p.add_run(data.diagnosis)
+        p = doc.add_paragraph()
+        p.add_run("Barrera Detectada: ").bold = True
+        p.add_run(data.barrier)
+
+        # Actividad Original
+        doc.add_heading('2. Actividad Original', level=1)
+        doc.add_paragraph(data.activity)
+
+        # Adecuaciones
+        doc.add_heading('3. Estrategias de Adecuación Curricular', level=1)
+        
+        p = doc.add_paragraph()
+        p.add_run("Enfoque DUA: ").bold = True
+        p.add_run(data.dua_principles).italic = True
+
+        doc.add_heading('A. Adecuación de Acceso (Preparación)', level=2)
+        doc.add_paragraph(data.estrategias.acceso)
+
+        doc.add_heading('B. Adecuación de la Actividad (Desarrollo)', level=2)
+        doc.add_paragraph(data.estrategias.actividad)
+
+        doc.add_heading('C. Evaluación Diversificada', level=2)
+        doc.add_paragraph(data.estrategias.evaluacion)
+
+        # Footer
+        section = doc.sections[0]
+        footer = section.footer
+        p = footer.paragraphs[0]
+        p.text = "Documento generado por ProfeIC - Colegio Madre Paulina"
+
+        buffer = io.BytesIO()
+        doc.save(buffer)
+        buffer.seek(0)
+
+        return StreamingResponse(
+            buffer,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={"Content-Disposition": "attachment; filename=Adecuacion_Curricular.docx"}
+        )
+
+    except Exception as e:
+        print(f"❌ Error DOCX NEE: {e}")
+        raise HTTPException(status_code=500, detail="Error generando documento")

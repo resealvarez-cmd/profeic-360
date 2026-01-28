@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-dotenv
+supabase
+pandas
+langchain-groq
+langchain-core
+pydantic
+python-docx
+python-pptx
+requests
+google-generativeai
+python-multipart
