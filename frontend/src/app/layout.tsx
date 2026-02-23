@@ -48,11 +48,6 @@ export const metadata: Metadata = {
         description: "Inteligencia Artificial para potenciar el aprendizaje y la gestión escolar.",
         images: ["/og-image.png"],
     },
-    icons: {
-        icon: "/favicon.ico",
-        shortcut: "/favicon-16x16.png",
-        apple: "/apple-touch-icon.png",
-    },
 };
 
 export const viewport: Viewport = {
