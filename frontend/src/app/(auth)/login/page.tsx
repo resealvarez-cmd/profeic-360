@@ -100,9 +100,9 @@ export default function LoginPage() {
                         <input
                             type="email"
                             {...register('email')}
-                            className={`w-full pl-4 pr-4 py-3 bg-[#F8FAFC] border rounded-xl 
+                            className={`w-full pl-4 pr-4 py-3 bg-[#F8FAFC] border rounded-xl text-slate-800 
                         ${errors.email ? 'border-red-500' : 'border-slate-200'}
-                        focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-300`}
+                        focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-400`}
                             placeholder="docente@profeic.cl"
                             disabled={isLoading}
                         />
@@ -116,9 +116,9 @@ export default function LoginPage() {
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 {...register('password')}
-                                className={`w-full pl-4 pr-12 py-3 bg-[#F8FAFC] border rounded-xl 
+                                className={`w-full pl-4 pr-12 py-3 bg-[#F8FAFC] border rounded-xl text-slate-800 
                             ${errors.password ? 'border-red-500' : 'border-slate-200'}
-                            focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-300`}
+                            focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-400`}
                                 placeholder="••••••••"
                                 disabled={isLoading}
                             />
