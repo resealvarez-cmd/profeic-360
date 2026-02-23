@@ -28,7 +28,11 @@ class UnitRequest(BaseModel):
     nivel: str
     horas: int
     oas: List[str]
+    oas: List[str]
     contexto_manual: Optional[str] = ""
+    # Community Fields
+    is_public: bool = False
+    author_name: Optional[str] = None
 
 class ClassGenerationRequest(BaseModel):
     estrategia_unidad: EstrategiaUnidad

@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/telemetry";
 
 // --- IMPORTACIÓN ÚNICA DEL BOTÓN ---
 import { BotonGuardar } from "@/components/BotonGuardar";
@@ -38,6 +39,8 @@ const LoadingOverlay = ({ mensaje }: { mensaje: string }) => {
     );
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function AnalizadorPage() {
     const [objetivo, setObjetivo] = useState("");
     const [instrumento, setInstrumento] = useState("");
@@ -52,7 +55,10 @@ export default function AnalizadorPage() {
     const [copiado, setCopiado] = useState(false);
     const [inputCollapsed, setInputCollapsed] = useState(false);
 
-    useEffect(() => { setMounted(true); }, []);
+    useEffect(() => {
+        setMounted(true);
+        trackEvent({ eventName: 'page_view', module: 'analizador' });
+    }, []);
 
     useEffect(() => {
         if (result && result.items_analizados?.[selectedIndex]) {
@@ -70,7 +76,7 @@ export default function AnalizadorPage() {
         setResult(null);
 
         try {
-            const response = await fetch('https://profeic-backend-484019506864.us-central1.run.app/analizador/audit', {
+            const response = await fetch(`${API_URL}/analizador/audit`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ objetivo_aprendizaje: objetivo, texto_evaluacion: instrumento })
@@ -81,9 +87,20 @@ export default function AnalizadorPage() {
             const data = await response.json();
             setResult(data);
             setVerSoloCriticos(true);
+
+            // Telemetry: Generation Success
+            trackEvent({
+                eventName: 'generation_success',
+                module: 'analizador',
+                metadata: {
+                    subject: data.metadata?.asignatura_detectada,
+                    level: data.metadata?.nivel_detectado,
+                    score: data.score_coherencia
+                }
+            });
         } catch (error) {
             console.error(error);
-            alert("No se pudo conectar con la IA.");
+            alert("No se pudo conectar con la IA. Asegúrate de que el backend esté corriendo.");
         } finally {
             setIsAnalyzing(false);
         }
@@ -194,7 +211,7 @@ export default function AnalizadorPage() {
                                     <label className="text-xs font-bold text-slate-400 uppercase">OA</label>
                                     <Textarea
                                         placeholder="Ej: OA 4..."
-                                        className="bg-slate-50 min-h-[100px] text-sm resize-none"
+                                        className="bg-slate-50 min-h-[100px] text-sm resize-none text-slate-900"
                                         value={objetivo}
                                         onChange={(e) => setObjetivo(e.target.value)}
                                     />
@@ -203,7 +220,7 @@ export default function AnalizadorPage() {
                                     <label className="text-xs font-bold text-slate-400 uppercase">Prueba</label>
                                     <Textarea
                                         placeholder="Pega la prueba..."
-                                        className="bg-slate-50 min-h-[300px] text-sm font-mono"
+                                        className="bg-slate-50 min-h-[300px] text-sm font-mono text-slate-900"
                                         value={instrumento}
                                         onChange={(e) => setInstrumento(e.target.value)}
                                     />
@@ -217,7 +234,7 @@ export default function AnalizadorPage() {
                 </div>
 
                 {/* --- COLUMNA RESULTADOS --- */}
-                <div className="flex-1 min-w-0 space-y-6">
+                < div className="flex-1 min-w-0 space-y-6" >
                     {!result ? (
                         <div className="h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/30 text-slate-400 p-8 text-center">
                             <BrainCircuit className="w-16 h-16 mb-4 opacity-10" />
@@ -316,11 +333,11 @@ export default function AnalizadorPage() {
                             </div>
                         </div>
                     )}
-                </div>
-            </div>
+                </div >
+            </div >
 
             {/* PANEL LATERAL */}
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            < Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen} >
                 <SheetContent className="w-[400px] sm:w-[550px] bg-[#fcfcfc] overflow-y-auto">
                     {selectedItem && (
                         <div className="space-y-6 pt-6">
@@ -371,7 +388,7 @@ export default function AnalizadorPage() {
                         </div>
                     )}
                 </SheetContent>
-            </Sheet>
-        </div>
+            </Sheet >
+        </div >
     );
 }

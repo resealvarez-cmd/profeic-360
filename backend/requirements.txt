@@ -11,3 +11,4 @@ python-pptx
 requests
 google-generativeai
 python-multipart
+pypdf

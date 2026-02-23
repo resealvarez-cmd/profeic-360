@@ -38,6 +38,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     history: List[ChatMessage]
+    user_name: str | None = "Docente"
 
 # --- UTILIDAD: GENERAR EMBEDDING ---
 def get_query_embedding(text: str):
@@ -53,9 +54,11 @@ def get_query_embedding(text: str):
 # --- PERSONALIDAD REFORZADA (Con Pragmatismo Didáctico) ---
 fecha_hoy = datetime.now().strftime("%A %d de %B de %Y")
 
-SYSTEM_PROMPT_BASE = f"""
+def get_system_prompt(nombre_usuario="Docente"):
+    return f"""
 ROL: Eres 'Mentor IC', el consejero pedagógico y pastoral del Colegio Madre Paulina de Chiguayante.
 FECHA: {fecha_hoy}.
+USUARIO: Estás hablando con {nombre_usuario}. Llámalo por su nombre de vez en cuando para generar cercanía.
 
 TUS 4 PILARES FUNDAMENTALES:
 
@@ -79,7 +82,7 @@ async def chat_mentor(req: ChatRequest):
     try:
         # 1. Identificar la última pregunta del usuario
         if not req.history:
-            return {"response": "Hola, soy Mentor IC. ¿En qué puedo ayudarte hoy?"}
+            return {"response": f"Hola {req.user_name}, soy Mentor IC. ¿En qué puedo ayudarte hoy?"}
             
         ultima_pregunta = req.history[-1].content
         
@@ -114,10 +117,11 @@ async def chat_mentor(req: ChatRequest):
                 contexto_institucional += f"FUENTE: {source}\nFRAGMENTO: {content}\n\n"
         
         # 4. Armar el Prompt Completo
-        full_prompt = SYSTEM_PROMPT_BASE + contexto_institucional + "\n--- HISTORIAL DE CONVERSACIÓN ---\n"
+        SYSTEM_PROMPT = get_system_prompt(req.user_name)
+        full_prompt = SYSTEM_PROMPT + contexto_institucional + "\n--- HISTORIAL DE CONVERSACIÓN ---\n"
         
         for msg in req.history:
-            role_label = "DOCENTE" if msg.role == "user" else "MENTOR IC"
+            role_label = req.user_name.upper() if msg.role == "user" else "MENTOR IC"
             full_prompt += f"{role_label}: {msg.content}\n"
             
         full_prompt += "MENTOR IC (Responde con calidez, rigor técnico y estrategias prácticas):"

@@ -6,7 +6,7 @@ import {
     Library, Book, Search, Calendar, GraduationCap, Layout,
     BrainCircuit, Target, CheckCircle2, Layers, FileQuestion,
     Puzzle, TrendingUp, AlertCircle, Download, Trash2, X,
-    FileText, Loader2, MoreVertical
+    FileText, Loader2, MoreVertical, Share2, Globe
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -233,7 +233,10 @@ type LibraryItem = {
     nivel: string;
     created_at: string;
     contenido: any;
+    is_public?: boolean; // Added for Community Phase
 };
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function BibliotecaPage() {
     const [items, setItems] = useState<LibraryItem[]>([]);
@@ -272,6 +275,58 @@ export default function BibliotecaPage() {
             if (selectedResource?.id === id) setSelectedResource(null);
         } catch (error) {
             console.error("Error eliminando:", error);
+        }
+    };
+
+    const handlePublish = async (item: LibraryItem, e: any) => {
+        e.stopPropagation();
+        const newStatus = !item.is_public;
+        const confirmMsg = newStatus
+            ? "¿Quieres publicar este recurso en la Sala de Profesores? Todos podrán verlo."
+            : "¿Quieres ocultar este recurso?";
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            // Obtener sesión actual para autenticar la petición al backend
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+
+            if (!token) {
+                alert("Error de sesión. Por favor recarga la página.");
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/community/share`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Enviar token para contextos RLS/Auth
+                },
+                body: JSON.stringify({
+                    resource_id: item.id,
+                    is_public: newStatus
+                })
+            });
+
+            if (res.ok) {
+                // Actualizar estado local
+                setItems(prevItems => prevItems.map(i => String(i.id) === String(item.id) ? { ...i, is_public: newStatus } : i));
+
+                if (selectedResource && String(selectedResource.id) === String(item.id)) {
+                    setSelectedResource({ ...selectedResource, is_public: newStatus });
+                }
+
+                alert(newStatus ? "¡Publicado exitosamente!" : "Recurso ocultado.");
+            } else {
+                const errData = await res.json();
+                console.error("Backend Error:", errData);
+                // Fallback amigable si el error es de base de datos/permisos
+                alert(`No se pudo actualizar. Verifica tu conexión o intenta más tarde.`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión al intentar publicar.");
         }
     };
 
@@ -403,6 +458,14 @@ export default function BibliotecaPage() {
                                         onClick={(e: any) => handleDownload(item, e)}
                                     >
                                         <Download className="w-3 h-3 mr-2" /> DOCX
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className={`flex-1 text-xs font-bold ${item.is_public ? 'text-teal-600 bg-teal-50 hover:bg-teal-100' : 'text-slate-400 hover:text-[#f2ae60] hover:bg-orange-50'}`}
+                                        onClick={(e: any) => handlePublish(item, e)}
+                                    >
+                                        {item.is_public ? <><Globe className="w-3 h-3 mr-2" /> Público</> : <><Share2 className="w-3 h-3 mr-2" /> Publicar</>}
                                     </Button>
                                     <Button
                                         variant="ghost"

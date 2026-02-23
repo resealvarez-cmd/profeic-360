@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
 
 interface BotonGuardarProps {
-    tipo: "PLANIFICACION" | "RUBRICA" | "EVALUACION" | "AUDITORIA" | "ESTRATEGIA" | "ELEVADOR";
+    tipo: "PLANIFICACION" | "RUBRICA" | "EVALUACION" | "AUDITORIA" | "ESTRATEGIA" | "ELEVADOR" | "LECTURA";
     titulo?: string;
     asignatura?: string;
     nivel?: string;
@@ -125,16 +125,16 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
                         <div className="grid gap-4 py-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="titulo" className="font-bold text-slate-600">Título</Label>
-                                <Input id="titulo" value={formTitulo} onChange={(e) => setFormTitulo(e.target.value)} className="focus-visible:ring-[#2b546e]" />
+                                <Input id="titulo" value={formTitulo} onChange={(e) => setFormTitulo(e.target.value)} className="focus-visible:ring-[#2b546e] text-slate-800" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="asignatura" className="font-bold text-slate-600">Asignatura</Label>
-                                    <Input id="asignatura" value={formAsignatura} onChange={(e) => setFormAsignatura(e.target.value)} />
+                                    <Input id="asignatura" value={formAsignatura} onChange={(e) => setFormAsignatura(e.target.value)} className="text-slate-800" />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="nivel" className="font-bold text-slate-600">Nivel</Label>
-                                    <Input id="nivel" value={formNivel} onChange={(e) => setFormNivel(e.target.value)} />
+                                    <Input id="nivel" value={formNivel} onChange={(e) => setFormNivel(e.target.value)} className="text-slate-800" />
                                 </div>
                             </div>
                         </div>

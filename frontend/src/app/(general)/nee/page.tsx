@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 // --- 1. IMPORTAMOS EL BOTÓN INTELIGENTE ---
 import { BotonGuardar } from "@/components/BotonGuardar";
+import { trackEvent } from "@/lib/telemetry";
 
 // Lista de Diagnósticos Comunes (Para agilizar)
 const DIAGNOSES = [
@@ -38,6 +39,7 @@ export default function NeePage() {
 
     // Carga de Cursos
     useEffect(() => {
+        trackEvent({ eventName: 'page_view', module: 'nee' });
         async function fetchGrades() {
             try {
                 const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", {
@@ -93,6 +95,17 @@ export default function NeePage() {
             if (!res.ok) throw new Error("Error");
             const data = await res.json();
             setResult(data);
+
+            // Telemetry: Generation Success
+            trackEvent({
+                eventName: 'generation_success',
+                module: 'nee',
+                metadata: {
+                    level: form.grade,
+                    subject: form.subject,
+                    diagnosis: form.diagnosis
+                }
+            });
         } catch (error) { alert("Error de conexión con el Asistente de Inclusión."); }
         finally { setLoading(false); }
     };

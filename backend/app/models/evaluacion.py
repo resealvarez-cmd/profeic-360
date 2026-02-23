@@ -52,3 +52,6 @@ class AssessmentResult(BaseModel):
     title: str = Field(alias="assessmentTitle")
     description: str = Field(default="Instrucciones generales")
     items: List[AssessmentItem]
+    # Community Fields
+    is_public: bool = False
+    author_name: Optional[str] = None

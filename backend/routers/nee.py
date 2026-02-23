@@ -40,7 +40,19 @@ class DownloadRequest(BaseModel):
     barrier: str
     activity: str
     estrategias: Estrategias
+    estrategias: Estrategias
     dua_principles: str # Breve explicación de qué principios DUA se usan
+
+# --- MODELOS PARA GENERACIÓN DUA ---
+class DUARequest(BaseModel):
+    planificacion_original: str
+    contexto_estudiante: str
+
+class VariantesDUA(BaseModel):
+    visual_espacial: str
+    kinestesica: str
+    focalizada: str
+
 
 # --- PROMPT ESPECIALISTA EN INCLUSIÓN ---
 SYSTEM_PROMPT = """
@@ -108,7 +120,49 @@ async def generate_nee_strategies(req: NeeRequest):
                 "actividad": "",
                 "evaluacion": ""
             }
+            }
+
+
+# --- GENERADOR DUA (NUEVO endpoint) ---
+@router.post("/nee/generate-dua")
+async def generate_dua_variants(req: DUARequest):
+    try:
+        print(f"🧩 [NEE] Generando DUA para: {req.contexto_estudiante}")
+        
+        prompt = f"""
+        ACTÚA COMO ESPECIALISTA EN EDUCACIÓN DIFERENCIAL.
+        
+        INPUT:
+        1. PLANIFICACIÓN BASE:
+        "{req.planificacion_original}"
+        
+        2. CONTEXTO DEL ESTUDIANTE:
+        "{req.contexto_estudiante}"
+        
+        TAREA:
+        Genera 3 variantes de adecuación curricular para la actividad principal de esta planificación.
+        
+        SALIDA JSON ESTRICTA:
+        {{
+            "visual_espacial": "Descripción de estrategia con apoyo visual/gráfico...",
+            "kinestesica": "Descripción de estrategia manipulativa/corporal...",
+            "focalizada": "Estrategia específica y simplificada para el perfil descrito..."
+        }}
+        """
+
+        model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
+        response = model.generate_content(prompt)
+        
+        return json.loads(response.text)
+
+    except Exception as e:
+        print(f"❌ Error DUA: {e}")
+        return {
+            "visual_espacial": "Error generando variante visual.",
+            "kinestesica": "Error generando variante kinestésica.",
+            "focalizada": "Error generando variante focalizada."
         }
+
 
 # --- EXPORTACIÓN A WORD ---
 @router.post("/nee/download")

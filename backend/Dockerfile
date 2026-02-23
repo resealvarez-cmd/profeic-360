@@ -1,25 +1,24 @@
-# Usamos una imagen oficial de Python ligera
-FROM python:3.9-slim
+# Usamos Python 3.11 para mejor rendimiento
+FROM python:3.11-slim
 
-# Evita que Python genere archivos .pyc y fuerza la salida por consola (útil para logs)
+# Evita que Python genere archivos .pyc y fuerza la salida por consola
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Directorio de trabajo dentro del contenedor
+# Directorio de trabajo
 WORKDIR /app
 
-# Copiamos los requerimientos primero (para aprovechar la caché de Docker)
+# Copiamos requerimientos
 COPY requirements.txt .
 
-# Instalamos las dependencias
+# Instalamos dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiamos el resto del código del backend
+# Copiamos el código
 COPY . .
 
-# Exponemos el puerto 8080 (el estándar de Google Cloud Run)
+# Puerto por defecto (Cloud Run inyecta esta variable)
 ENV PORT 8080
 
-# Comando para iniciar la aplicación
-# Importante: "main:app" asume que tu archivo principal se llama main.py
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Comando de inicio optimizado
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]

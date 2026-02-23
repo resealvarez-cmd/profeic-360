@@ -1,164 +1,171 @@
+
 "use client";
-import { useState } from "react";
-// Eliminamos useRouter porque usaremos redirección nativa del navegador
-// import { useRouter } from "next/navigation"; 
-import Image from "next/image"; 
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
-import { supabase } from "@/lib/supabaseClient"; 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { Loader2, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { supabase } from "@/lib/supabaseClient";
+import { Logo } from "@/components/Logo";
+
+const loginSchema = z.object({
+    email: z
+        .string()
+        .email('Correo electrónico inválido'),
+    password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-    // const router = useRouter(); // <--- Desactivado para usar redirección fuerte
-    const [loading, setLoading] = useState(false);
-    const [isRegistering, setIsRegistering] = useState(false);
-    const [form, setForm] = useState({ email: "", password: "" });
-    const [errorMsg, setErrorMsg] = useState("");
-    const [buttonText, setButtonText] = useState("Ingresar"); // Estado para feedback visual
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [buttonText, setButtonText] = useState("Ingresar");
 
-    const handleAuth = async (e: any) => {
-        e.preventDefault();
-        setLoading(true);
-        setErrorMsg("");
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginForm>({
+        resolver: zodResolver(loginSchema),
+    });
+
+    const onSubmit = async (data: LoginForm) => {
+        setIsLoading(true);
+        setButtonText("Verificando...");
 
         try {
-            if (isRegistering) {
-                // --- REGISTRO ---
-                const { error: signUpError } = await supabase.auth.signUp({
-                    email: form.email,
-                    password: form.password,
-                });
-                if (signUpError) throw signUpError;
-                
-                alert("Cuenta creada. Por favor revisa tu correo para confirmar.");
-                setIsRegistering(false);
-                setLoading(false);
-                return;
+            const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+                email: data.email,
+                password: data.password,
+            });
 
+            if (signInError) throw signInError;
+
+            toast.success("Bienvenido a ProfeIC");
+
+            // --- LOGICA DE REDIRECCION POR ROL (Conserva lógica original) ---
+            const { user } = authData;
+            let role = user?.user_metadata?.role;
+
+            if (!role) {
+                const preferredRole = localStorage.getItem("preferred_role");
+                if (preferredRole) role = preferredRole;
+            }
+            role = role || "teacher";
+
+            let redirectPath = "/dashboard";
+            if (role === "admin" || role === "director" || role === "utp") {
+                redirectPath = "/acompanamiento/dashboard";
+                setButtonText("Entrando a Gestión...");
             } else {
-                // --- LOGIN ---
-                const { data, error: signInError } = await supabase.auth.signInWithPassword({
-                    email: form.email,
-                    password: form.password,
-                });
-                
-                if (signInError) throw signInError;
-
-                // ¡ÉXITO!
-                console.log("✅ Login correcto. Sesión iniciada.");
-                setButtonText("¡Bienvenido! Redirigiendo..."); // Feedback inmediato
-
-                // RESPALDO: Guardamos también en localStorage por si acaso
-                if (data.session) {
-                    localStorage.setItem("profeic_token", data.session.access_token);
-                }
-
-                // 🔥 LA SOLUCIÓN CLAVE: Redirección nativa (Hard Redirect).
-                // Esto fuerza a recargar la página destino leyendo la sesión desde cero.
-                window.location.href = "/planificador"; 
+                setButtonText("Entrando al Aula...");
             }
 
+            // Hard redirect
+            window.location.href = redirectPath;
+
         } catch (error: any) {
-            console.error("Error auth:", error);
-            setErrorMsg(error.message || "Credenciales incorrectas");
-            setLoading(false); // Solo quitamos loading si hubo error
+            toast.error(error.message || 'Error al iniciar sesión');
+            setIsLoading(false);
+            setButtonText("Ingresar");
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center relative font-sans">
+        <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center relative font-sans">
+            <div className="absolute top-0 left-0 w-full h-[40vh] bg-[#1B3C73] rounded-b-[100%] scale-x-125 z-0 shadow-xl"></div>
 
-            {/* EL ARCO SUPERIOR OSCURO */}
-            <div className="absolute top-0 left-0 w-full h-[40vh] bg-[#1a2e3b] rounded-b-[100%] scale-x-125 z-0 shadow-xl"></div>
-
-            {/* TARJETA FLOTANTE */}
             <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 relative">
-
-                {/* LOGO OFICIAL FLOTANTE */}
                 <div className="absolute -top-12 left-1/2 -translate-x-1/2">
-                    <div className="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-gray-50 overflow-hidden relative">
-                        <Image
-                            src="/logo.png"
-                            alt="Insignia Colegio Madre Paulina"
-                            fill
-                            className="object-contain p-2"
-                            priority
-                        />
+                    <div className="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-[#F8FAFC] overflow-hidden relative">
+                        <Logo size={60} />
                     </div>
                 </div>
 
                 <div className="mt-10 text-center mb-8">
-                    <h2 className="text-2xl font-extrabold text-[#1a2e3b] mb-1">ProfeIC Suite</h2>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Plataforma Colegio Madre Paulina</p>
+                    <h2 className="text-2xl font-extrabold text-[#1B3C73] mb-1">Iniciar Sesión</h2>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ProfeIC Suite</p>
                 </div>
 
-                {errorMsg && (
-                    <div className="mb-4 p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg text-center animate-pulse">
-                        {errorMsg}
-                    </div>
-                )}
-
-                <form onSubmit={handleAuth} className="space-y-5">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                    {/* Email */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Correo Institucional</label>
-                        <div className="relative">
-                            <input
-                                type="email"
-                                value={form.email}
-                                onChange={e => setForm({ ...form, email: e.target.value })}
-                                className="w-full pl-4 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[#1a2e3b] font-medium focus:ring-2 focus:ring-[#1a2e3b] focus:border-transparent outline-none transition-all placeholder:text-gray-300"
-                                placeholder="docente@madrepaulina.cl"
-                                required
-                            />
-                        </div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Correo Institucional</label>
+                        <input
+                            type="email"
+                            {...register('email')}
+                            className={`w-full pl-4 pr-4 py-3 bg-[#F8FAFC] border rounded-xl 
+                        ${errors.email ? 'border-red-500' : 'border-slate-200'}
+                        focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-300`}
+                            placeholder="docente@profeic.cl"
+                            disabled={isLoading}
+                        />
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
 
+                    {/* Password */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Contraseña</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Contraseña</label>
                         <div className="relative">
                             <input
-                                type="password"
-                                value={form.password}
-                                onChange={e => setForm({ ...form, password: e.target.value })}
-                                className="w-full pl-4 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[#1a2e3b] font-medium focus:ring-2 focus:ring-[#1a2e3b] focus:border-transparent outline-none transition-all placeholder:text-gray-300"
+                                type={showPassword ? 'text' : 'password'}
+                                {...register('password')}
+                                className={`w-full pl-4 pr-12 py-3 bg-[#F8FAFC] border rounded-xl 
+                            ${errors.password ? 'border-red-500' : 'border-slate-200'}
+                            focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-300`}
                                 placeholder="••••••••"
-                                required
+                                disabled={isLoading}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
                         </div>
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+                    </div>
+
+                    <div className="text-right">
+                        <Link href="/forgot-password" className="text-sm text-[#1B3C73] hover:underline">
+                            ¿Olvidaste tu contraseña?
+                        </Link>
                     </div>
 
                     <button
                         type="submit"
-                        disabled={loading}
-                        className="w-full py-3.5 bg-[#1a2e3b] text-white font-bold rounded-xl shadow-lg hover:bg-[#233d4d] hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
+                        disabled={isLoading}
+                        className="w-full py-3.5 bg-[#1B3C73] text-white font-bold rounded-xl shadow-lg hover:bg-[#2A59A8] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                        {loading ? (
-                             <span className="flex items-center gap-2">
-                                {buttonText === "Ingresar" ? "Procesando..." : buttonText}
-                             </span>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {buttonText === "Ingresar" ? "Ingresando..." : buttonText}
+                            </>
                         ) : (
                             <>
-                                {isRegistering ? "Crear Cuenta" : "Ingresar"}
-                                <ArrowRightIcon className="w-4 h-4" />
+                                Ingresar
+                                <ArrowRight className="w-4 h-4" />
                             </>
                         )}
                     </button>
                 </form>
 
-                <div className="mt-8 text-center border-t border-gray-100 pt-6">
-                    <p className="text-xs text-gray-400 mb-2">
-                        {isRegistering ? "¿Ya tienes acceso?" : "¿Eres nuevo en el sistema?"}
+                <div className="mt-8 text-center border-t border-slate-100 pt-6">
+                    <p className="text-xs text-slate-500 mb-2 font-medium">Acceso restringido a usuarios institucionales.</p>
+                    <p className="text-[#1B3C73] font-bold text-sm">
+                        Si tu colegio tiene ProfeIC, revisa tu correo.
                     </p>
-                    <button
-                        onClick={() => setIsRegistering(!isRegistering)}
-                        className="text-[#1a2e3b] font-bold text-sm hover:underline"
-                    >
-                        {isRegistering ? "Iniciar Sesión" : "Crear una cuenta nueva"}
-                    </button>
                 </div>
             </div>
-
-            <p className="absolute bottom-6 text-gray-400/50 text-xs font-medium">
-                © 2025 Dirección Colegio Madre Paulina
-            </p>
+            <p className="absolute bottom-6 text-slate-400/50 text-xs font-medium">© 2026 ProfeIC Suite Empresarial</p>
         </div>
     );
 }

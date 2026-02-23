@@ -12,6 +12,7 @@ import { BotonGuardar } from "@/components/BotonGuardar";
 interface OA { id: number; oa_codigo: string; descripcion: string; }
 interface RubricCriteria { criterio: string; porcentaje: number; niveles: { insuficiente: string; elemental: string; adecuado: string; destacado: string; }; }
 interface RubricResult { titulo: string; descripcion: string; tabla: RubricCriteria[]; }
+import { trackEvent } from "@/lib/telemetry";
 
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
 
@@ -51,9 +52,26 @@ export default function RubricasPage() {
     const [form, setForm] = useState({ nivel: "", asignatura: "", oaId: "", oaDescripcion: "", actividad: "" });
     const [result, setResult] = useState<RubricResult | null>(null);
     const [totalScore, setTotalScore] = useState<number>(60);
+    const [isDirty, setIsDirty] = useState(false);
+
+    useEffect(() => {
+        if (result) setIsDirty(true);
+    }, [result]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [isDirty]);
 
     // Carga inicial de niveles
     useEffect(() => {
+        trackEvent({ eventName: 'page_view', module: 'rubricas' });
         const fetchLevels = async () => { try { const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }); const data = await res.json(); if (data.type === "niveles") setLevels(data.data.sort((a: string, b: string) => (NIVEL_ORDER.indexOf(a) === -1 ? 999 : NIVEL_ORDER.indexOf(a)) - (NIVEL_ORDER.indexOf(b) === -1 ? 999 : NIVEL_ORDER.indexOf(b)))); } catch (e) { console.error(e); } };
         fetchLevels();
     }, []);
@@ -89,6 +107,18 @@ export default function RubricasPage() {
             });
             const data = await res.json();
             setResult(data);
+
+            // Telemetry: Generation Success
+            trackEvent({
+                eventName: 'generation_success',
+                module: 'rubricas',
+                metadata: {
+                    level: form.nivel,
+                    subject: form.asignatura,
+                    is_manual: mode === 'manual'
+                }
+            });
+
             setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }), 500);
         } catch (e) { alert("Error al generar la rúbrica."); } finally { setGenerating(false); }
     };
@@ -242,7 +272,7 @@ export default function RubricasPage() {
                                     <textarea value={result.descripcion} onChange={(e) => setResult({ ...result, descripcion: e.target.value })} className="w-full bg-transparent border-none resize-none focus:ring-0 p-0 text-slate-600 h-auto" rows={2} />
                                 </div>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
+                                    <table className="w-full min-w-[800px] text-left border-collapse">
                                         <thead><tr className="bg-slate-100 border-b-2 border-slate-200 text-slate-700"><th className="p-5 w-[20%] text-[11px] font-bold uppercase tracking-wider">Criterio & Peso</th><th className="p-5 w-[20%] text-[11px] font-bold uppercase tracking-wider border-l border-slate-200 bg-[#ffebee]">Insuficiente</th><th className="p-5 w-[20%] text-[11px] font-bold uppercase tracking-wider border-l border-slate-200 bg-[#fff8e1]">Elemental</th><th className="p-5 w-[20%] text-[11px] font-bold uppercase tracking-wider border-l border-slate-200 bg-[#f1f8e9]">Adecuado</th><th className="p-5 w-[20%] text-[11px] font-bold uppercase tracking-wider border-l border-slate-200 bg-[#e3f2fd]">Destacado</th></tr></thead>
                                         <tbody className="text-sm divide-y divide-slate-100">
                                             {result.tabla.map((row, idx) => (

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import {
     ClipboardCheck, Sparkles, RefreshCw, CheckCircle,
     FileText, Sliders, Download, Plus, Minus,
@@ -7,10 +8,16 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
+
 import { BotonGuardar } from "@/components/BotonGuardar";
+import { trackEvent } from "@/lib/telemetry";
+import { UploadZone } from "@/components/ui/UploadZone"; // <--- Import nuevo
+import HeroSection from "@/components/ui/HeroSection"; // <--- Import Hero (opcional, para test)
+
 
 // --- CONSTANTES ---
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const MENSAJES_CARGA = [
     "Analizando los Objetivos de Aprendizaje...",
@@ -21,6 +28,12 @@ const MENSAJES_CARGA = [
     "Ajustando el puntaje total...",
     "Finalizando formato..."
 ];
+
+// --- UTILS ---
+const findTeacherGuide = (itemId: number, guide: any) => {
+    if (!guide?.answers) return null;
+    return guide.answers.find((a: any) => a.related_item_id === itemId);
+};
 
 // --- UI COMPONENTS ---
 const ModernSelect = ({ label, value, options, onChange, placeholder = "Seleccionar...", disabled = false }: any) => {
@@ -96,12 +109,15 @@ export default function GeneradorEvaluaciones() {
 
     const [config, setConfig] = useState({
         grade: "", subject: "", oaIds: [] as string[], customOa: "",
+        contextText: "", // <--- NUEVO STATE
         dokDistribution: { dok1: 20, dok2: 50, dok3: 30 },
         quantities: { multiple_choice: 10, true_false: 0, short_answer: 0, essay: 2 },
-        points: { multiple_choice: 2, true_false: 1, short_answer: 3, essay: 5 }
+        points: { multiple_choice: 2, true_false: 1, short_answer: 3, essay: 5 },
+        num_alternatives: 4 // <--- NUEVO CAMPO
     });
 
     const [resultado, setResultado] = useState<any>(null);
+    const [showTeacherGuide, setShowTeacherGuide] = useState(false); // <--- NUEVO STATE
     const totalPoints = (config.quantities.multiple_choice * config.points.multiple_choice) + (config.quantities.true_false * config.points.true_false) + (config.quantities.short_answer * config.points.short_answer) + (config.quantities.essay * config.points.essay);
 
     useEffect(() => {
@@ -125,20 +141,23 @@ export default function GeneradorEvaluaciones() {
         setConfig({ ...config, dokDistribution: newDist });
     };
 
-    useEffect(() => { fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }).then(res => res.json()).then(data => { if (data.type === 'niveles') setNiveles(data.data.sort((a: string, b: string) => (NIVEL_ORDER.indexOf(a) === -1 ? 999 : NIVEL_ORDER.indexOf(a)) - (NIVEL_ORDER.indexOf(b) === -1 ? 999 : NIVEL_ORDER.indexOf(b)))) }); }, []);
+    useEffect(() => {
+        trackEvent({ eventName: 'page_view', module: 'evaluaciones' });
+        fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }).then(res => res.json()).then(data => { if (data.type === 'niveles') setNiveles(data.data.sort((a: string, b: string) => (NIVEL_ORDER.indexOf(a) === -1 ? 999 : NIVEL_ORDER.indexOf(a)) - (NIVEL_ORDER.indexOf(b) === -1 ? 999 : NIVEL_ORDER.indexOf(b)))) });
+    }, []);
 
     useEffect(() => {
         if (!config.grade) return;
         if (isManualSubject) return; // Si es manual, no reseteamos al cambiar curso
         setAsignaturas([]);
         setConfig(p => ({ ...p, subject: "" }));
-        fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: config.grade }) }).then(res => res.json()).then(data => data.type === 'asignaturas' && setAsignaturas(data.data));
+        fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: config.grade }) }).then(res => res.json()).then(data => data.type === 'asignaturas' && setAsignaturas(data.data));
     }, [config.grade, isManualSubject]);
 
     useEffect(() => {
         if (!config.grade || !config.subject) return;
         if (isManualSubject) return; // Si es manual, no buscamos OAs en BD
-        fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: config.grade, asignatura: config.subject }) }).then(res => res.json()).then(data => data.type === 'oas' && setOasDisponibles(data.data));
+        fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: config.grade, asignatura: config.subject }) }).then(res => res.json()).then(data => data.type === 'oas' && setOasDisponibles(data.data));
     }, [config.subject, isManualSubject]);
 
     const generarPrueba = async () => {
@@ -148,8 +167,18 @@ export default function GeneradorEvaluaciones() {
 
         setLoading(true);
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/generate-assessment", {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(config)
+            // Mapeo manual de campos (camelCase -> snake_case) si es necesario
+            const payload = {
+                ...config,
+                context_text: config.contextText,
+            };
+
+            // Debug para confirmar
+            if (payload.context_text) console.log("✅ Enviando contexto:", payload.context_text.substring(0, 50));
+            else console.log("⚠️ Contexto vacío en payload");
+
+            const res = await fetch(`${API_URL}/generate-assessment`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
             });
             if (!res.ok) {
                 const errData = await res.json();
@@ -158,6 +187,18 @@ export default function GeneradorEvaluaciones() {
             const data = await res.json();
             setResultado(data);
             setStep(3);
+
+            // Telemetry: Generation Success
+            trackEvent({
+                eventName: 'generation_success',
+                module: 'evaluaciones',
+                metadata: {
+                    level: config.grade,
+                    subject: config.subject,
+                    total_questions: Object.values(config.quantities).reduce((a, b) => a + b, 0)
+                }
+            });
+
             setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }), 500);
         } catch (e: any) { alert(`Error al generar: ${e.message}`); } finally { setLoading(false); }
     };
@@ -166,8 +207,18 @@ export default function GeneradorEvaluaciones() {
         if (!resultado) return;
         setDownloading(true);
         try {
-            const payload = { title: resultado.title, description: resultado.description, grade: config.grade, subject: config.subject, items: resultado.items };
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/export/evaluacion-docx", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+            // Adaptar para enviar la versión de alumno al exportador
+            const studentData = resultado.student_version || resultado; // Fallback
+            // INCLUIMOS PAUTA (teacher_guide) PARA QUE EL BACKEND LA RENDERICE AL FINAL
+            const payload = {
+                title: studentData.title,
+                description: studentData.description,
+                grade: config.grade,
+                subject: config.subject,
+                items: studentData.items,
+                teacher_guide: resultado.teacher_guide
+            };
+            const res = await fetch(`${API_URL}/export/evaluacion-docx`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
             if (res.ok) { const blob = await res.blob(); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Evaluacion_${config.subject}.docx`; document.body.appendChild(a); a.click(); a.remove(); }
         } catch (e) { alert("Error descarga"); } finally { setDownloading(false); }
     };
@@ -192,6 +243,16 @@ export default function GeneradorEvaluaciones() {
                         <div className="lg:col-span-7 space-y-6">
                             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                                 <h2 className="font-bold text-[#1a2e3b] mb-4 flex items-center gap-2"><FileText className="w-5 h-5" /> 1. Contexto Curricular</h2>
+
+                                {/* ZONA DE UPLOAD (NUEVO) */}
+                                <div className="mb-8">
+                                    <UploadZone onContextLoaded={(text, filename) => {
+                                        setConfig(prev => ({ ...prev, contextText: text }));
+                                        // Opcional: Podrías autocompletar la asignatura con el nombre del archivo
+                                        if (!config.subject) setConfig(prev => ({ ...prev, subject: filename.replace(".pdf", "") }));
+                                    }} />
+                                </div>
+
                                 <div className="space-y-4">
                                     <ModernSelect label="Nivel Educativo" value={config.grade} onChange={(v: string) => setConfig({ ...config, grade: v })} options={niveles.map(n => ({ value: n, label: n }))} />
 
@@ -238,6 +299,26 @@ export default function GeneradorEvaluaciones() {
                                     <ItemConfigRow label="Verdadero/Falso" quantity={config.quantities.true_false} points={config.points.true_false} onQtyChange={(v: number) => updateQty('true_false', v)} onPointsChange={(v: number) => updatePts('true_false', v)} />
                                     <ItemConfigRow label="Respuesta Breve" quantity={config.quantities.short_answer} points={config.points.short_answer} onQtyChange={(v: number) => updateQty('short_answer', v)} onPointsChange={(v: number) => updatePts('short_answer', v)} />
                                     <ItemConfigRow label="Desarrollo" quantity={config.quantities.essay} points={config.points.essay} onQtyChange={(v: number) => updateQty('essay', v)} onPointsChange={(v: number) => updatePts('essay', v)} />
+
+                                    {/* SELECTOR NÚMERO DE ALTERNATIVAS */}
+                                    <div className="pt-4 mt-2 border-t border-slate-100">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase">Alternativas por Pregunta</label>
+                                            <span className="text-sm font-bold text-[#1a2e3b] bg-slate-100 px-3 py-1 rounded-full">{config.num_alternatives}</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="3"
+                                            max="5"
+                                            step="1"
+                                            value={config.num_alternatives}
+                                            onChange={(e) => setConfig({ ...config, num_alternatives: parseInt(e.target.value) })}
+                                            className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-slate-200 accent-[#2b546e]"
+                                        />
+                                        <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                                            <span>3</span><span>4</span><span>5</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -285,33 +366,125 @@ export default function GeneradorEvaluaciones() {
 
                 {step === 3 && resultado && (
                     <div className="animate-in zoom-in-95 duration-500 max-w-4xl mx-auto">
-                        <div className="mb-6 flex justify-between items-center"><button onClick={() => setStep(2)} className="text-slate-400 hover:text-[#2b546e] flex items-center gap-2 font-bold transition-colors"><ArrowLeft size={20} /> Editar Objetivos</button><span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">Total: {totalPoints} puntos</span></div>
-                        <div className="bg-white p-10 rounded-xl shadow-lg border border-slate-200 mb-20">
-                            <div className="text-center border-b-2 border-slate-100 pb-6 mb-8"><h1 className="text-2xl font-bold text-slate-900 uppercase tracking-widest">{resultado.title}</h1><p className="text-slate-500 italic mt-2">{resultado.description}</p></div>
+                        <div className="mb-6 flex justify-between items-center">
+                            <button onClick={() => setStep(2)} className="text-slate-400 hover:text-[#2b546e] flex items-center gap-2 font-bold transition-colors"><ArrowLeft size={20} /> Editar Objetivos</button>
+
+                            {/* SWITCH DE PAUTA DOCENTE */}
+                            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
+                                <span className={cn("text-xs font-bold uppercase transition-colors", showTeacherGuide ? "text-[#1a2e3b]" : "text-slate-400")}>Pauta Docente</span>
+                                <button
+                                    onClick={() => setShowTeacherGuide(!showTeacherGuide)}
+                                    className={cn("w-12 h-6 rounded-full p-1 transition-colors relative", showTeacherGuide ? "bg-[#f2ae60]" : "bg-slate-200")}
+                                >
+                                    <div className={cn("w-4 h-4 rounded-full bg-white shadow-sm transition-transform", showTeacherGuide ? "translate-x-6" : "translate-x-0")} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-10 rounded-xl shadow-lg border border-slate-200 mb-20 relative overflow-hidden">
+                            {showTeacherGuide && (
+                                <div className="absolute top-0 right-0 bg-[#f2ae60] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-10">MODO DOCENTE</div>
+                            )}
+
+                            {/* CABECERA (Usamos student_version) */}
+                            <div className="text-center border-b-2 border-slate-100 pb-6 mb-8">
+                                <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-widest">{resultado.student_version?.title || resultado.title}</h1>
+                                <p className="text-slate-500 italic mt-2">{resultado.student_version?.description || resultado.description}</p>
+                            </div>
+
                             <div className="space-y-8">
-                                {resultado.items.map((item: any, i: number) => (
-                                    <div key={i} className="break-inside-avoid">
-                                        <div className="flex gap-2 mb-2"><span className="font-bold text-slate-900">{i + 1}.</span>
-                                            <div className="flex-1">
-                                                <div className="flex justify-between items-start"><p className="text-slate-800 font-medium text-lg leading-snug">{item.stem}</p><span className="text-xs font-bold text-slate-400 ml-4 whitespace-nowrap">({item.points} pts)</span></div>
-                                                {item.type === 'multiple_choice' && item.options && <div className="mt-3 space-y-2 ml-2">{item.options.map((opt: any, idx: number) => (<div key={idx} className="flex items-center gap-3"><div className="w-6 h-6 rounded-full border border-slate-400 flex items-center justify-center text-xs font-bold text-slate-500">{String.fromCharCode(97 + idx)}</div><span className="text-slate-700">{opt.text}</span></div>))}</div>}
-                                                {(item.type === 'essay' || item.type === 'short_answer') && <div className="mt-4 w-full h-24 border border-slate-200 rounded-lg bg-slate-50/50"></div>}
-                                                {item.type === 'true_false' && <div className="mt-2 text-slate-600 font-medium ml-4">_____ Verdadero &nbsp;&nbsp;&nbsp;&nbsp; _____ Falso</div>}
+                                {(resultado.student_version?.items || resultado.items).map((item: any, i: number) => {
+                                    const guide = resultado.teacher_guide ? findTeacherGuide(item.id, resultado.teacher_guide) : null;
+
+                                    return (
+                                        <div key={i} className="break-inside-avoid relative group">
+                                            <div className="flex gap-2 mb-2">
+                                                <span className="font-bold text-slate-900">{i + 1}.</span>
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-start">
+                                                        <p className="text-slate-800 font-medium text-lg leading-snug">{item.stem}</p>
+                                                        <span className="text-xs font-bold text-slate-400 ml-4 whitespace-nowrap">({item.points} pts)</span>
+                                                    </div>
+
+                                                    {item.type === 'multiple_choice' && item.options && (
+                                                        <div className="mt-3 space-y-2 ml-2">
+                                                            {item.options.map((opt: any, idx: number) => {
+                                                                const currentLetter = String.fromCharCode(65 + idx); // "A", "B"...
+                                                                // Lógica de Highlight: Si showTeacherGuide es true Y (la respuesta del guide empieza con la letra O el texto coincide)
+                                                                const isCorrect = showTeacherGuide && guide?.correct_answer && guide.correct_answer.startsWith(currentLetter);
+
+                                                                return (
+                                                                    <div key={idx} className={cn("flex items-center gap-3 p-2 rounded-lg transition-colors", isCorrect ? "bg-green-100 border border-green-200" : "")}>
+                                                                        <div className={cn("w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold", isCorrect ? "bg-green-500 text-white border-green-600" : "border-slate-400 text-slate-500")}>{String.fromCharCode(97 + idx)}</div>
+                                                                        <span className={cn(isCorrect ? "font-bold text-green-800" : "text-slate-700")}>{opt.text || opt}</span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+
+                                                    {(item.type === 'essay' || item.type === 'short_answer') && (
+                                                        <div className="mt-4 w-full h-24 border border-slate-200 rounded-lg bg-slate-50/50"></div>
+                                                    )}
+
+                                                    {item.type === 'true_false' && (
+                                                        <div className="mt-2 text-slate-600 font-medium ml-4">_____ Verdadero &nbsp;&nbsp;&nbsp;&nbsp; _____ Falso</div>
+                                                    )}
+
+                                                    {/* --- VISUALIZACIÓN DE PAUTA DOCENTE --- */}
+                                                    {showTeacherGuide && guide && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, height: 0 }}
+                                                            animate={{ opacity: 1, height: "auto" }}
+                                                            className="mt-4 bg-[#f2ae60]/10 border border-[#f2ae60]/30 rounded-lg p-4 text-sm"
+                                                        >
+                                                            <div className="flex gap-2 items-start">
+                                                                <span className="bg-[#f2ae60] text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 shrink-0">
+                                                                    <Sparkles size={10} /> PAUTA
+                                                                </span>
+                                                                <div className="space-y-2 w-full">
+                                                                    {guide.correct_answer && (
+                                                                        <div>
+                                                                            <strong className="text-[#1a2e3b] block text-xs uppercase mb-1">Respuesta Correcta:</strong>
+                                                                            <p className="text-[#1a2e3b] font-medium">{guide.correct_answer}</p>
+                                                                        </div>
+                                                                    )}
+                                                                    {guide.explanation && (
+                                                                        <div>
+                                                                            <strong className="text-[#1a2e3b] block text-xs uppercase mb-1">Justificación:</strong>
+                                                                            <p className="text-slate-600 italic">{guide.explanation}</p>
+                                                                        </div>
+                                                                    )}
+                                                                    {guide.rubric && (
+                                                                        <div>
+                                                                            <strong className="text-[#1a2e3b] block text-xs uppercase mb-1">Rúbrica Sugerida:</strong>
+                                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+                                                                                <div className="bg-green-50 p-2 rounded border border-green-100"><span className="text-[10px] font-bold text-green-700 block">LOGRADO</span><p className="text-xs text-green-800 leading-tight">{guide.rubric.logrado}</p></div>
+                                                                                <div className="bg-yellow-50 p-2 rounded border border-yellow-100"><span className="text-[10px] font-bold text-yellow-700 block">MEDIANAMENTE</span><p className="text-xs text-yellow-800 leading-tight">{guide.rubric.medianamente}</p></div>
+                                                                                <div className="bg-red-50 p-2 rounded border border-red-100"><span className="text-[10px] font-bold text-red-700 block">NO LOGRADO</span><p className="text-xs text-red-800 leading-tight">{guide.rubric.no_logrado}</p></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </div>
+                                                <div className="print:hidden"><span className={cn("text-[10px] font-bold px-2 py-1 rounded border", item.dok_level === 1 ? "bg-green-50 text-green-700 border-green-200" : item.dok_level === 2 ? "bg-yellow-50 text-yellow-700 border-yellow-200" : "bg-red-50 text-red-700 border-red-200")}>DOK {item.dok_level}</span></div>
                                             </div>
-                                            <div className="print:hidden"><span className={cn("text-[10px] font-bold px-2 py-1 rounded border", item.dok_level === 1 ? "bg-green-50 text-green-700 border-green-200" : item.dok_level === 2 ? "bg-yellow-50 text-yellow-700 border-yellow-200" : "bg-red-50 text-red-700 border-red-200")}>DOK {item.dok_level}</span></div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                         <div className="fixed bottom-8 right-8 flex gap-3 z-50">
                             {/* --- 2. AQUÍ INSERTAMOS EL BOTÓN GUARDAR --- */}
                             <BotonGuardar
                                 tipo="EVALUACION"
-                                titulo={resultado.title}
+                                titulo={resultado.student_version?.title || resultado.title}
                                 asignatura={config.subject}
                                 nivel={config.grade}
-                                contenido={{ ...config, ...resultado }} // Guardamos configuración y resultado
+                                contenido={{ ...config, ...resultado }} // Guardamos configuración y resultado completo
                             />
 
                             <button onClick={descargarWord} disabled={downloading} className="bg-[#2b546e] text-white px-6 py-3 rounded-full font-bold shadow-xl hover:bg-[#1a2e3b] flex items-center gap-2 transform hover:scale-105 transition-all">{downloading ? "Descargando..." : <><Download className="w-5 h-5" /> Descargar Word</>}</button>

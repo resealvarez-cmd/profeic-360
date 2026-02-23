@@ -6,6 +6,9 @@ import {
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/telemetry";
+
+import { supabase } from "@/lib/supabaseClient"; // <--- Import Supabase
 
 interface Message {
     role: "user" | "ai";
@@ -39,12 +42,27 @@ export default function MentorPage() {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
+    const [userName, setUserName] = useState("Colega"); // <--- Nuevo Estado
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    // EFECTO: Cargar nombre del usuario
+    useEffect(() => {
+        trackEvent({ eventName: 'page_view', module: 'mentor' });
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                // Leemos nombre del metadata o perfiles
+                const nombre = user.user_metadata?.full_name?.split(" ")[0] || "Profe";
+                setUserName(nombre);
+            }
+        };
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         if (textareaRef.current) {
@@ -66,13 +84,25 @@ export default function MentorPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/chat-mentor", {
+            const res = await fetch("http://localhost:8000/chat-mentor", { // Reemplazamos por localhost para probar (Ojo con la URL final)
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ history: newHistory })
+                body: JSON.stringify({
+                    history: newHistory,
+                    user_name: userName // <--- Enviamos el nombre
+                })
             });
             const data = await res.json();
             setMessages([...newHistory, { role: "ai", content: data.response }]);
+
+            // Telemetry: Generation Success (Mentor chat completion)
+            trackEvent({
+                eventName: 'generation_success',
+                module: 'mentor',
+                metadata: {
+                    chat_length: newHistory.length + 1
+                }
+            });
         } catch (e) {
             setMessages([...newHistory, { role: "ai", content: "Error de conexión. Intenta nuevamente." }]);
         } finally {

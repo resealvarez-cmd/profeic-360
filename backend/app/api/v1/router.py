@@ -1,7 +1,8 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import planificador, evaluacion, library
+from app.api.v1.endpoints import planificador, evaluacion, library, profile
 
 api_router = APIRouter()
 api_router.include_router(planificador.router, tags=["planificador"])
 api_router.include_router(evaluacion.router, tags=["evaluacion"])
 api_router.include_router(library.router, tags=["library"])
+api_router.include_router(profile.router, tags=["profile"])

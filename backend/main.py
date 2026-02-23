@@ -16,7 +16,14 @@ from routers import (
     nee, 
     login,
     analizador,
-    biblioteca    # <--- CRÍTICO: Tu nueva estantería
+    analizador,
+    biblioteca,   # <--- CRÍTICO: Tu nueva estantería
+    community,    # <--- FASE V: Mercado Interno
+    social,       # <--- FASE SOCIAL: Noticias y Likes
+    acompanamiento, 
+    lectura_inteligente,
+    telemetry,
+    admin
 )
 
 app = FastAPI(title="API ProfeIC", version="4.0.0")
@@ -24,7 +31,7 @@ app = FastAPI(title="API ProfeIC", version="4.0.0")
 # 2. SEGURIDAD (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +50,12 @@ app.include_router(nee.router)
 app.include_router(login.router)
 app.include_router(analizador.router)
 app.include_router(biblioteca.router)
+app.include_router(community.router) # <--- Public Market
+app.include_router(social.router)    # <--- Social Engine
+app.include_router(acompanamiento.router)
+app.include_router(lectura_inteligente.router)
+app.include_router(telemetry.router)
+app.include_router(admin.router)
 
 @app.get("/")
 def read_root():

@@ -1,5 +1,6 @@
 import io
 import os
+import pypdf
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -11,6 +12,32 @@ from pptx.dml.color import RGBColor as PptxRGB
 TEMPLATE_PPT = "formato ppt ia.pptx"
 LOGO_PATH = "logo.png"
 BLUE = RGBColor(26, 46, 59)
+
+# --- 0. FILE ENGINE (EXTRACTION) ---
+async def extract_text_from_pdf(file_content: bytes) -> str:
+    """
+    Extrae texto de un archivo PDF (bytes) usando pypdf.
+    Retorna el texto limpio.
+    """
+    try:
+        # Pypdf trabaja con streams
+        stream = io.BytesIO(file_content)
+        reader = pypdf.PdfReader(stream)
+        
+        text = []
+        for page in reader.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text.append(page_text)
+                
+        full_text = "\n".join(text)
+        
+        # Limpieza básica
+        return full_text.strip()
+        
+    except Exception as e:
+        print(f"❌ Error extrayendo PDF: {e}")
+        return "" # Retornamos vacío en caso de error para no romper el flujo, o podríamos relanzar.
 
 def add_header(doc, title):
     """Encabezado estándar"""

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
+from typing import Optional
 import os
 import json
 import google.generativeai as genai
@@ -56,16 +57,21 @@ async def auditar_instrumento(request: AnalisisRequest):
         )
 
         prompt = f"""
-        ACTÚA COMO: Auditor Pedagógico Forense (Taxonomía Webb DOK).
+        ACTÚA COMO: Coach Pedagógico Senior especializado en Taxonomía Webb (DOK).
+
+        INSTRUCCIONES DE CALIBRACIÓN (CASO JASNNA):
+        1. PRIORIDAD COGNITIVA: Evalúa la demanda cognitiva de la tarea (lo que debe hacer el cerebro del estudiante), NO la presencia de verbos específicos o palabras clave sofisticadas.
+        2. FLEXIBILIDAD SEMÁNTICA: Si el docente pide 'inferir', 'concluir' o 'relacionar', asume DOK 3 (Estratégico) aunque la redacción sea simple. NO seas pedante con la terminología académica ni actúes como un "policía de palabras".
+        3. TONO CONSTRUCTIVO: En lugar de decir 'Error: Nivel incorrecto', utiliza un lenguaje propositivo como 'Sugerencia: Para robustecer el DOK 3, podrías...'. Sé un aliado, no un juez auditor.
         
         INPUTS:
         1. OA: {request.objetivo_aprendizaje}
         2. Prueba: {request.texto_evaluacion}
         
         TAREA:
-        1. Identifica la ASIGNATURA y NIVEL probables (Ej: Matemática 8° Básico).
-        2. Escanea TODOS los reactivos. Clasifícalos como "Crítico" (si DOK ítem < DOK OA) o "Alineado".
-        3. Genera un "Ejemplo de Excelencia": Crea UNA pregunta modelo DOK 3 perfecta para este tema específico.
+        1. Identifica la ASIGNATURA y NIVEL probables.
+        2. Escanea los reactivos. Clasifica como "Alineado" o "Mejorable" (evita "Crítico" a menos que sea muy bajo).
+        3. Genera un "Ejemplo de Excelencia": Crea UNA pregunta modelo DOK 3 perfecta.
         
         FORMATO JSON (ESTRICTO):
         {{
@@ -122,40 +128,48 @@ async def auditar_instrumento(request: AnalisisRequest):
 
 # --- ENDPOINT 2: GUARDAR (CONECTADO A DB) ---
 @router.post("/save")
-async def guardar_en_biblioteca(data: GuardarAnalisisRequest):
+async def guardar_analisis(request: GuardarAnalisisRequest, authorization: Optional[str] = Header(None)):
     if not supabase:
-        raise HTTPException(status_code=500, detail="Base de datos no configurada.")
+        raise HTTPException(status_code=503, detail="Base de datos no disponible")
 
     try:
-        print(f"💾 Guardando análisis en biblioteca...")
+        user_id = request.user_id
+        author_name = "Profe IC"
 
-        # 1. Extraer metadatos
-        metadata = data.resultado_analisis.get("metadata", {})
-        asignatura = metadata.get("asignatura_detectada", "General")
-        nivel = metadata.get("nivel_detectado", "No especificado")
+        # Validar usuario real si viene token
+        if authorization:
+            token = authorization.replace("Bearer ", "")
+            user_response = supabase.auth.get_user(token)
+            if user_response and user_response.user:
+                user_id = user_response.user.id
+                # Fetch profile name
+                try:
+                    profile = supabase.table("profiles").select("full_name").eq("id", user_id).single().execute()
+                    if profile.data and profile.data.get("full_name"):
+                        author_name = profile.data["full_name"]
+                except Exception as e:
+                    print(f"⚠️ Error fetching profile: {e}")
         
-        titulo = f"Auditoría: {asignatura}"
-        if nivel != "No especificado":
-            titulo += f" ({nivel})"
-
-        # 2. Preparar registro
-        registro = {
-            "user_id": data.user_id,
+        # Preparar data
+        data = {
+            "user_id": user_id,
             "tipo": "AUDITORIA",
-            "titulo": titulo,
-            "asignatura": asignatura,
-            "nivel": nivel,
-            "contenido": data.resultado_analisis 
+            "titulo": f"Auditoría: {request.resultado_analisis.get('metadata', {}).get('asignatura_detectada', 'General')}",
+            "asignatura": request.resultado_analisis.get('metadata', {}).get('asignatura_detectada'),
+            "nivel": request.resultado_analisis.get('metadata', {}).get('nivel_detectado'),
+            "contenido": request.resultado_analisis,
+            "is_public": False,
+            "author_name": author_name
         }
 
-        # 3. Insertar
-        response = supabase.table("biblioteca_recursos").insert(registro).execute()
+        # Insertar
+        res = supabase.table("biblioteca_recursos").insert(data).execute()
         
-        if response.data:
-            return {"status": "success", "id": response.data[0]['id']}
+        if res.data:
+            return {"success": True, "id": res.data[0]['id']}
         else:
-            raise Exception("Error al insertar en Supabase")
+            raise HTTPException(status_code=500, detail="Error al guardar en Supabase")
 
     except Exception as e:
-        print(f"❌ Error DB: {str(e)}")
+        print(f"Error saving: {e}")
         raise HTTPException(status_code=500, detail=str(e))

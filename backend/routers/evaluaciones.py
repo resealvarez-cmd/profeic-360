@@ -50,9 +50,12 @@ class AssessmentConfig(BaseModel):
     subject: str
     oaIds: List[Union[str, int]] 
     customOa: str
+    context_text: Optional[str] = None # <--- RAG CTX
     dokDistribution: DokDistribution
     quantities: Quantities
+    quantities: Quantities
     points: PointsPerType 
+    num_alternatives: Optional[int] = 4 # Default 4 
 
 # --- LIMPIEZA JSON ---
 def limpiar_json(texto):
@@ -88,8 +91,25 @@ async def generate_assessment(config: AssessmentConfig):
             (config.quantities.essay * config.points.essay)
         )
 
+        # PREPARAR BLOQUE DE CONTEXTO ESTRICTO
+        strict_block = ""
+        if config.context_text:
+            strict_block = f"""
+        === REGLA DE ORO (MODO ESTRICTO) ===
+        Tienes PROHIBIDO utilizar tu conocimiento general para responder las preguntas de contenido.
+        Debes actuar como si SOLO supieras lo que está escrito en el texto proporcionado abajo.
+        Si la respuesta a una pregunta no aparece explícitamente en el texto, NO la inventes.
+        ====================================
+
+        TEXTO DE REFERENCIA (FUENTE ÚNICA DE VERDAD):
+        {config.context_text}
+        =============================================
+            """
+
         # PROMPT ENRIQUECIDO CON CONTEXTO LOCAL
         prompt = f"""
+        {strict_block}
+
         ROL: Experto en Evaluación Educativa del Mineduc (Chile).
         TAREA: Crear una PRUEBA SUMATIVA rigurosa (Total: {total_pts} pts).
         
@@ -101,7 +121,8 @@ async def generate_assessment(config: AssessmentConfig):
         - Objetivos (IDs/Textos): {oas_texto}
         
         ESTRUCTURA OBLIGATORIA:
-        1. Selección Múltiple: {config.quantities.multiple_choice} preguntas ({config.points.multiple_choice} pts c/u).
+        ESTRUCTURA OBLIGATORIA:
+        1. Selección Múltiple: {config.quantities.multiple_choice} preguntas ({config.points.multiple_choice} pts c/u). Cada una con EXACTAMENTE {config.num_alternatives} alternativas.
         2. Verdadero/Falso: {config.quantities.true_false} preguntas ({config.points.true_false} pts c/u).
         3. Respuesta Breve: {config.quantities.short_answer} preguntas ({config.points.short_answer} pts c/u).
         4. Desarrollo: {config.quantities.essay} preguntas ({config.points.essay} pts c/u).
@@ -113,27 +134,44 @@ async def generate_assessment(config: AssessmentConfig):
 
         FORMATO JSON DE RESPUESTA:
         {{
-            "title": "Título Formal (Incluir 'Evaluación Sumativa')",
-            "description": "Instrucciones generales para el estudiante.",
-            "items": [
-                {{
-                    "type": "multiple_choice",
-                    "dok_level": 1,
-                    "points": {config.points.multiple_choice}, 
-                    "stem": "¿Pregunta contextualizada?",
-                    "options": [
-                        {{"text": "Distractor A", "correct": false}},
-                        {{"text": "Respuesta Correcta B", "correct": true}}
-                    ]
-                }},
-                {{
-                    "type": "essay",
-                    "dok_level": 3,
-                    "points": {config.points.essay},
-                    "stem": "Pregunta de desarrollo profundo...",
-                    "rubric_hint": "Criterios de corrección..."
-                }}
-            ]
+            "student_version": {{
+                "title": "Título de la Prueba",
+                "description": "Instrucciones...",
+                "items": [
+                    {{
+                        "id": 1,
+                        "type": "multiple_choice",
+                        "dok_level": 1,
+                        "points": {config.points.multiple_choice},
+                        "stem": "Pregunta...",
+                        "options": ["A) Opción 1", "B) Opción 2"]
+                    }},
+                     {{
+                        "id": 2,
+                        "type": "essay",
+                        "dok_level": 3,
+                        "points": {config.points.essay},
+                        "stem": "Pregunta de desarrollo..."
+                    }}
+                ]
+            }},
+            "teacher_guide": {{
+                "answers": [
+                    {{
+                        "related_item_id": 1,
+                        "correct_answer": "A) Opción 1",
+                        "explanation": "Justificación basada en el texto..."
+                    }},
+                    {{
+                        "related_item_id": 2,
+                        "rubric": {{
+                            "logrado": "Describe correctamente...",
+                            "medianamente": "Menciona parcialmente...",
+                            "no_logrado": "No menciona..."
+                        }}
+                    }}
+                ]
+            }}
         }}
         """
 
