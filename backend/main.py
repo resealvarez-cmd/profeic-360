@@ -1,6 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import os
+
+# --- PREVENCIÓN DE CRASHES EN CLOUD RUN ---
+# Si Cloud Run arranca pero faltan variables (ej. error de tipeo en la consola),
+# esto evita que la aplicación entera colapse al importar Supabase en los routers.
+if not os.getenv("SUPABASE_URL"):
+    os.environ["SUPABASE_URL"] = "https://falsesupabase.supabase.co"
+if not os.getenv("SUPABASE_KEY"):
+    os.environ["SUPABASE_KEY"] = "false_anon_key"
+if not os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
+    os.environ["SUPABASE_SERVICE_ROLE_KEY"] = "false_role_key"
+if not os.getenv("GOOGLE_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = "false_gemini_key"
 
 # 1. IMPORTAMOS TUS ROUTERS
 # (Basado en el árbol de archivos que me mostraste, TIENES TODOS ESTOS)
