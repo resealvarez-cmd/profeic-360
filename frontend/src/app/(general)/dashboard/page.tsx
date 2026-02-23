@@ -147,13 +147,15 @@ export default function Dashboard() {
         fetchDashboardData();
     }, []);
 
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
     const handleGenerateTrajectory = async () => {
         setLoadingTrajectory(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const response = await fetch('http://127.0.0.1:8000/acompanamiento/trajectory-report', {
+            const response = await fetch(`${API_URL}/acompanamiento/trajectory-report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ teacher_id: user.id })
@@ -177,7 +179,7 @@ export default function Dashboard() {
     const handleGenerateExecutive = async () => {
         setLoadingExecutive(true);
         try {
-            const response = await fetch('http://127.0.0.1:8000/acompanamiento/executive-report', {
+            const response = await fetch(`${API_URL}/acompanamiento/executive-report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({})

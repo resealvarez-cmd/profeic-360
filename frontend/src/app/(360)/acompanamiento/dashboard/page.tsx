@@ -45,6 +45,8 @@ export default function Dashboard360() {
     // DASHBOARD REFINEMENTS
     const [showSuperAdminPanel, setShowSuperAdminPanel] = useState(false);
 
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
     const handleGenerateExecutive = async () => {
         setLoadingExecutive(true);
         setShowConfigModal(false); // Close config, start loading
@@ -56,7 +58,7 @@ export default function Dashboard360() {
                 age_range: filterAge || null
             };
 
-            const response = await fetch('http://127.0.0.1:8000/acompanamiento/executive-report', {
+            const response = await fetch(`${API_URL}/acompanamiento/executive-report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -86,7 +88,7 @@ export default function Dashboard360() {
         setTeacherDetailData(null); // Reset prev data
         try {
             const body = { teacher_id: teacherId };
-            const response = await fetch('http://127.0.0.1:8000/acompanamiento/trajectory-report', {
+            const response = await fetch(`${API_URL}/acompanamiento/trajectory-report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -266,7 +268,7 @@ export default function Dashboard360() {
             const fetchMetrics = async () => {
                 setLoadingMetrics(true);
                 try {
-                    const res = await fetch('http://127.0.0.1:8000/acompanamiento/executive-metrics', {
+                    const res = await fetch(`${API_URL}/acompanamiento/executive-metrics`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
