@@ -23,9 +23,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # 4. Copiamos todo el código fuente del backend
 COPY . .
 
-# Cloud Run lee la variable de entorno $PORT (por defecto 8080)
+# Cloud Run usa el puerto 8080 por defecto
 ENV PORT=8080
-EXPOSE $PORT
+EXPOSE 8080
 
-# 5. Comando de arranque maestro
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
+# 5. Comando de arranque maestro adaptado para Cloud Run sin variables conflictivas de shell
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
