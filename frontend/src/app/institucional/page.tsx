@@ -48,24 +48,28 @@ export default function InstitucionalPage() {
                             <span className="text-sm font-bold text-slate-400">/Mes</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                1 Docente (Personal).
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">1 Docente (Personal).</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Acceso a herramientas de Aula IA genéricas.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Aula IA: Planificador DUA y Generador de Rúbricas.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Planificador y Generador de Rúbricas.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Elevador Cognitivo y Analizador de Evaluaciones.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-500 line-through opacity-70 align-top">
-                                <CheckCircle2 className="w-5 h-5 text-slate-300 shrink-0" />
-                                Sin ADN pedagógico institucional.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Asistente NEE (Adecuaciones) y Lectura Inteligente.</span>
+                            </li>
+                            <li className="flex gap-3 text-sm text-slate-500 line-through opacity-70 items-start">
+                                <CheckCircle2 className="w-5 h-5 text-slate-300 shrink-0 mt-0.5" />
+                                <span className="flex-1">Integración del Modelo Pedagógico del Colegio.</span>
                             </li>
                         </ul>
-                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud - Plan Individual" className="w-full py-4 text-center rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud - Plan Individual" className="w-full py-4 text-center rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors mt-auto">
                             Suscribirme
                         </a>
                     </div>
@@ -79,24 +83,24 @@ export default function InstitucionalPage() {
                             <span className="text-sm font-bold text-slate-400">/Mes</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Hasta 20 docentes inscritos.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Hasta 20 docentes inscritos.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Plataforma ProfeIC completa.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Plataforma ProfeIC completa.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Planificador DUA, Elevador Cognitivo, Analizador Forense.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Planificador DUA, Elevador Cognitivo, Analizador de Evaluaciones.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-500 line-through opacity-70 align-top">
-                                <CheckCircle2 className="w-5 h-5 text-slate-300 shrink-0" />
-                                Panel de Acompañamiento 360° para Directivos.
+                            <li className="flex gap-3 text-sm text-slate-500 line-through opacity-70 items-start">
+                                <CheckCircle2 className="w-5 h-5 text-slate-300 shrink-0 mt-0.5" />
+                                <span className="flex-1">Panel de Acompañamiento 360° para Directivos.</span>
                             </li>
                         </ul>
-                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud Demo - Plan Básico" className="w-full py-4 text-center rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud Demo - Plan Básico" className="w-full py-4 text-center rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors mt-auto">
                             Cotizar Básico
                         </a>
                     </div>
@@ -115,20 +119,20 @@ export default function InstitucionalPage() {
                             <span className="text-sm font-bold text-blue-200/50">/Mes</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex gap-3 text-sm text-blue-100 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />
-                                Hasta 60 docentes inscritos.
+                            <li className="flex gap-3 text-sm text-blue-100 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+                                <span className="flex-1">Hasta 60 docentes inscritos.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-blue-100 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />
-                                Integración del Modelo y Sello del Colegio en todas las inteligencias.
+                            <li className="flex gap-3 text-sm text-blue-100 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+                                <span className="flex-1">Integración del Modelo y Sello del Colegio en todas las inteligencias.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-blue-100 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />
-                                Todo ProfeIC <strong>+ Panel Acompañamiento 360° para Directivos</strong> (Observaciones y Analytics).
+                            <li className="flex gap-3 text-sm text-blue-100 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+                                <span className="flex-1">Todo ProfeIC <strong>+ Panel Acompañamiento 360° para Directivos</strong> (Observaciones y Analytics).</span>
                             </li>
                         </ul>
-                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud Demo - Plan Institucional" className="w-full py-3 text-center rounded-xl font-black bg-white text-[#1B3C73] hover:bg-orange-50 hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud Demo - Plan Institucional" className="w-full py-4 text-center rounded-xl font-black bg-white text-[#1B3C73] hover:bg-orange-50 hover:shadow-lg transition-all flex items-center justify-center gap-2 mt-auto">
                             Agendar Demo <Zap className="w-4 h-4 text-orange-500" />
                         </a>
                     </div>
@@ -141,21 +145,21 @@ export default function InstitucionalPage() {
                             <span className="text-3xl font-black text-slate-900">A Medida</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Docentes ilimitados.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Docentes ilimitados.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Configuración Multi-Sede (Jerarquía por colegio).
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Configuración Multi-Sede (Jerarquía por colegio).</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Soporte Prioritario Dedicado.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Soporte Prioritario Dedicado.</span>
                             </li>
-                            <li className="flex gap-3 text-sm text-slate-600 font-medium align-top">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                Capacitación Onboarding.
+                            <li className="flex gap-3 text-sm text-slate-600 font-medium items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                <span className="flex-1">Capacitación Onboarding.</span>
                             </li>
                         </ul>
                         <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud Demo - Plan Enterprise" className="w-full py-4 text-center rounded-xl font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors">
