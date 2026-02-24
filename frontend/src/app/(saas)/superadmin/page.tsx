@@ -74,6 +74,36 @@ export default function SuperAdminDashboard() {
         }
     };
 
+    const handleUpdateSchoolPlan = async (schoolId: string, newPlan: string) => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("No hay sesión activa");
+
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const response = await fetch(`${BE_URL}/admin/school-plan`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    school_id: schoolId,
+                    subscription_plan: newPlan
+                })
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || "Error al actualizar plan");
+            }
+
+            toast.success("Plan actualizado. Aplicando cambios...");
+            await fetchSchools();
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    };
+
     const handleInviteUser = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inviteEmail || !inviteSchoolId) return;
@@ -87,6 +117,8 @@ export default function SuperAdminDashboard() {
             // We call our FastAPI backend instead of the JS SDK directly 
             // because we need the Service Role Key to invite dynamically.
             const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const isIndividual = inviteSchoolId === "independiente";
+
             const response = await fetch(`${BE_URL}/admin/invite`, {
                 method: "POST",
                 headers: {
@@ -95,8 +127,9 @@ export default function SuperAdminDashboard() {
                 },
                 body: JSON.stringify({
                     email: inviteEmail,
-                    school_id: inviteSchoolId,
-                    role: inviteRole
+                    school_id: isIndividual ? null : inviteSchoolId,
+                    role: inviteRole,
+                    individual_plan_active: isIndividual
                 })
             });
 
@@ -189,7 +222,21 @@ export default function SuperAdminDashboard() {
                                             {school.status}
                                         </span>
                                     </h3>
-                                    <p className="text-xs text-slate-500 mt-1">Slug: {school.slug} | Plan: {school.subscription_plan} | Max Users: {school.max_users}</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <select
+                                            value={school.subscription_plan}
+                                            onChange={(e) => handleUpdateSchoolPlan(school.id, e.target.value)}
+                                            className="bg-slate-800 border border-slate-600 outline-none text-xs px-2 py-1 rounded text-slate-300 focus:border-[#C87533] cursor-pointer"
+                                        >
+                                            <option value="trial">Trial</option>
+                                            <option value="basic">Básico</option>
+                                            <option value="pro">Pro (360°)</option>
+                                            <option value="enterprise">Enterprise</option>
+                                        </select>
+                                        <span className="text-xs text-slate-500">
+                                            | Cupos: {school.max_users} | Slug: {school.slug}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="text-right flex flex-col items-end gap-1">
                                     <p className="text-sm font-mono text-slate-400 text-xs">{school.id.substring(0, 8)}...</p>
@@ -213,15 +260,16 @@ export default function SuperAdminDashboard() {
 
                     <form onSubmit={handleInviteUser} className="space-y-5">
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Colegio (Tenant)</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Colegio (Tenant) o Independiente</label>
                             <select
                                 value={inviteSchoolId}
                                 onChange={(e) => setInviteSchoolId(e.target.value)}
                                 className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#C87533] outline-none"
                                 required
                             >
+                                <option value="independiente">👤 Profesor Independiente (Suscripción $12k)</option>
                                 {schools.map((school) => (
-                                    <option key={school.id} value={school.id}>{school.name}</option>
+                                    <option key={school.id} value={school.id}>🏫 {school.name}</option>
                                 ))}
                             </select>
                         </div>
