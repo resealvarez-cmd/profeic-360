@@ -33,6 +33,8 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
     const [isTransitioningTo360, setIsTransitioningTo360] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [individualPlan, setIndividualPlan] = useState(false);
+    const [schoolPlan, setSchoolPlan] = useState("basic");
 
     useEffect(() => {
         const checkSession = async () => {
@@ -48,6 +50,19 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
 
                 const role = meta?.role || localStorage.getItem("preferred_role") || "director";
                 setUserRole(role);
+
+                // Load plan info to control feature access
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('individual_plan_active, schools(plan_type, subscription_plan)')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profileData) {
+                    setIndividualPlan(profileData.individual_plan_active || false);
+                    const schoolData = Array.isArray(profileData.schools) ? profileData.schools[0] : profileData.schools;
+                    setSchoolPlan((schoolData as any)?.subscription_plan || (schoolData as any)?.plan_type || "basic");
+                }
 
                 // Load collapsed preference
                 const storedPref = localStorage.getItem("sidebar_collapsed");
@@ -177,11 +192,14 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
                     <NavItem href="/mentor" icon={ChatBubbleLeftRightIcon} label="ChatBot Mentor" />
                     <NavItem href="/elevador" icon={TrendingUpIcon} label="Elevador Cognitivo" />
                     <NavItem href="/nee" icon={PuzzlePieceIcon} label="Asistente NEE" />
-                    <NavItem href="/comunidad" icon={GlobeAltIcon} label="Sala de Profesores" />
+
+                    {!individualPlan && (
+                        <NavItem href="/comunidad" icon={GlobeAltIcon} label="Sala de Profesores" />
+                    )}
                 </nav>
 
                 <div className="p-4 border-t border-gray-100 space-y-2">
-                    {["admin", "director", "utp"].includes(userRole) && (
+                    {["admin", "director", "utp"].includes(userRole) && !individualPlan && ['pro', 'enterprise'].includes(schoolPlan) && (
                         <a
                             href="/acompanamiento/dashboard"
                             onClick={handleGoTo360}
