@@ -175,7 +175,7 @@ export default function AnalizadorPage() {
                 </div>
             </div>
 
-            <div className="max-w-[1600px] mx-auto flex gap-6 items-start transition-all duration-500">
+            <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 items-start transition-all duration-500">
 
                 {/* --- COLUMNA INPUTS --- */}
                 <div className={cn(
