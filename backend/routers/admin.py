@@ -42,12 +42,12 @@ async def verify_super_admin(authorization: str = Header(...)):
     try:
         token = authorization.split("Bearer ")[1]
         
-        # Ojo: aquí usamos un cliente normal temporal solo para verificar el token de quien llama
-        from lib.supabase_client import get_supabase_client
-        supabase = get_supabase_client()
+        # Validar el token usando un cliente limpio de fastapi request 
+        anon_key = os.getenv("SUPABASE_ANON_KEY") or os.getenv("SUPABASE_KEY")
+        supabase_anon = create_client(SUPABASE_URL, anon_key)
         
-        user_response = supabase.auth.get_user(token)
-        if not user_response or not user_response.user:
+        user_response = supabase_anon.auth.get_user(token)
+        if not user_response or not hasattr(user_response, 'user') or not user_response.user:
             raise HTTPException(status_code=401, detail="Token inválido")
             
         email = user_response.user.email
