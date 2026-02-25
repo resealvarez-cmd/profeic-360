@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Logo } from "@/components/Logo";
-import { Loader2, Server, LogOut } from "lucide-react";
+import { Loader2, Server, LogOut, LayoutDashboard, Sparkles } from "lucide-react";
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
     const [authorized, setAuthorized] = useState(false);
@@ -60,11 +60,21 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                     </div>
 
                     <nav className="p-4 space-y-2">
-                        <div className="flex items-center gap-3 px-4 py-3 bg-[#C87533]/20 text-[#C87533] border border-[#C87533]/30 rounded-xl font-bold text-sm">
+                        <div className="flex items-center gap-3 px-4 py-3 bg-[#C87533]/20 text-[#C87533] border border-[#C87533]/30 rounded-xl font-bold text-sm mb-4">
                             <Server size={20} />
                             Tenants & Escuelas
                         </div>
-                        {/* More admin tools can be added here */}
+
+                        <div className="pt-4 border-t border-slate-800 space-y-2">
+                            <button onClick={() => router.push('/home')} className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-all text-sm font-medium">
+                                <LayoutDashboard size={18} />
+                                Volver a ProfeIC
+                            </button>
+                            <button onClick={() => router.push('/acompanamiento/dashboard')} className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-all text-sm font-medium">
+                                <Sparkles size={18} />
+                                Volver a Gestión 360°
+                            </button>
+                        </div>
                     </nav>
                 </div>
 
