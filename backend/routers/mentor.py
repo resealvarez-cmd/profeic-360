@@ -28,8 +28,11 @@ supabase_key = os.getenv("SUPABASE_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 
-# Cliente de Supabase
-supabase: Client = create_client(supabase_url, supabase_key)
+if not supabase_url or not supabase_key:
+    print("⚠️ Advertencia: Falta SUPABASE_URL o SUPABASE_KEY. El servidor iniciará, pero este módulo fallará.")
+    supabase = None
+else:
+    supabase: Client = create_client(supabase_url, supabase_key)
 
 # --- MODELOS DE DATOS ---
 class ChatMessage(BaseModel):

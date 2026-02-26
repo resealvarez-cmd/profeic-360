@@ -66,7 +66,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                         </div>
 
                         <div className="pt-4 border-t border-slate-800 space-y-2">
-                            <button onClick={() => router.push('/home')} className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-all text-sm font-medium">
+                            <button onClick={() => router.push('/dashboard')} className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-all text-sm font-medium">
                                 <LayoutDashboard size={18} />
                                 Volver a ProfeIC
                             </button>

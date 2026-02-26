@@ -1371,30 +1371,42 @@ function DashboardContent({
 
                         {/* WIDGET 3: AI INSIGHT & DOCENTES SEMÁFORO */}
                         <div className="lg:col-span-2 flex flex-col gap-6">
-                            {/* AI INSIGHT */}
-                            <div className="bg-gradient-to-br from-[#1B3C73] to-[#2A59A8] p-6 rounded-3xl shadow-xl text-white relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-6 opacity-10">
+                            {/* AI INSIGHT COLLAPSIBLE*/}
+                            <div className="bg-gradient-to-br from-[#1B3C73] to-[#2A59A8] p-6 rounded-3xl shadow-xl text-white relative transition-all duration-300">
+                                <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
                                     <BrainCircuit size={150} />
                                 </div>
                                 <div className="relative z-10">
-                                    <div className="flex items-center gap-2 mb-4 text-[#C87533]">
-                                        <BrainCircuit size={20} />
-                                        <span className="font-bold text-xs uppercase tracking-widest">Insight Directivo (IA)</span>
-                                    </div>
-                                    <p className="text-lg font-light leading-relaxed mb-4">
-                                        {userRole === 'teacher'
-                                            ? '"Tu práctica destaca en el Modelamiento, pero podrías potenciar el Cierre de Clase. Conoce estrategias prácticas aquí."'
-                                            : latestInsight
-                                                ? `"${latestInsight.systemic_summary}"`
-                                                : '"Genera tu primer Reporte Ejecutivo para ver insights en tiempo real aquí."'
-                                        }
-                                    </p>
-                                    <button
-                                        onClick={() => setShowInsightDrawer(true)}
-                                        disabled={!latestInsight && userRole !== 'teacher'}
-                                        className="text-xs font-bold text-[#C87533] hover:text-white transition-colors flex items-center gap-1 group disabled:opacity-50">
-                                        VER DETALLE DE ANÁLISIS <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                    <details className="group">
+                                        <summary className="cursor-pointer list-none flex items-center justify-between outline-none">
+                                            <div className="flex items-center gap-2 text-[#C87533] hover:text-[#f2ae60] transition-colors">
+                                                <BrainCircuit size={20} />
+                                                <span className="font-bold text-xs uppercase tracking-widest">
+                                                    {userRole === 'teacher' ? 'Feedback de Práctica (IA)' : 'Análisis Sistémico Extendido (IA)'}
+                                                </span>
+                                            </div>
+                                            <ChevronDown size={18} className="text-[#C87533] group-open:rotate-180 transition-transform duration-300" />
+                                        </summary>
+                                        <div className="mt-5 animate-in slide-in-from-top-2 fade-in duration-300">
+                                            <p className="text-sm font-light leading-relaxed mb-4 text-blue-50/90 whitespace-pre-wrap max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                                {userRole === 'teacher'
+                                                    ? '"Tu práctica destaca en el Modelamiento, pero podrías potenciar el Cierre de Clase. Conoce estrategias prácticas aquí."'
+                                                    : latestInsight
+                                                        ? latestInsight.systemic_summary
+                                                        : '"Genera tu primer Reporte Ejecutivo para ver insights en tiempo real aquí."'
+                                                }
+                                            </p>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setShowInsightDrawer(true);
+                                                }}
+                                                disabled={!latestInsight && userRole !== 'teacher'}
+                                                className="text-xs font-bold text-[#C87533] hover:text-white transition-colors flex items-center gap-1 group/btn disabled:opacity-50">
+                                                VER DETALLE DE ANÁLISIS <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                                            </button>
+                                        </div>
+                                    </details>
                                 </div>
                             </div>
 
