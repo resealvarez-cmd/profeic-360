@@ -84,7 +84,8 @@ export default function MentorPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:8000/chat-mentor", { // Reemplazamos por localhost para probar (Ojo con la URL final)
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const res = await fetch(`${API_URL}/chat-mentor`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
