@@ -180,10 +180,10 @@ export default function Dashboard360() {
                 }
             }
 
-            // Fetch Users Map
-            const { data: usersList } = await supabase.from('authorized_users').select('id, full_name, role');
+            // Fetch Users Map from profiles
+            const { data: usersList } = await supabase.from('profiles').select('id, full_name, email, role');
             const uMap: Record<string, string> = {};
-            usersList?.forEach(u => { if (u.id) uMap[u.id] = u.full_name });
+            usersList?.forEach(u => { if (u.id) uMap[u.id] = u.full_name || u.email });
             setUsersMap(uMap);
             setAllUsers(usersList || []);
 
@@ -657,8 +657,8 @@ export default function Dashboard360() {
                                     onChange={(e) => setNewCycleTeacherId(e.target.value)}
                                 >
                                     <option value="">Seleccionar Docente...</option>
-                                    {allUsers.filter((u: any) => u.role !== 'admin').map((u: any) => (
-                                        <option key={u.id} value={u.id}>{u.full_name || u.id}</option>
+                                    {allUsers.filter((u: any) => u.role !== 'superadmin').map((u: any) => (
+                                        <option key={u.id} value={u.id}>{u.full_name || u.email}</option>
                                     ))}
                                 </select>
                             </div>
@@ -1311,7 +1311,7 @@ function DashboardContent({
                                                     onClick={() => handleViewTeacherDetail(cycle.teacher_id)}
                                                     className="font-bold text-[#1B3C73] text-left hover:underline focus:outline-none"
                                                 >
-                                                    Observación Docente
+                                                    {usersMap[cycle.teacher_id] || 'Docente Observado'}
                                                 </button>
                                                 <div className="text-xs text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</div>
                                             </td>
@@ -1472,7 +1472,7 @@ function DashboardContent({
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-2 h-2 rounded-full ${cycle.status === 'completed' ? 'bg-green-500' : 'bg-[#C87533]'}`}></div>
                                                         <div>
-                                                            <p className="font-bold text-sm text-[#1B3C73]">Observación Docente</p>
+                                                            <p className="font-bold text-sm text-[#1B3C73]">{usersMap[cycle.teacher_id] || 'Docente Observado'}</p>
                                                             <p className="text-xs text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</p>
                                                         </div>
                                                     </div>
