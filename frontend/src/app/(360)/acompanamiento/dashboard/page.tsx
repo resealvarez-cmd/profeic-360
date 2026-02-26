@@ -899,7 +899,8 @@ function DashboardContent({
                                             onClick={async () => {
                                                 const toastId = toast.loading("Generando documento...");
                                                 try {
-                                                    const res = await fetch('http://127.0.0.1:8000/export/executive-docx', {
+                                                    const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+                                                    const res = await fetch(`${BE_URL}/export/executive-docx`, {
                                                         method: 'POST',
                                                         headers: { 'Content-Type': 'application/json' },
                                                         body: JSON.stringify(latestInsight)
@@ -1037,7 +1038,8 @@ function DashboardContent({
                                                     },
                                                     highlights: executiveData.metrics?.highlights
                                                 };
-                                                const res = await fetch('http://127.0.0.1:8000/export/executive-docx', {
+                                                const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+                                                const res = await fetch(`${BE_URL}/export/executive-docx`, {
                                                     method: 'POST',
                                                     headers: { 'Content-Type': 'application/json' },
                                                     body: JSON.stringify(body)
