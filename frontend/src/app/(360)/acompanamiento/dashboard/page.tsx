@@ -24,6 +24,11 @@ export default function Dashboard360() {
     const [userName, setUserName] = useState<string>("");
     const [showInsightDrawer, setShowInsightDrawer] = useState(false);
 
+    // NEW OBSERVATION CYCLE STATE
+    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [showNewCycleModal, setShowNewCycleModal] = useState(false);
+    const [newCycleTeacherId, setNewCycleTeacherId] = useState("");
+
     // EXECUTIVE REPORT STATE
     const [showExecutiveModal, setShowExecutiveModal] = useState(false);
     const [showConfigModal, setShowConfigModal] = useState(false); // New Config Modal
@@ -176,10 +181,11 @@ export default function Dashboard360() {
             }
 
             // Fetch Users Map
-            const { data: usersList } = await supabase.from('authorized_users').select('id, full_name');
+            const { data: usersList } = await supabase.from('authorized_users').select('id, full_name, role');
             const uMap: Record<string, string> = {};
             usersList?.forEach(u => { if (u.id) uMap[u.id] = u.full_name });
             setUsersMap(uMap);
+            setAllUsers(usersList || []);
 
             try {
                 const { data: latestReport } = await supabase
@@ -227,30 +233,28 @@ export default function Dashboard360() {
     }, []);
 
     const handleNewCycle = async () => {
-        console.log("handleNewCycle initiated");
+        if (!newCycleTeacherId) {
+            toast.error("Selecciona un docente para observar.");
+            return;
+        }
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            console.log("Current User:", user);
 
             if (!user) {
-                console.warn("No user found, redirecting to login");
                 return router.push('/login');
             }
 
-            const teacherId = user.id; // Demo loopback
-            console.log("Creating cycle for teacher:", teacherId);
-
             const { data, error } = await supabase
                 .from('observation_cycles')
-                .insert([{ teacher_id: teacherId, observer_id: user.id, status: 'planned' }])
+                .insert([{ teacher_id: newCycleTeacherId, observer_id: user.id, status: 'planned' }])
                 .select().single();
 
             if (error) {
                 console.error("Supabase Error:", error);
-                toast.error("Error creating cycle: " + error.message);
+                toast.error("Error al crear ciclo: " + error.message);
             } else {
-                console.log("Cycle created:", data);
-                toast.success("Nueva observación creada. Redirigiendo...");
+                toast.success("Nueva observación creada.");
+                setShowNewCycleModal(false);
                 router.push(`/acompanamiento/observacion/${data.id}`);
             }
         } catch (err) {
@@ -630,7 +634,45 @@ export default function Dashboard360() {
                 showSuperAdminPanel={showSuperAdminPanel}
                 setShowSuperAdminPanel={setShowSuperAdminPanel}
                 handleDeleteObservation={handleDeleteObservation}
+                setShowNewCycleModal={setShowNewCycleModal}
             />
+
+            {/* NEW CYCLE MODAL */}
+            {showNewCycleModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="bg-[#1B3C73] p-6 text-white relative">
+                            <button onClick={() => setShowNewCycleModal(false)} className="absolute top-4 right-4 text-white/70 hover:text-white">✕</button>
+                            <h2 className="text-xl font-bold flex items-center gap-2">
+                                <Users size={20} /> Nueva Observación
+                            </h2>
+                            <p className="text-blue-100 text-sm mt-1">Selecciona el docente que vas a acompañar</p>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-2">Docente a Observar</label>
+                                <select
+                                    className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
+                                    value={newCycleTeacherId}
+                                    onChange={(e) => setNewCycleTeacherId(e.target.value)}
+                                >
+                                    <option value="">Seleccionar Docente...</option>
+                                    {allUsers.filter((u: any) => u.role !== 'admin').map((u: any) => (
+                                        <option key={u.id} value={u.id}>{u.full_name || u.id}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <button
+                                onClick={handleNewCycle}
+                                disabled={!newCycleTeacherId}
+                                className="w-full py-3 bg-[#1B3C73] hover:bg-[#2A59A8] text-white font-bold rounded-xl shadow-lg transition-all disabled:opacity-50"
+                            >
+                                INICIAR PAUTA
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* TEACHER DETAIL DRAWER */}
             {showTeacherDetailDrawer && (
@@ -825,7 +867,7 @@ function DashboardContent({
     showInsightDrawer, setShowInsightDrawer, showExecutiveModal, setShowExecutiveModal, executiveData, SuperAdminWidget, usersMap,
     latestInsight, setShowConfigModal, handleViewTeacherDetail,
     showTeacherDetailDrawer, setShowTeacherDetailDrawer, teacherDetailData, loadingTeacherDetail, selectedTeacherId,
-    showSuperAdminPanel, setShowSuperAdminPanel, handleDeleteObservation
+    showSuperAdminPanel, setShowSuperAdminPanel, handleDeleteObservation, setShowNewCycleModal
 }: any) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -1133,7 +1175,7 @@ function DashboardContent({
                             </Link>
                         )}
 
-                        <button onClick={handleNewCycle} className="bg-[#1B3C73] text-white p-3 md:px-5 md:py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-[#2A59A8] transition-colors shadow-lg shadow-blue-900/20 active:scale-95 whitespace-nowrap">
+                        <button onClick={() => setShowNewCycleModal(true)} className="bg-[#1B3C73] text-white p-3 md:px-5 md:py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-[#2A59A8] transition-colors shadow-lg shadow-blue-900/20 active:scale-95 whitespace-nowrap">
                             <Plus size={20} />
                             <span className="hidden md:inline font-bold">Observar</span>
                         </button>
