@@ -180,12 +180,35 @@ export default function Dashboard360() {
                 }
             }
 
-            // Fetch Users Map from profiles
-            const { data: usersList } = await supabase.from('profiles').select('id, full_name, email, role');
+            // Fetch Users Map
+            const { data: authorizedList } = await supabase.from('authorized_users').select('*');
             const uMap: Record<string, string> = {};
-            usersList?.forEach(u => { if (u.id) uMap[u.id] = u.full_name || u.email });
+            let fetchedProfiles: any[] = [];
+
+            if (authorizedList && authorizedList.length > 0) {
+                const emails = authorizedList.map(a => a.email);
+                const { data: profilesList } = await supabase
+                    .from('profiles')
+                    .select('id, email, full_name, role')
+                    .in('email', emails);
+
+                if (profilesList) {
+                    fetchedProfiles = authorizedList.map(auth => {
+                        const profile = profilesList.find(p => p.email === auth.email);
+                        if (profile && profile.id) {
+                            uMap[profile.id] = profile.full_name || auth.full_name || auth.email;
+                        }
+                        return {
+                            ...auth,
+                            id: profile?.id,
+                            role: profile?.role || auth.role
+                        };
+                    }).filter(u => u.id); // Only keep users who have activated their account (have a UUID)
+                }
+            }
+
             setUsersMap(uMap);
-            setAllUsers(usersList || []);
+            setAllUsers(fetchedProfiles);
 
             try {
                 const { data: latestReport } = await supabase
