@@ -549,20 +549,26 @@ async def get_executive_metrics(req: MetricsRequest):
             if author_res.data and author_res.data[0].get('school_id'):
                 author_school_id = author_res.data[0]['school_id']
 
-        # 1. Fetch total target teachers (eligible for observation) from PROFILES (tenant isolated)
+        # 1. Safe Intersection of Roles and Tenant Profiles
+        # Step A: Get all valid teacher/utp emails globally
+        auth_res = supabase.table('authorized_users').select('email').in_('role', ['teacher', 'utp']).execute()
+        valid_teacher_emails = set(item['email'] for item in (auth_res.data or []))
+        
+        # Step B: Get profiles bound securely to the Tenant
         if author_school_id:
-            auth_res = supabase.table('profiles')\
-                .select('id, email, full_name, role, department, years_experience, age')\
+            prof_res = supabase.table('profiles')\
+                .select('id, email, full_name, department, years_experience, age')\
                 .eq('school_id', author_school_id)\
-                .in_('role', ['teacher', 'utp'])\
                 .execute()
         else:
-            auth_res = supabase.table('profiles')\
-                .select('id, email, full_name, role, department, years_experience, age')\
-                .in_('role', ['teacher', 'utp'])\
+            prof_res = supabase.table('profiles')\
+                .select('id, email, full_name, department, years_experience, age')\
                 .execute()
         
-        all_teachers = auth_res.data or []
+        raw_profiles = prof_res.data or []
+        
+        # Step C: Intersect those who belong to the school AND have the correct role
+        all_teachers = [p for p in raw_profiles if p.get('email') in valid_teacher_emails]
         
         filtered_teachers = []
         for t in all_teachers:
