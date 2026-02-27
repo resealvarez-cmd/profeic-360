@@ -1023,9 +1023,9 @@ function DashboardContent({
                                     <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
                                         <h3 className="font-bold text-[#C87533] text-sm mb-2">🚨 Brechas Detectadas (Top 3)</h3>
                                         <ul className="space-y-2">
-                                            {latestInsight.top_3_gaps?.map((gap: string, i: number) => (
+                                            {latestInsight.top_3_gaps?.map((gap: any, i: number) => (
                                                 <li key={i} className="text-sm text-slate-700 leading-relaxed flex gap-2">
-                                                    <span className="font-bold">•</span> {gap}
+                                                    <span className="font-bold">•</span> {typeof gap === 'string' ? gap : (gap.foco || gap.objetivo || JSON.stringify(gap))}
                                                 </li>
                                             ))}
                                         </ul>
@@ -1033,9 +1033,11 @@ function DashboardContent({
 
                                     <div>
                                         <h3 className={"font-bold text-[#1B3C73] text-sm mb-3"}>💡 Recomendación Estratégica</h3>
-                                        <div className={"bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-slate-700 mb-4"}>
+                                        <div className={"bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-slate-700 mb-4 whitespace-pre-wrap"}>
                                             <span className={"block font-bold text-[#2A59A8] mb-1"}>Capacitación Sugerida:</span>
-                                            "{latestInsight.recommended_training}"
+                                            {typeof latestInsight.recommended_training === 'string'
+                                                ? latestInsight.recommended_training
+                                                : JSON.stringify(latestInsight.recommended_training, null, 2)}
                                         </div>
 
                                         {/* EXPORT BUTTON */}
