@@ -519,15 +519,19 @@ class MetricsRequest(BaseModel):
 @router.post("/acompanamiento/executive-metrics")
 async def get_executive_metrics(req: MetricsRequest):
     try:
-        # 1. Fetch total target teachers (eligible for observation)
-        profiles_res = supabase.table('profiles')\
-            .select('id, full_name, department, years_experience, age')\
+        # 1. Fetch total target teachers (eligible for observation) from authorized_users
+        auth_res = supabase.table('authorized_users')\
+            .select('email, full_name')\
+            .in_('role', ['teacher', 'utp'])\
             .execute()
-            
-        all_teachers = profiles_res.data or []
         
-        # In-memory filter for teachers based on request
-        target_teachers = []
+        all_teachers = auth_res.data or []
+        total_target = len(all_teachers)
+        
+        # 2. Fetch related observation cycles (We don't need to filter by target_ids if we aren't using strict department filters yet)
+        cycles_res = supabase.table('observation_cycles')\
+            .select('id, teacher_id, observer_id, status, created_at, observer:observer_id(full_name), teacher:teacher_id(full_name)')\
+            .execute()
         for t in all_teachers:
             if req.department and t.get('department') != req.department: continue
             
@@ -543,18 +547,7 @@ async def get_executive_metrics(req: MetricsRequest):
                 if req.age_range == "30-50" and not (30 < age <= 50): continue
                 if req.age_range == "50+" and not (age > 50): continue
                 
-            target_teachers.append(t)
-
-        total_target = len(target_teachers)
-        target_ids = [t['id'] for t in target_teachers]
-        
-        # 2. Fetch related observation cycles
-        cycles_res = supabase.table('observation_cycles')\
-            .select('id, teacher_id, observer_id, status, created_at, observer:observer_id(full_name), teacher:teacher_id(full_name)')\
-            .in_('teacher_id', target_ids if target_ids else ['00000000-0000-0000-0000-000000000000'])\
-            .execute()
-            
-        all_cycles = cycles_res.data or []
+            all_cycles = cycles_res.data or []
         
         # 3. Calculate Global Metrics (Coverage)
         observed_teacher_ids = set([c['teacher_id'] for c in all_cycles if c['status'] in ['in_progress', 'completed']])

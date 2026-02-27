@@ -190,7 +190,7 @@ export default function Dashboard360() {
                 const { data: authorizedList, error: authListErr } = await supabase
                     .from('authorized_users')
                     .select('*')
-                    .eq('role', 'teacher') // Ensures we only get trackable profiles
+                    .in('role', ['teacher', 'utp']) // Ensures we only get trackable profiles
                     .order('full_name', { ascending: true });
 
                 console.log("DASHBOARD_FETCH: Authorized fetched:", authorizedList?.length, "Error:", authListErr);
