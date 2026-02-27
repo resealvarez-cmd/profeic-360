@@ -590,6 +590,8 @@ async def get_executive_metrics(req: MetricsRequest):
         
         observer_stats = {} # observer_id -> stats
         matriz = [] # Flat list for table rendering
+        focus_scores: Dict[str, List[int]] = {}
+        teacher_scores = {}
         
         for c in all_cycles:
             obs_id = c['observer_id']
@@ -624,6 +626,13 @@ async def get_executive_metrics(req: MetricsRequest):
                 # Check Depth
                 content = obs_map.get(c['id'], {})
                 observations = content.get('observations', {})
+                scores = content.get('scores', {})
+                
+                # Setup Heatmap aggregator
+                for focus, score in scores.items():
+                    if focus not in focus_scores: focus_scores[focus] = []
+                    focus_scores[focus].append(score)
+
                 evaluative_keywords = ["debido a", "porque", "impactó en", "logró", "evidencia", "efectivo", "falta"]
                 for focus, note in observations.items():
                     if note:
@@ -683,6 +692,12 @@ async def get_executive_metrics(req: MetricsRequest):
                         teacher_scores[teach_id] = {"name": teach_name, "scores": []}
                     teacher_scores[teach_id]["scores"].append(avg_score)
                     
+        # Calculate Global Heatmap
+        heatmap = {}
+        for focus, values in focus_scores.items():
+            if values:
+                heatmap[focus] = round(sum(values) / len(values), 1)
+
         top_teachers = []
         for tid, data in teacher_scores.items():
             avg = sum(data["scores"]) / len(data["scores"])
@@ -733,6 +748,7 @@ async def get_executive_metrics(req: MetricsRequest):
                 "total_planned": total_planned
             },
             "matriz": matriz,
+            "heatmap": heatmap,
             "observer_ranking": observer_ranking,
             "highlights": {
                 "top_teachers": top_3_teachers,

@@ -511,6 +511,7 @@ class ExecutiveDocxRequest(BaseModel):
     heatmap: Optional[Dict[str, float]] = None
     global_metrics: Optional[Dict[str, Any]] = None
     highlights: Optional[Dict[str, Any]] = None
+    matriz: Optional[List[Dict[str, Any]]] = None
 
 def get_color_for_score(score: float, invert: bool = False) -> str:
     """Returns a hex color based on the score (1-4 scale or percentages)."""
@@ -752,6 +753,49 @@ def renderizar_reporte_ejecutivo(doc, data):
         
         style_header_cell(c3, "Muestra Analizada", "EFEFEF", "000000")
         c3.add_paragraph(f"{data.rigor_audit.get('sample_size', 0)} obs.").alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # --- NÚCLEO: MATRIZ DE ACOMPAÑAMIENTO (ANEXO) ---
+    if data.matriz and len(data.matriz) > 0:
+        doc.add_page_break()
+        doc.add_heading("VI. Anexo: Registro Histórico de Acompañamiento", level=2)
+        doc.add_paragraph("Detalle de las observaciones realizadas durante el período analizado.")
+        
+        t_matriz = doc.add_table(rows=1, cols=4)
+        t_matriz.style = 'Table Grid'
+        t_matriz.autofit = False
+        t_matriz.columns[0].width = Inches(1.0) # Fecha
+        t_matriz.columns[1].width = Inches(2.2) # Docente
+        t_matriz.columns[2].width = Inches(2.2) # Observador
+        t_matriz.columns[3].width = Inches(1.1) # Estado
+        
+        cells = t_matriz.rows[0].cells
+        style_header_cell(cells[0], "Fecha", "1B3C73", "FFFFFF")
+        style_header_cell(cells[1], "Docente Observado", "1B3C73", "FFFFFF")
+        style_header_cell(cells[2], "Acompañante", "1B3C73", "FFFFFF")
+        style_header_cell(cells[3], "Estado", "1B3C73", "FFFFFF")
+        
+        # Sort data by date descending just in case
+        try:
+            sorted_matriz = sorted(data.matriz, key=lambda x: x.get('date', ''), reverse=True)
+        except:
+            sorted_matriz = data.matriz
+            
+        for m in sorted_matriz:
+            row = t_matriz.add_row().cells
+            # Parse Date logic (safely)
+            date_str = str(m.get('date', '')).split('T')[0] if m.get('date') else 'N/A'
+            row[0].text = date_str
+            row[1].text = str(m.get('teacher_name', ''))
+            row[2].text = str(m.get('observer_name', ''))
+            
+            status = m.get('status', '')
+            status_text = "Completado" if status == 'completed' else "En Proceso" if status == 'in_progress' else "Planificado"
+            row[3].text = status_text
+            
+            # Color status
+            if status == 'completed': set_cell_background(row[3], "F0FDF4") # Verde
+            elif status == 'in_progress': set_cell_background(row[3], "EFF6FF") # Azul
+            else: set_cell_background(row[3], "FEFCE8") # Amarillo
 
 @router.post("/export/executive-docx")
 async def export_executive_docx(req: ExecutiveDocxRequest):

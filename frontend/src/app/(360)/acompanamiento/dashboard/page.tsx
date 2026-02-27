@@ -142,114 +142,132 @@ export default function Dashboard360() {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setCurrentUser(user);
+            console.log("DASHBOARD_FETCH: Starting fetch...");
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                console.log("DASHBOARD_FETCH: User verified:", user?.email);
+                setCurrentUser(user);
 
-            let currentRole = 'teacher';
-            if (user) {
-                // Determine Role & Name
+                let currentRole = 'teacher';
+                if (user) {
+                    // Determine Role & Name
+                    try {
+                        const { data: authUser, error: authErr } = await supabase
+                            .from('authorized_users')
+                            .select('role, full_name')
+                            .eq('email', user.email)
+                            .single();
+
+                        if (!authErr && authUser) {
+                            currentRole = authUser.role;
+                            setUserRole(authUser.role);
+                            setUserName(authUser.full_name || 'Docente');
+                        } else if (user.email === 're.se.alvarez@gmail.com') {
+                            currentRole = 'admin';
+                            setUserRole('admin');
+                            setUserName('Super Admin');
+                        } else {
+                            setUserRole('teacher');
+                            setUserName('Docente');
+                        }
+                    } catch (e) {
+                        console.error("Auth check error:", e);
+                        if (user?.email === 're.se.alvarez@gmail.com') {
+                            currentRole = 'admin';
+                            setUserRole('admin');
+                            setUserName('Super Admin');
+                        } else {
+                            setUserRole('teacher');
+                            setUserName('Docente');
+                        }
+                    }
+                }
+
+                console.log("DASHBOARD_FETCH: Determined Role:", currentRole);
+
+                // Fetch Users Map
+                console.log("DASHBOARD_FETCH: Starting Profile Fetch...");
+                const { data: authorizedList, error: authListErr } = await supabase
+                    .from('authorized_users')
+                    .select('*')
+                    .eq('role', 'teacher') // Ensures we only get trackable profiles
+                    .order('full_name', { ascending: true });
+
+                console.log("DASHBOARD_FETCH: Authorized fetched:", authorizedList?.length, "Error:", authListErr);
+
+                const uMap: Record<string, string> = {};
+                let fetchedProfiles: any[] = [];
+
+                if (authorizedList && authorizedList.length > 0) {
+                    const emails = authorizedList.map((a: any) => a.email);
+                    const { data: profilesList } = await supabase
+                        .from('profiles')
+                        .select('id, email, full_name, role')
+                        .in('email', emails);
+
+                    if (profilesList) {
+                        fetchedProfiles = authorizedList.map((auth: any) => {
+                            const profile = profilesList.find((p: any) => p.email === auth.email);
+                            if (profile && profile.id) {
+                                uMap[profile.id] = profile.full_name || auth.full_name || auth.email;
+                            }
+                            return {
+                                ...auth,
+                                id: profile?.id,
+                                role: profile?.role || auth.role
+                            };
+                        }).filter((u: any) => u.id); // Only keep users who have activated their account (have a UUID)
+                    }
+                }
+
+                setUsersMap(uMap);
+                setAllUsers(fetchedProfiles);
+
                 try {
-                    const { data: authUser, error: authErr } = await supabase
-                        .from('authorized_users')
-                        .select('role, full_name')
-                        .eq('email', user.email)
+                    const { data: latestReport } = await supabase
+                        .from('reports')
+                        .select('content, metrics, created_at')
+                        .eq('type', 'executive')
+                        .order('created_at', { ascending: false })
+                        .limit(1)
                         .single();
 
-                    if (!authErr && authUser) {
-                        currentRole = authUser.role;
-                        setUserRole(authUser.role);
-                        setUserName(authUser.full_name || 'Docente');
-                    } else if (user.email === 're.se.alvarez@gmail.com') {
-                        currentRole = 'admin';
-                        setUserRole('admin');
-                        setUserName('Super Admin');
-                    } else {
-                        setUserRole('teacher');
-                        setUserName('Docente');
+                    if (latestReport && latestReport.content) {
+                        setLatestInsight({
+                            ...latestReport.content,
+                            heatmap: latestReport.metrics,
+                            created_at: latestReport.created_at
+                        });
                     }
-                } catch (e) {
-                    console.error("Auth check error:", e);
-                    if (user.email === 're.se.alvarez@gmail.com') {
-                        currentRole = 'admin';
-                        setUserRole('admin');
-                        setUserName('Super Admin');
-                    } else {
-                        setUserRole('teacher');
-                        setUserName('Docente');
-                    }
+                } catch (e) { console.log("No previous reports found") }
+
+                let query = supabase
+                    .from('observation_cycles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (currentRole === 'teacher' && user) {
+                    query = query.eq('teacher_id', user.id);
                 }
-            }
 
-            // Fetch Users Map
-            const { data: authorizedList } = await supabase.from('authorized_users').select('*');
-            const uMap: Record<string, string> = {};
-            let fetchedProfiles: any[] = [];
+                const { data: cycles, error } = await query;
+                console.log("DASHBOARD_FETCH: Cycles fetched:", cycles?.length, "Error:", error);
 
-            if (authorizedList && authorizedList.length > 0) {
-                const emails = authorizedList.map(a => a.email);
-                const { data: profilesList } = await supabase
-                    .from('profiles')
-                    .select('id, email, full_name, role')
-                    .in('email', emails);
+                if (cycles) {
+                    const active = cycles.filter(c => c.status === 'in_progress' || c.status === 'planned').length;
+                    const completed = cycles.filter(c => c.status === 'completed').length;
 
-                if (profilesList) {
-                    fetchedProfiles = authorizedList.map(auth => {
-                        const profile = profilesList.find(p => p.email === auth.email);
-                        if (profile && profile.id) {
-                            uMap[profile.id] = profile.full_name || auth.full_name || auth.email;
-                        }
-                        return {
-                            ...auth,
-                            id: profile?.id,
-                            role: profile?.role || auth.role
-                        };
-                    }).filter(u => u.id); // Only keep users who have activated their account (have a UUID)
+                    console.log("DASHBOARD_FETCH: Success! Applying state...");
+                    setStats({ active, completed, total: cycles.length });
+                    setRecentCycles(cycles.slice(0, 5));
+                } else {
+                    console.log("DASHBOARD_FETCH: No personal observation cycles found for user.");
                 }
-            }
-
-            setUsersMap(uMap);
-            setAllUsers(fetchedProfiles);
-
-            try {
-                const { data: latestReport } = await supabase
-                    .from('reports')
-                    .select('content, metrics, created_at')
-                    .eq('type', 'executive')
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .single();
-
-                if (latestReport && latestReport.content) {
-                    setLatestInsight({
-                        ...latestReport.content,
-                        heatmap: latestReport.metrics,
-                        created_at: latestReport.created_at
-                    });
-                }
-            } catch (e) { console.log("No previous reports found") }
-
-            let query = supabase
-                .from('observation_cycles')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (currentRole === 'teacher' && user) {
-                query = query.eq('teacher_id', user.id);
-            }
-
-            const { data: cycles, error } = await query;
-
-            if (error || !cycles) {
+            } catch (err) {
+                console.error("Dashboard massive crash:", err);
+            } finally {
                 setLoading(false);
-                return;
             }
-
-            const active = cycles.filter(c => c.status === 'in_progress' || c.status === 'planned').length;
-            const completed = cycles.filter(c => c.status === 'completed').length;
-
-            setStats({ active, completed, total: cycles.length });
-            setRecentCycles(cycles.slice(0, 5));
-            setLoading(false);
         };
 
         fetchDashboardData();
@@ -433,29 +451,89 @@ export default function Dashboard360() {
                                             </div>
                                         </div>
 
-                                        {/* Activity Matrix Card */}
-                                        <div className="lg:col-span-1 bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                                            <h3 className="text-slate-400 text-[10px] font-black uppercase mb-6 tracking-widest">Actividad Reciente</h3>
-                                            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-3 custom-scrollbar">
-                                                {metrics.matriz.slice(0, 8).map((m: any, idx: number) => (
-                                                    <div key={idx} className="flex justify-between items-center bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm">
-                                                        <div className="flex flex-col">
-                                                            <button
-                                                                onClick={() => handleViewTeacherDetail(m.teacher_id)}
-                                                                className="text-xs text-slate-900 font-black hover:text-[#A1C969] transition-colors text-left"
-                                                            >
-                                                                {m.teacher_name}
-                                                            </button>
-                                                            <span className="text-[8px] text-slate-400 font-bold mt-0.5 uppercase tracking-tighter">OBS: {m.observer_name}</span>
-                                                        </div>
-                                                        <span className={`text-[8px] px-2 py-0.5 rounded-lg font-black tracking-widest uppercase ${m.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                            {m.status === 'completed' ? 'DOC' : 'PRO'}
-                                                        </span>
+                                        {/* Activity Matrix Card (Collapsible) */}
+                                        <div className="lg:col-span-3 bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm mt-4">
+                                            <details className="group">
+                                                <summary className="cursor-pointer flex items-center justify-between text-slate-400 text-[10px] font-black uppercase tracking-widest list-none">
+                                                    <span className="flex items-center gap-2">
+                                                        <Zap size={14} className="text-[#C87533]" />
+                                                        Matriz Histórica de Acompañamiento
+                                                    </span>
+                                                    <span className="transition group-open:rotate-180">
+                                                        <ChevronDown size={14} />
+                                                    </span>
+                                                </summary>
+                                                <div className="mt-6">
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full text-left text-sm text-slate-600">
+                                                            <thead className="bg-slate-100 text-slate-500 uppercase font-black text-[9px] tracking-widest">
+                                                                <tr>
+                                                                    <th className="px-4 py-3 rounded-l-xl">Fecha</th>
+                                                                    <th className="px-4 py-3">Docente</th>
+                                                                    <th className="px-4 py-3">Acompañante</th>
+                                                                    <th className="px-4 py-3 rounded-r-xl">Estado</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-slate-100">
+                                                                {metrics.matriz && metrics.matriz.length > 0 ? metrics.matriz.map((m: any, idx: number) => (
+                                                                    <tr key={idx} className="hover:bg-white transition-colors">
+                                                                        <td className="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-900">
+                                                                            {m.date ? new Date(m.date).toLocaleDateString() : 'N/A'}
+                                                                        </td>
+                                                                        <td className="px-4 py-3 text-xs font-black">
+                                                                            <button
+                                                                                onClick={() => handleViewTeacherDetail(m.teacher_id)}
+                                                                                className="hover:text-[#A1C969] transition-colors"
+                                                                            >
+                                                                                {m.teacher_name}
+                                                                            </button>
+                                                                        </td>
+                                                                        <td className="px-4 py-3 text-[10px] font-bold uppercase tracking-tight">
+                                                                            {m.observer_name}
+                                                                        </td>
+                                                                        <td className="px-4 py-3">
+                                                                            <span className={`text-[9px] px-2 py-1 rounded-lg font-black tracking-widest uppercase ${m.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                                                                                {m.status === 'completed' ? 'DOC' : 'PRO'}
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                )) : (
+                                                                    <tr>
+                                                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-400 text-xs text-italic">No hay ciclos de observación registrados aún.</td>
+                                                                    </tr>
+                                                                )}
+                                                            </tbody>
+                                                        </table>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                </div>
+                                            </details>
                                         </div>
                                     </div>
+
+                                    {/* HEATMAP SECTION (Wow Factor) */}
+                                    {metrics.heatmap && Object.keys(metrics.heatmap).length > 0 && (
+                                        <div className="mt-8 pt-8 border-t border-slate-100">
+                                            <h4 className="text-[10px] font-black text-slate-400 uppercase mb-6 flex items-center gap-2 tracking-widest">
+                                                <BrainCircuit size={14} className="text-[#A1C969]" /> Pulso Cuantitativo (Heatmap)
+                                            </h4>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                                {Object.entries(metrics.heatmap).sort((a: any, b: any) => b[1] - a[1]).map(([focus, score]: any) => {
+                                                    const bgColor = score >= 3.2 ? 'bg-green-50 border-green-200' : (score >= 2.6 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200');
+                                                    const textColor = score >= 3.2 ? 'text-green-700' : (score >= 2.6 ? 'text-yellow-700' : 'text-red-700');
+                                                    return (
+                                                        <div key={focus} className={`p-4 rounded-2xl border ${bgColor} flex flex-col justify-between h-24 hover:scale-105 transition-transform cursor-default shadow-sm`}>
+                                                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-tight">
+                                                                {focus.replace(/_/g, ' ')}
+                                                            </span>
+                                                            <span className={`text-2xl font-black ${textColor}`}>
+                                                                {score.toFixed(1)}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Highlights Section */}
                                     {metrics.highlights && (
@@ -1101,7 +1179,8 @@ function DashboardContent({
                                                         ...executiveData.metrics?.global_metrics,
                                                         structural: executiveData.metrics?.structural
                                                     },
-                                                    highlights: executiveData.metrics?.highlights
+                                                    highlights: executiveData.metrics?.highlights,
+                                                    matriz: executiveData.metrics?.matriz
                                                 };
                                                 const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
                                                 const res = await fetch(`${BE_URL}/export/executive-docx`, {
