@@ -203,7 +203,7 @@ export default function Dashboard360() {
                     // and matching them locally, instead of dumping 70+ emails into an .in() query.
                     const { data: profilesList, error: pError } = await supabase
                         .from('profiles')
-                        .select('id, email, full_name, role');
+                        .select('id, email, full_name');
 
                     if (pError) console.error("DASHBOARD_FETCH: Error fetching profiles:", pError);
 
@@ -215,8 +215,7 @@ export default function Dashboard360() {
                             }
                             return {
                                 ...auth,
-                                id: profile?.id,
-                                role: profile?.role || auth.role
+                                id: profile?.id
                             };
                         }).filter((u: any) => u.id); // Only keep users who have activated their account (have a UUID)
                     }
@@ -1121,7 +1120,9 @@ function DashboardContent({
                                         🔍 Diagnóstico Sistémico
                                     </h4>
                                     <div className="text-slate-600 leading-relaxed bg-slate-50 p-5 rounded-2xl border border-slate-100 text-sm whitespace-pre-wrap">
-                                        {executiveData.analysis.systemic_summary}
+                                        {typeof executiveData.analysis.systemic_summary === 'string'
+                                            ? executiveData.analysis.systemic_summary
+                                            : JSON.stringify(executiveData.analysis.systemic_summary)}
                                     </div>
                                 </div>
 
@@ -1130,10 +1131,10 @@ function DashboardContent({
                                         ⚠️ Top 3 Brechas Detectadas
                                     </h4>
                                     <ul className="space-y-2">
-                                        {executiveData.analysis.top_3_gaps.map((gap: string, i: number) => (
+                                        {executiveData.analysis.top_3_gaps.map((gap: any, i: number) => (
                                             <li key={i} className="flex items-start gap-3 bg-red-50 p-3 rounded-xl border border-red-100 text-red-900 text-sm font-medium">
                                                 <span className="bg-white text-red-600 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-sm shrink-0">{i + 1}</span>
-                                                {gap}
+                                                {typeof gap === 'string' ? gap : (gap.foco || gap.objetivo || JSON.stringify(gap))}
                                             </li>
                                         ))}
                                     </ul>
