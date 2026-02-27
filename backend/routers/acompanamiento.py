@@ -547,7 +547,7 @@ async def get_executive_metrics(req: MetricsRequest):
                 if req.age_range == "30-50" and not (30 < age <= 50): continue
                 if req.age_range == "50+" and not (age > 50): continue
                 
-            all_cycles = cycles_res.data or []
+        all_cycles = cycles_res.data or []
         
         # 3. Calculate Global Metrics (Coverage)
         observed_teacher_ids = set([c['teacher_id'] for c in all_cycles if c['status'] in ['in_progress', 'completed']])
