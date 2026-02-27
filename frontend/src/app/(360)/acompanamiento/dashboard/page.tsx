@@ -196,29 +196,36 @@ export default function Dashboard360() {
                 console.log("DASHBOARD_FETCH: Authorized fetched:", authorizedList?.length, "Error:", authListErr);
 
                 const uMap: Record<string, string> = {};
+                // Multi-Tenant Isolation: Get the current user's school
+                let currentSchoolId = null;
+                if (user) {
+                    const { data: myProfile } = await supabase.from('profiles').select('school_id').eq('id', user.id).single();
+                    currentSchoolId = myProfile?.school_id;
+                }
+
+                // Fetch Profiles to match with authorized users. We strictly filter by school_id to avoid data leaks.
+                let profileQuery = supabase.from('profiles').select('id, email, full_name');
+                if (currentSchoolId) {
+                    profileQuery = profileQuery.eq('school_id', currentSchoolId);
+                }
+
+                const { data: profilesList, error: pError } = await profileQuery;
+
                 let fetchedProfiles: any[] = [];
 
-                if (authorizedList && authorizedList.length > 0) {
-                    // Fix: Avoid 400 Bad Request URL limit by fetching profiles unconditionally 
-                    // and matching them locally, instead of dumping 70+ emails into an .in() query.
-                    const { data: profilesList, error: pError } = await supabase
-                        .from('profiles')
-                        .select('id, email, full_name');
+                if (pError) console.error("DASHBOARD_FETCH: Error fetching profiles:", pError);
 
-                    if (pError) console.error("DASHBOARD_FETCH: Error fetching profiles:", pError);
-
-                    if (profilesList) {
-                        fetchedProfiles = authorizedList.map((auth: any) => {
-                            const profile = profilesList.find((p: any) => p.email === auth.email);
-                            if (profile && profile.id) {
-                                uMap[profile.id] = profile.full_name || auth.full_name || auth.email;
-                            }
-                            return {
-                                ...auth,
-                                id: profile?.id
-                            };
-                        }).filter((u: any) => u.id); // Only keep users who have activated their account (have a UUID)
-                    }
+                if (profilesList && authorizedList) {
+                    fetchedProfiles = authorizedList.map((auth: any) => {
+                        const profile = profilesList.find((p: any) => p.email === auth.email);
+                        if (profile && profile.id) {
+                            uMap[profile.id] = profile.full_name || auth.full_name || auth.email;
+                        }
+                        return {
+                            ...auth,
+                            id: profile?.id
+                        };
+                    }).filter((u: any) => u.id); // Only keep users who have activated their account (have a UUID)
                 }
 
                 setUsersMap(uMap);
@@ -320,7 +327,8 @@ export default function Dashboard360() {
                         body: JSON.stringify({
                             department: filterDept || undefined,
                             years_experience_range: filterExp || undefined,
-                            age_range: filterAge || undefined
+                            age_range: filterAge || undefined,
+                            author_id: currentUser?.id
                         })
                     });
                     if (res.ok) {

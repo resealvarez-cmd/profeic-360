@@ -239,21 +239,27 @@ async def generate_executive_report(req: ExecutiveRequest):
             .select('id, created_at, teacher:teacher_id(full_name, department, years_experience, age)')\
             .eq('status', 'completed')
         
-        # Apply Date Filters
-        if req.start_date:
-            query = query.gte('created_at', req.start_date)
-        if req.end_date:
-            query = query.lte('created_at', req.end_date)
+        # Apply Optional School Filtering (Tenant Safety)
+        if req.author_id:
+            # Look up author's school_id
+            author_res = supabase.table('profiles').select('school_id').eq('id', req.author_id).execute()
+            if author_res.data and author_res.data[0].get('school_id'):
+                author_school_id = author_res.data[0]['school_id']
+                # The nested relation filtering in Supabase is tricky with gRPC, we filter locally in the python loop instead safely.
         
         cycles_res = query.execute()
         raw_cycles = cycles_res.data or []
 
-        # 2. In-Memory Filtering (Supabase Join Filtering is tricky with ORM, easier in Python for small datasets)
-        # Strategic Mining: Filter by Department, Experience, Age
+        # 2. In-Memory Filtering (Supabase Join Filtering runs into issues easily)
         filtered_cycles = []
         for c in raw_cycles:
             teacher = c.get('teacher') or {}
             
+            # Tenant Security
+            if req.author_id and author_res.data and author_res.data[0].get('school_id'):
+                if teacher.get('school_id') != author_res.data[0]['school_id']:
+                    continue
+
             # Filter Department
             if req.department and teacher.get('department') != req.department:
                 continue
@@ -276,11 +282,28 @@ async def generate_executive_report(req: ExecutiveRequest):
 
         if not filtered_cycles:
              return {
-                "summary": "No se encontraron observaciones que coincidan con los filtros seleccionados.",
-                "heatmap": {},
-                "top_3_gaps": [],
-                "recommended_training": "N/A",
-                "rigor_audit": {"depth_index": 0, "sample_size": 0, "alert": "Insufficient Data"}
+                 "metrics": {
+                     "total_observations": 0,
+                     "heatmap": {},
+                     "structural": {},
+                     "global_metrics": {
+                        "total_teachers": 0,
+                        "observed_teachers": 0,
+                        "coverage_percent": 0.0,
+                        "total_completed": 0,
+                        "total_in_progress": 0,
+                        "total_planned": 0
+                     },
+                     "highlights": {"top_teachers": [], "top_observers": []},
+                     "matriz": []
+                 },
+                 "analysis": {
+                    "summary": "No se encontraron observaciones finalizadas en esta institución para aplicar Inteligencia Artificial.",
+                    "systemic_summary": "La Institución aún no registra un volumen de observaciones completadas en sistema.",
+                    "top_3_gaps": [],
+                    "recommended_training": "N/A",
+                    "rigor_audit": {"depth_index": 0, "sample_size": 0, "alert": "Datos Insuficientes"}
+                 }
             }
 
         # 3. Aggregation Loop
@@ -515,23 +538,33 @@ class MetricsRequest(BaseModel):
     department: Optional[str] = None
     years_experience_range: Optional[str] = None
     age_range: Optional[str] = None
+    author_id: Optional[str] = None
 
 @router.post("/acompanamiento/executive-metrics")
 async def get_executive_metrics(req: MetricsRequest):
     try:
-        # 1. Fetch total target teachers (eligible for observation) from authorized_users
-        auth_res = supabase.table('authorized_users')\
-            .select('email, full_name')\
-            .in_('role', ['teacher', 'utp'])\
-            .execute()
+        author_school_id = None
+        if req.author_id:
+            author_res = supabase.table('profiles').select('school_id').eq('id', req.author_id).execute()
+            if author_res.data and author_res.data[0].get('school_id'):
+                author_school_id = author_res.data[0]['school_id']
+
+        # 1. Fetch total target teachers (eligible for observation) from PROFILES (tenant isolated)
+        if author_school_id:
+            auth_res = supabase.table('profiles')\
+                .select('id, email, full_name, role, department, years_experience, age')\
+                .eq('school_id', author_school_id)\
+                .in_('role', ['teacher', 'utp'])\
+                .execute()
+        else:
+            auth_res = supabase.table('profiles')\
+                .select('id, email, full_name, role, department, years_experience, age')\
+                .in_('role', ['teacher', 'utp'])\
+                .execute()
         
         all_teachers = auth_res.data or []
-        total_target = len(all_teachers)
         
-        # 2. Fetch related observation cycles (We don't need to filter by target_ids if we aren't using strict department filters yet)
-        cycles_res = supabase.table('observation_cycles')\
-            .select('id, teacher_id, observer_id, status, created_at, observer:observer_id(full_name), teacher:teacher_id(full_name)')\
-            .execute()
+        filtered_teachers = []
         for t in all_teachers:
             if req.department and t.get('department') != req.department: continue
             
@@ -546,8 +579,23 @@ async def get_executive_metrics(req: MetricsRequest):
                 if req.age_range == "20-30" and not (20 <= age <= 30): continue
                 if req.age_range == "30-50" and not (30 < age <= 50): continue
                 if req.age_range == "50+" and not (age > 50): continue
-                
-        all_cycles = cycles_res.data or []
+            
+            filtered_teachers.append(t)
+            
+        total_target = len(filtered_teachers)
+        
+        # 2. Fetch related observation cycles
+        cycles_res = supabase.table('observation_cycles')\
+            .select('id, teacher_id, observer_id, status, created_at, observer:observer_id(full_name), teacher:teacher_id(full_name, school_id)')\
+            .execute()
+
+        all_cycles = []
+        for c in (cycles_res.data or []):
+            teacher = c.get('teacher') or {}
+            # Tenant Security
+            if author_school_id and teacher.get('school_id') != author_school_id:
+                continue
+            all_cycles.append(c)
         
         # 3. Calculate Global Metrics (Coverage)
         observed_teacher_ids = set([c['teacher_id'] for c in all_cycles if c['status'] in ['in_progress', 'completed']])
