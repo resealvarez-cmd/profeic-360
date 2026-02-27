@@ -551,7 +551,7 @@ async def get_executive_metrics(req: MetricsRequest):
         # 2. Fetch related observation cycles
         cycles_res = supabase.table('observation_cycles')\
             .select('id, teacher_id, observer_id, status, created_at, observer:observer_id(full_name), teacher:teacher_id(full_name)')\
-            .in_('teacher_id', target_ids if target_ids else ['none'])\
+            .in_('teacher_id', target_ids if target_ids else ['00000000-0000-0000-0000-000000000000'])\
             .execute()
             
         all_cycles = cycles_res.data or []
@@ -572,7 +572,7 @@ async def get_executive_metrics(req: MetricsRequest):
         completed_cycle_ids = [c['id'] for c in all_cycles if c['status'] == 'completed']
         obs_data_res = supabase.table('observation_data')\
             .select('cycle_id, content')\
-            .in_('cycle_id', completed_cycle_ids if completed_cycle_ids else ['none'])\
+            .in_('cycle_id', completed_cycle_ids if completed_cycle_ids else ['00000000-0000-0000-0000-000000000000'])\
             .eq('stage', 'execution')\
             .execute()
         obs_map = {item['cycle_id']: item['content'] for item in obs_data_res.data}
@@ -580,7 +580,7 @@ async def get_executive_metrics(req: MetricsRequest):
         # We need commitments to check Closure Rate
         commitments_res = supabase.table('commitments')\
             .select('cycle_id, status')\
-            .in_('cycle_id', completed_cycle_ids if completed_cycle_ids else ['none'])\
+            .in_('cycle_id', completed_cycle_ids if completed_cycle_ids else ['00000000-0000-0000-0000-000000000000'])\
             .execute()
         commitments_map = {}
         for cmt in commitments_res.data or []:
