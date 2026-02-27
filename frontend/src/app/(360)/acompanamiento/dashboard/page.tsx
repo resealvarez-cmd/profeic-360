@@ -199,11 +199,13 @@ export default function Dashboard360() {
                 let fetchedProfiles: any[] = [];
 
                 if (authorizedList && authorizedList.length > 0) {
-                    const emails = authorizedList.map((a: any) => a.email);
-                    const { data: profilesList } = await supabase
+                    // Fix: Avoid 400 Bad Request URL limit by fetching profiles unconditionally 
+                    // and matching them locally, instead of dumping 70+ emails into an .in() query.
+                    const { data: profilesList, error: pError } = await supabase
                         .from('profiles')
-                        .select('id, email, full_name, role')
-                        .in('email', emails);
+                        .select('id, email, full_name, role');
+
+                    if (pError) console.error("DASHBOARD_FETCH: Error fetching profiles:", pError);
 
                     if (profilesList) {
                         fetchedProfiles = authorizedList.map((auth: any) => {

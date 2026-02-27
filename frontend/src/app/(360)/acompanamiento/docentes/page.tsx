@@ -55,12 +55,10 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                 return;
             }
 
-            // 3. Fetch Profiles to get UUIDs
-            const emails = authorized.map(a => a.email);
+            // 3. Fetch Profiles to get UUIDs (unconditional to avoid 400 URL overflow limit from Supabase .in() query)
             const { data: profiles, error: profError } = await supabase
                 .from('profiles')
-                .select('id, email, full_name, avatar_url')
-                .in('email', emails);
+                .select('id, email, full_name, avatar_url');
 
             // 4. Merge Data
             const merged = authorized.map(auth => {
