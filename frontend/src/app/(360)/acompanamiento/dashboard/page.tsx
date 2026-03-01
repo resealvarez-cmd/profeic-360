@@ -268,6 +268,51 @@ export default function Dashboard360() {
                     console.log("DASHBOARD_FETCH: Success! Applying state...");
                     setStats({ active, completed, total: cycles.length });
                     setRecentCycles(cycles.slice(0, 5));
+                    setAllCycles(cycles);
+
+                    // 4. Fetch Execution Data for Radar Calculation (Only completed cycles)
+                    const completedCycleIds = cycles.filter(c => c.status === 'completed').map(c => c.id);
+
+                    if (completedCycleIds.length > 0) {
+                        const { data: executionData } = await supabase
+                            .from('observation_data')
+                            .select('content, created_at')
+                            .in('cycle_id', completedCycleIds)
+                            .eq('stage', 'execution');
+
+                        if (executionData && executionData.length > 0) {
+                            // Aggregate Scores using Weighted Average (Recency Bias)
+                            const weightedSums: Record<string, number> = {};
+                            const totalWeights: Record<string, number> = {};
+                            const now = new Date();
+
+                            executionData.forEach((row: any) => {
+                                const scores = row.content?.scores || {};
+                                const obs = row.content?.observations || {};
+                                const date = new Date(row.created_at);
+
+                                const diffDays = (now.getTime() - date.getTime()) / (1000 * 3600 * 24);
+                                const weight = Math.max(0.5, 1 - (diffDays / 180));
+
+                                Object.keys(scores).forEach((key) => {
+                                    const evidence = obs[key];
+                                    if (evidence && typeof evidence === 'string' && evidence.trim().length > 3) {
+                                        weightedSums[key] = (weightedSums[key] || 0) + (scores[key] * weight);
+                                        totalWeights[key] = (totalWeights[key] || 0) + weight;
+                                    }
+                                });
+                            });
+
+                            // Update Radar Data
+                            setRadarData(prevData => prevData.map(item => {
+                                const wSum = weightedSums[item.id] || 0;
+                                const wTotal = totalWeights[item.id] || 0;
+                                const weightedAvg = wTotal > 0 ? wSum / wTotal : 0;
+                                const normalized = Math.round((weightedAvg / 4) * 100);
+                                return { ...item, A: normalized };
+                            }));
+                        }
+                    }
                 } else {
                     console.log("DASHBOARD_FETCH: No personal observation cycles found for user.");
                 }
@@ -616,109 +661,7 @@ export default function Dashboard360() {
         { subject: 'Feedback', A: 0, fullMark: 100, id: 'retroalimentacion' },
     ]);
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            setCurrentUser(user);
 
-            // 1. Get Role & Name
-            let role = 'teacher';
-            let name = '';
-
-            const { data: authUser } = await supabase
-                .from('authorized_users')
-                .select('role, full_name')
-                .eq('email', user.email)
-                .single();
-
-            if (authUser) {
-                role = authUser.role;
-                name = authUser.full_name;
-            }
-
-            // KEY FIX: Always set state, defaulting to 'teacher' if undefined/null
-            setUserRole(role);
-            setUserName(name || 'Docente');
-
-            // 2. Fetch Cycles (Filtered by Role)
-            let query = supabase
-                .from('observation_cycles')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (role === 'teacher') {
-                query = query.eq('teacher_id', user.id);
-            }
-
-            const { data: cycles, error } = await query;
-
-            if (error || !cycles) {
-                setLoading(false);
-                return;
-            }
-
-            // 3. Calculate Stats
-            const active = cycles.filter(c => c.status === 'in_progress' || c.status === 'planned').length;
-            const completed = cycles.filter(c => c.status === 'completed').length;
-
-            setStats({ active, completed, total: cycles.length });
-            setRecentCycles(cycles.slice(0, 5));
-            setAllCycles(cycles);
-
-            // 4. Fetch Execution Data for Radar Calculation (Only completed cycles)
-            const completedCycleIds = cycles.filter(c => c.status === 'completed').map(c => c.id);
-
-            if (completedCycleIds.length > 0) {
-                const { data: executionData } = await supabase
-                    .from('observation_data')
-                    .select('content, created_at')
-                    .in('cycle_id', completedCycleIds)
-                    .eq('stage', 'execution');
-
-                if (executionData && executionData.length > 0) {
-                    // Aggregate Scores using Weighted Average (Recency Bias)
-                    // New observations count more than old ones.
-                    const weightedSums: Record<string, number> = {};
-                    const totalWeights: Record<string, number> = {};
-
-                    const now = new Date();
-
-                    executionData.forEach((row: any) => {
-                        const scores = row.content?.scores || {};
-                        const obs = row.content?.observations || {};
-                        const date = new Date(row.created_at);
-
-                        // Calculate Recency Weight (Linear decay over 6 months, min 0.5)
-                        const diffDays = (now.getTime() - date.getTime()) / (1000 * 3600 * 24);
-                        const weight = Math.max(0.5, 1 - (diffDays / 180));
-
-                        Object.keys(scores).forEach((key) => {
-                            // SEMANTIC VALIDATION: Evidence required
-                            const evidence = obs[key];
-                            if (evidence && typeof evidence === 'string' && evidence.trim().length > 3) {
-                                weightedSums[key] = (weightedSums[key] || 0) + (scores[key] * weight);
-                                totalWeights[key] = (totalWeights[key] || 0) + weight;
-                            }
-                        });
-                    });
-
-                    // Update Radar Data
-                    setRadarData(prevData => prevData.map(item => {
-                        const wSum = weightedSums[item.id] || 0;
-                        const wTotal = totalWeights[item.id] || 0;
-                        const weightedAvg = wTotal > 0 ? wSum / wTotal : 0;
-                        const normalized = Math.round((weightedAvg / 4) * 100);
-                        return { ...item, A: normalized };
-                    }));
-                }
-            }
-
-            setLoading(false);
-        };
-
-        fetchDashboardData();
-    }, []);
 
     return (
         <Suspense fallback={<div className="p-8 text-[#1B3C73]">Cargando panel...</div>}>
@@ -1227,6 +1170,39 @@ function DashboardContent({
                                         className={"w-full py-4 bg-[#C87533] text-white text-sm font-bold rounded-xl hover:bg-[#A65E26] transition-all shadow-lg shadow-orange-900/10 flex items-center justify-center gap-2"}
                                     >
                                         <FileText size={18} /> DESCARGAR REPORTE OFICIAL PARA SOSTENEDOR
+                                    </button>
+
+                                    {/* CSV EXPORT BUTTON */}
+                                    <button
+                                        onClick={() => {
+                                            if (!allCycles || allCycles.length === 0) {
+                                                toast.error("No hay datos para exportar");
+                                                return;
+                                            }
+                                            const headers = ["ID_Observacion", "Fecha", "Estado", "ID_Docente", "Nombre_Docente", "ID_Observador", "Puntaje_Total_Generado"];
+                                            const csvRows = allCycles.map((c: any) => {
+                                                const date = new Date(c.created_at).toLocaleDateString() || "";
+                                                const status = c.status || "";
+                                                const teacherId = c.teacher_id || "";
+                                                const teacherName = (usersMap[c.teacher_id] || "Desconocido").replace(/,/g, " ");
+                                                const obsId = c.observer_id || "";
+                                                const score = c.total_score || 0;
+                                                return [c.id, date, status, teacherId, teacherName, obsId, score].join(",");
+                                            });
+                                            const csvContent = "\uFEFF" + [headers.join(","), ...csvRows].join("\n");
+                                            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                            const url = URL.createObjectURL(blob);
+                                            const link = document.createElement("a");
+                                            link.href = url;
+                                            link.setAttribute("download", "Dataset_Observaciones_ProfeIC.csv");
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            toast.success("Dataset exportado correctamente");
+                                        }}
+                                        className={"w-full py-3 mt-3 bg-white text-[#1B3C73] border-2 border-[#1B3C73] text-sm font-bold rounded-xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2"}
+                                    >
+                                        <FileText size={18} /> DESCARGAR DATASET CRUDO (CSV)
                                     </button>
                                 </div>
                             </div>
