@@ -1009,10 +1009,11 @@ function DashboardContent({
                                                 try {
                                                     const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
                                                     const metricsData = latestInsight.metrics || latestInsight.heatmap || {};
+                                                    const analysisData = latestInsight.analysis || latestInsight || {};
                                                     const body = {
-                                                        systemic_summary: (latestInsight.analysis || latestInsight).systemic_summary || "",
-                                                        top_3_gaps: (latestInsight.analysis || latestInsight).top_3_gaps || [],
-                                                        recommended_training: (latestInsight.analysis || latestInsight).recommended_training || "",
+                                                        systemic_summary: String(analysisData.systemic_summary || ""),
+                                                        top_3_gaps: Array.isArray(analysisData.top_3_gaps) ? analysisData.top_3_gaps : (analysisData.top_3_gaps ? [analysisData.top_3_gaps] : []),
+                                                        recommended_training: analysisData.recommended_training || "",
                                                         rigor_audit: metricsData.rigor_audit || null,
                                                         heatmap: metricsData.heatmap || null,
                                                         global_metrics: metricsData.global_metrics || null,
@@ -1160,16 +1161,20 @@ function DashboardContent({
                                         onClick={async () => {
                                             const toastId = toast.loading("Generando documento...");
                                             try {
+                                                const metricsData = executiveData.metrics || {};
+                                                const analysisData = executiveData.analysis || {};
                                                 const body = {
-                                                    ...executiveData.analysis,
-                                                    rigor_audit: executiveData.metrics?.rigor_audit || null,
-                                                    heatmap: executiveData.metrics?.heatmap || null,
+                                                    systemic_summary: String(analysisData.systemic_summary || ""),
+                                                    top_3_gaps: Array.isArray(analysisData.top_3_gaps) ? analysisData.top_3_gaps : (analysisData.top_3_gaps ? [analysisData.top_3_gaps] : []),
+                                                    recommended_training: analysisData.recommended_training || "",
+                                                    rigor_audit: metricsData.rigor_audit || null,
+                                                    heatmap: metricsData.heatmap || null,
                                                     global_metrics: {
-                                                        ...executiveData.metrics?.global_metrics,
-                                                        structural: executiveData.metrics?.structural || null
+                                                        ...metricsData.global_metrics,
+                                                        structural: metricsData.structural || null
                                                     },
-                                                    highlights: executiveData.metrics?.highlights || null,
-                                                    matriz: executiveData.metrics?.matriz || null
+                                                    highlights: metricsData.highlights || null,
+                                                    matriz: metricsData.matriz || null
                                                 };
                                                 const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
                                                 const res = await fetch(`${BE_URL}/export/executive-docx`, {
@@ -1385,9 +1390,9 @@ function DashboardContent({
                         <div className={`bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm flex flex-col items-center justify-center ${canManageTeachers ? 'md:col-span-2' : 'md:col-span-3'}`}>
                             <h3 className="font-bold text-[#1B3C73] mb-4 text-center w-full relative">
                                 Radar de Prácticas Pedagógicas
-                                <div className="absolute right-0 top-0 group cursor-help">
-                                    <Info size={16} className="text-slate-400 hover:text-slate-600 transition-colors" />
-                                    <div className="hidden group-hover:block absolute right-full top-1/2 -translate-y-1/2 mr-2 w-48 p-2 bg-slate-800 text-white text-xs rounded-lg shadow-lg z-10 font-normal">
+                                <div className="absolute right-0 top-0 group">
+                                    <Info size={16} className="text-slate-400 cursor-help hover:text-[#C87533] transition-colors" />
+                                    <div className="hidden group-hover:block absolute right-0 top-full mt-2 w-max max-w-[200px] px-3 py-2 bg-slate-800 text-white text-xs font-normal rounded-lg shadow-xl z-50 pointer-events-none">
                                         Basado únicamente en evidencia textual evaluativa.
                                     </div>
                                 </div>

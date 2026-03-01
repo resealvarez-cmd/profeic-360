@@ -93,9 +93,10 @@ export default function Layout360({ children }: { children: React.ReactNode }) {
                         {/* Collapse Toggle (Desktop only) */}
                         <button
                             onClick={() => setIsCollapsed(!isCollapsed)}
-                            className="hidden md:flex absolute -right-5 top-8 w-10 h-10 bg-[#C87533] text-white rounded-full items-center justify-center shadow-xl border-[3px] border-[#F8FAFC] hover:bg-[#d68a4d] hover:scale-105 transition-all z-[60]"
+                            title={isCollapsed ? "Expandir Menú" : "Colapsar Menú"}
+                            className={`hidden md:flex absolute ${isCollapsed ? '-right-6' : '-right-6'} top-10 w-12 h-12 bg-[#C87533] text-white rounded-full items-center justify-center shadow-2xl border-4 border-[#F8FAFC] hover:bg-[#A65E26] hover:scale-110 transition-all z-[60]`}
                         >
-                            {isCollapsed ? <ChevronRight size={22} strokeWidth={2.5} /> : <ChevronLeft size={22} strokeWidth={2.5} />}
+                            {isCollapsed ? <ChevronRight size={24} strokeWidth={3} /> : <ChevronLeft size={24} strokeWidth={3} />}
                         </button>
                         <div className={`p-6 flex items-center border-b border-white/10 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                             <div className="flex items-center gap-3">
