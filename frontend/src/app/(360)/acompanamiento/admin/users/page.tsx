@@ -15,6 +15,7 @@ export default function AdminUsersPage() {
         email: '',
         full_name: '',
         role: 'teacher',
+        password: '', // Optional: if provided, creates account directly
         age: '',
         department: '',
         years_experience: ''
@@ -137,7 +138,6 @@ export default function AdminUsersPage() {
                     .eq('email', newUser.email);
 
                 if (error) throw error;
-                if (error) throw error;
 
                 // UPDATE PROFILES (Enrichment)
                 if (editingUser.id) {
@@ -168,22 +168,52 @@ export default function AdminUsersPage() {
                     return;
                 }
 
-                const { error } = await supabase
-                    .from('authorized_users')
-                    .insert([{
-                        email: newUser.email,
-                        full_name: newUser.full_name,
-                        role: newUser.role,
-                        status: 'pending'
-                    }]);
+                if (newUser.password && newUser.password.trim() !== "") {
+                    // Create directly via backend
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-                if (error) throw error;
-                alert(`Usuario ${newUser.full_name} pre-autorizado.`);
+                    const response = await fetch(`${BE_URL}/admin/create-user`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${session?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            email: newUser.email,
+                            password: newUser.password,
+                            full_name: newUser.full_name,
+                            role: newUser.role,
+                            school_id: null, // As it is not selected here, we leave it null for them to be independent or edit later
+                            individual_plan_active: false
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errData = await response.json();
+                        throw new Error(errData.detail || "Error al crear usuario directamente");
+                    }
+
+                    alert(`Usuario ${newUser.full_name} creado con contraseña exitosamente.`);
+                } else {
+                    // Pre-authorize without sending invite
+                    const { error } = await supabase
+                        .from('authorized_users')
+                        .insert([{
+                            email: newUser.email,
+                            full_name: newUser.full_name,
+                            role: newUser.role,
+                            status: 'pending'
+                        }]);
+
+                    if (error) throw error;
+                    alert(`Usuario ${newUser.full_name} pre-autorizado.`);
+                }
             }
 
             setShowModal(false);
             setEditingUser(null);
-            setNewUser({ email: '', full_name: '', role: 'teacher', age: '', department: '', years_experience: '' });
+            setNewUser({ email: '', full_name: '', role: 'teacher', password: '', age: '', department: '', years_experience: '' });
             fetchUsers();
 
         } catch (error: any) {
@@ -212,6 +242,7 @@ export default function AdminUsersPage() {
             email: user.email,
             full_name: user.full_name,
             role: user.role,
+            password: '',
             age: user.age || '',
             department: user.department || '',
             years_experience: user.years_experience || ''
@@ -221,7 +252,7 @@ export default function AdminUsersPage() {
 
     const openNewUserModal = () => {
         setEditingUser(null);
-        setNewUser({ email: '', full_name: '', role: 'teacher', age: '', department: '', years_experience: '' });
+        setNewUser({ email: '', full_name: '', role: 'teacher', password: '', age: '', department: '', years_experience: '' });
         setShowModal(true);
     };
 
@@ -385,6 +416,22 @@ export default function AdminUsersPage() {
                                     onChange={e => setNewUser({ ...newUser, email: e.target.value })}
                                 />
                             </div>
+
+                            {!editingUser && (
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                        Contraseña <span className="text-slate-400 font-normal lowercase">(opcional, creación directa)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#f2ae60] transition-all"
+                                        placeholder="Min 8 caracteres..."
+                                        value={newUser.password}
+                                        onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                                    />
+                                    <p className="text-[10px] text-slate-400 mt-1">Si dejas esto en blanco solo se pre-autorizará y no se creará la cuenta lista para usar.</p>
+                                </div>
+                            )}
 
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Rol Asignado</label>

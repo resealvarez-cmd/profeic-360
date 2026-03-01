@@ -36,6 +36,14 @@ class UpdateProfilePlanRequest(BaseModel):
     individual_plan_active: bool
     school_id: Optional[str] = None
 
+class CreateUserRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    role: str = "teacher"
+    school_id: Optional[str] = None
+    individual_plan_active: bool = False
+
 # === DEPENDECIA DE SEGURIDAD ===
 async def verify_super_admin(authorization: str = Header(...)):
     """Verifica que quien llama sea el SuperAdmin."""
@@ -95,6 +103,59 @@ async def invite_user(req: InviteRequest, _ = Depends(verify_super_admin)):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error invitando usuario: {str(e)}")
+
+@router.post("/create-user")
+async def create_user(req: CreateUserRequest, _ = Depends(verify_super_admin)):
+    """
+    1. Administrador crea un usuario directamente con clave.
+    2. Se marca el correo como confirmado.
+    3. Lo asocia inmediatamente a un colegio.
+    4. Le asigna un rol y actualiza 'authorized_users'.
+    """
+    if not supabase_admin:
+        raise HTTPException(status_code=500, detail="Falta Service Role Key")
+
+    try:
+        # 1. Create User
+        nuevo_user = supabase_admin.auth.admin.create_user({
+            "email": req.email,
+            "password": req.password,
+            "email_confirm": True,
+            "user_metadata": {
+                "full_name": req.full_name,
+                "role": req.role
+            }
+        })
+        user_id = nuevo_user.user.id
+        
+        # 2. Add/Update authorized_users
+        try:
+            supabase_admin.table('authorized_users').insert({
+                "email": req.email,
+                "full_name": req.full_name,
+                "role": req.role,
+                "status": "active"
+            }).execute()
+        except Exception:
+            # might already exist, so update
+            supabase_admin.table('authorized_users').update({
+                "full_name": req.full_name,
+                "role": req.role,
+                "status": "active"
+            }).eq("email", req.email).execute()
+
+        # 3. Associate with School and set Individual Plan
+        supabase_admin.table('profiles').update({
+            "school_id": req.school_id if req.school_id else None,
+            "individual_plan_active": req.individual_plan_active,
+            "full_name": req.full_name
+        }).eq("id", user_id).execute()
+
+        return {"message": f"Usuario {req.email} creado exitosamente con contraseña.", "user_id": user_id}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error creando usuario: {str(e)}")
+
 
 @router.post("/school-plan")
 async def update_school_plan(req: UpdateSchoolPlanRequest, _ = Depends(verify_super_admin)):

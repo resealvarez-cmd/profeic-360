@@ -84,6 +84,7 @@ function AdminPanel() {
 export default function Dashboard() {
     const [userName, setUserName] = useState("Profe");
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [newsKey, setNewsKey] = useState(0);
     const [activeTab, setActiveTab] = useState<"tools" | "social">("tools");
 
@@ -112,6 +113,10 @@ export default function Dashboard() {
                 // User & Role
                 const metadataName = session.user.user_metadata?.full_name;
                 if (metadataName) setUserName(metadataName.split(" ")[0]);
+
+                if (session.user.email === 're.se.alvarez@gmail.com') {
+                    setIsSuperAdmin(true);
+                }
 
                 // Check Admin via DB
                 const { data: authUser } = await supabase
@@ -229,26 +234,36 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* TABS DE NAVEGACIÓN */}
-                <div className="flex bg-slate-100 p-1 rounded-xl">
-                    <button
-                        onClick={() => setActiveTab("tools")}
-                        className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                            activeTab === "tools" ? "bg-white text-[#1a2e3b] shadow-sm" : "text-slate-400 hover:text-slate-600"
-                        )}
-                    >
-                        📚 Herramientas
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("social")}
-                        className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
-                            activeTab === "social" ? "bg-white text-[#f2ae60] shadow-sm" : "text-slate-400 hover:text-slate-600"
-                        )}
-                    >
-                        📢 Social
-                    </button>
+                <div className="flex gap-4">
+                    {/* TABS DE NAVEGACIÓN */}
+                    <div className="flex bg-slate-100 p-1 rounded-xl">
+                        <button
+                            onClick={() => setActiveTab("tools")}
+                            className={cn(
+                                "px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                                activeTab === "tools" ? "bg-white text-[#1a2e3b] shadow-sm" : "text-slate-400 hover:text-slate-600"
+                            )}
+                        >
+                            📚 Herramientas
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("social")}
+                            className={cn(
+                                "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
+                                activeTab === "social" ? "bg-white text-[#f2ae60] shadow-sm" : "text-slate-400 hover:text-slate-600"
+                            )}
+                        >
+                            📢 Social
+                        </button>
+                    </div>
+                    {isSuperAdmin && (
+                        <Link
+                            href="/superadmin"
+                            className="bg-[#C87533] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-[#B36829] transition-all flex items-center gap-2"
+                        >
+                            <Settings size={16} /> SaaS Backoffice
+                        </Link>
+                    )}
                 </div>
             </div>
 

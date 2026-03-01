@@ -288,14 +288,14 @@ export default function Dashboard360() {
 
                             executionData.forEach((row: any) => {
                                 const scores = row.content?.scores || {};
-                                const obs = row.content?.observations || {};
-                                const date = new Date(row.created_at);
+                                const date = row.created_at ? new Date(row.created_at) : new Date();
 
-                                const diffDays = (now.getTime() - date.getTime()) / (1000 * 3600 * 24);
+                                const diffDays = !isNaN(date.getTime()) ? (now.getTime() - date.getTime()) / (1000 * 3600 * 24) : 0;
                                 const weight = Math.max(0.5, 1 - (diffDays / 180));
 
                                 Object.keys(scores).forEach((key) => {
-                                    weightedSums[key] = (weightedSums[key] || 0) + (scores[key] * weight);
+                                    const scoreValue = Number(scores[key]) || 0;
+                                    weightedSums[key] = (weightedSums[key] || 0) + (scoreValue * weight);
                                     totalWeights[key] = (totalWeights[key] || 0) + weight;
                                 });
                             });
@@ -1361,7 +1361,7 @@ function DashboardContent({
                                         </div>
                                         <p className="text-blue-100 text-sm leading-relaxed font-medium">
                                             {latestInsight
-                                                ? `Se detectaron ${latestInsight.top_3_gaps?.length || 0} oportunidades de mejora sistémica.`
+                                                ? `Se detectaron ${(latestInsight.analysis || latestInsight).top_3_gaps?.length || 0} oportunidades de mejora sistémica.`
                                                 : "El analizador neuronal está listo para interpretar los datos observacionales."}
                                         </p>
                                     </div>
@@ -1570,7 +1570,7 @@ function DashboardContent({
                                                 {userRole === 'teacher'
                                                     ? '"Tu práctica destaca en el Modelamiento, pero podrías potenciar el Cierre de Clase. Conoce estrategias prácticas aquí."'
                                                     : latestInsight
-                                                        ? latestInsight.systemic_summary
+                                                        ? String((latestInsight.analysis || latestInsight).systemic_summary || "")
                                                         : '"Genera tu primer Reporte Ejecutivo para ver insights en tiempo real aquí."'
                                                 }
                                             </p>
