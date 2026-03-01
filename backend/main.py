@@ -75,7 +75,11 @@ app.include_router(admin.router)
 
 @app.get("/")
 def read_root():
-    return {"status": "online", "message": "🚀 SISTEMA PROFEIC OPERATIVO"}
+    return {"status": "ProfeIC API is running smoothly!"}
+
+@app.get("/version")
+def read_version():
+    return {"version": "v1.0.3-MultiTenantFix-SuperAdmin", "message": "🚀 SISTEMA PROFEIC OPERATIVO"}
 
 # Esto permite correrlo directamente con Python si quisieras
 if __name__ == "__main__":
