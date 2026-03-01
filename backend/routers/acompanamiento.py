@@ -13,7 +13,8 @@ router = APIRouter()
 api_key = os.getenv("GOOGLE_API_KEY")
 supabase_url = os.getenv("SUPABASE_URL")
 # Use Service Role Key to bypass RLS for administrative backend operations
-supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
+role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+supabase_key = role_key if role_key and role_key != "false_role_key" else os.getenv("SUPABASE_KEY")
 
 if api_key:
     genai.configure(api_key=api_key)
@@ -235,9 +236,9 @@ class ExecutiveRequest(BaseModel):
 @router.post("/acompanamiento/executive-report")
 async def generate_executive_report(req: ExecutiveRequest):
     try:
-        # 1. Build Query for Completed Cycles with Teacher Data
+        # 1. Build Query for Completed Cycles with Teacher Data AND Observer Data explicitly for DOCX
         query = supabase.table('observation_cycles')\
-            .select('id, created_at, teacher:teacher_id(full_name, department, years_experience, age)')\
+            .select('id, created_at, status, teacher:teacher_id(full_name, department, years_experience, age, school_id), observer:observer_id(full_name)')\
             .eq('status', 'completed')
         
         # Apply Optional School Filtering (Tenant Safety)
@@ -522,10 +523,30 @@ async def generate_executive_report(req: ExecutiveRequest):
             # We don't fail the request if saving fails, just return the data cleanly
             pass
 
+        matriz = []
+        for c in filtered_cycles:
+            matriz.append({
+                "observer_name": c.get('observer', {}).get('full_name', 'Desconocido') if c.get('observer') else 'Desconocido',
+                "teacher_name": c.get('teacher', {}).get('full_name', 'Desconocido') if c.get('teacher') else 'Desconocido',
+                "status": c.get('status', 'completed'),
+                "date": c.get('created_at')
+            })
+
         return {
             "metrics": {
                 "total_observations": len(filtered_cycles),
-                "heatmap": heatmap
+                "heatmap": heatmap,
+                "structural": {},
+                "global_metrics": {
+                    "total_teachers": 0,
+                    "observed_teachers": 0,
+                    "coverage_percent": 0.0,
+                    "total_completed": len(filtered_cycles),
+                    "total_in_progress": 0,
+                    "total_planned": 0
+                },
+                "highlights": {"top_teachers": [], "top_observers": []},
+                "matriz": matriz
             },
             "analysis": ai_result
         }
