@@ -208,7 +208,7 @@ async def download_nee_docx(data: DownloadRequest):
         section = doc.sections[0]
         footer = section.footer
         p = footer.paragraphs[0]
-        p.text = "Documento generado por ProfeIC - Colegio Madre Paulina"
+        p.text = "Documento generado por PROFE IC - Recurso creado con Inteligencia Aumentada de la Plataforma ProfeIC"
 
         buffer = io.BytesIO()
         doc.save(buffer)

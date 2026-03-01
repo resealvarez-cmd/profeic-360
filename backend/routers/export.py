@@ -123,7 +123,7 @@ def add_header_logo(doc, asignatura, nivel, titulo_extra=""):
     run = p.add_run()
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    logo_path = os.path.join(base_dir, 'assets', 'logo.png')
+    logo_path = os.path.join(base_dir, 'assets', 'logo_profeic.svg.png')
     
     if os.path.exists(logo_path):
         try:
@@ -136,8 +136,12 @@ def add_header_logo(doc, asignatura, nivel, titulo_extra=""):
     cell_info = table.cell(0, 1)
     p_info = cell_info.paragraphs[0]
     p_info.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    r1 = p_info.add_run("COLEGIO MADRE PAULINA\n")
+    r1 = p_info.add_run("PROFE IC\n")
     r1.bold = True; r1.font.size = Pt(12); r1.font.color.rgb = RGBColor(43, 84, 110)
+    
+    r2 = p_info.add_run("Recurso creado con Inteligencia Aumentada de la Plataforma ProfeIC\n")
+    r2.font.size = Pt(8); r2.font.color.rgb = RGBColor(100, 100, 100)
+    
     p_info.add_run(f"Asignatura: {asignatura} | Nivel: {nivel}\n").font.size = Pt(10)
     if titulo_extra:
         p_info.add_run(f"{titulo_extra}").italic = True
@@ -505,7 +509,7 @@ async def export_generic_docx(req: GenericExportRequest):
 # ==========================================
 class ExecutiveDocxRequest(BaseModel):
     systemic_summary: str
-    top_3_gaps: List[str]
+    top_3_gaps: Union[List[str], List[Dict[str, Any]], List[Any]]
     recommended_training: Union[str, List[Dict[str, Any]]]
     rigor_audit: Optional[Dict[str, Any]] = None
     heatmap: Optional[Dict[str, float]] = None
@@ -658,7 +662,8 @@ def renderizar_reporte_ejecutivo(doc, data):
     p_brechas = doc.add_paragraph()
     p_brechas.add_run("Principales Brechas Detectadas").bold = True
     for i, gap in enumerate(data.top_3_gaps):
-        doc.add_paragraph(f"{gap}", style='List Number')
+        gap_str = gap.get("descripcion", gap.get("gap", str(gap))) if isinstance(gap, dict) else str(gap)
+        doc.add_paragraph(f"{gap_str}", style='List Number')
         
     doc.add_paragraph()
     
@@ -697,7 +702,9 @@ def renderizar_reporte_ejecutivo(doc, data):
             row[3].text = item.get("kpi", "")
             row[3].paragraphs[0].runs[0].italic = True
     else:
-        doc.add_paragraph(str(training_list), style='Quote')
+        p_train = doc.add_paragraph(str(training_list))
+        if p_train.runs:
+            p_train.runs[0].italic = True
 
     # --- PÁGINA X: ANEXOS Y CUADRO DE HONOR ---
     if data.highlights or data.rigor_audit:
@@ -719,7 +726,8 @@ def renderizar_reporte_ejecutivo(doc, data):
             for t in top_t:
                 c_left.add_paragraph(f"• {t.get('name')} (+{t.get('score')} pts)")
         else:
-            c_left.add_paragraph("No hay datos en este período.", style='Italic')
+            p_empty1 = c_left.add_paragraph("No hay datos en este período.")
+            if p_empty1.runs: p_empty1.runs[0].italic = True
             
         # Right: Top Observers
         style_header_cell(c_right, "LIDERAZGO PEDAGÓGICO: ACOMPAÑANTES DESTACADOS", "2A59A8", "FFFFFF")
@@ -728,7 +736,8 @@ def renderizar_reporte_ejecutivo(doc, data):
             for o in top_o:
                 c_right.add_paragraph(f"• {o.get('name')} (KPI: {o.get('kpi_score')})")
         else:
-            c_right.add_paragraph("No hay datos en este período.", style='Italic')
+            p_empty2 = c_right.add_paragraph("No hay datos en este período.")
+            if p_empty2.runs: p_empty2.runs[0].italic = True
             
         doc.add_paragraph()
 

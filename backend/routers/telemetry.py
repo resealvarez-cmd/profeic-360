@@ -89,14 +89,27 @@ async def get_product_analytics(email: str = Query(...)):
             "ELEVADOR": "mentor"
         }
 
+        # 4.5 Fetch User Profiles for UUID -> Email mapping
+        res_profiles = supabase.table('profiles').select('id, email').execute()
+        uuid_map = {p['id']: p.get('email', 'anonymous') for p in (res_profiles.data or [])}
+
         for item in library_resources:
-            tipo = item.get('tipo', '')
+            tipo = str(item.get('tipo', '')).upper()
             uid = item.get('user_id')
-            if uid: unique_identities.add(uid) # Add user_id to active set
+            email_user = uuid_map.get(uid) if uid else "anonymous"
+            if email_user and email_user != "anonymous":
+                unique_identities.add(email_user) # Add email to active set
             
             mod_key = LIB_MAP.get(tipo, "unknown")
             weight = SAVED_MINUTES_MAP.get(mod_key, 0)
             total_saved_minutes += weight
+            
+            # INCLUDE HISTORICAL ITEMS IN METRICS
+            total_events += 1
+            if mod_key != "unknown":
+                module_usage[mod_key] = module_usage.get(mod_key, 0) + 1
+                
+            user_activity[email_user] = user_activity.get(email_user, 0) + 1
 
         # 6. Process Telemetry Events (Real-time)
         for event in events:

@@ -295,11 +295,8 @@ export default function Dashboard360() {
                                 const weight = Math.max(0.5, 1 - (diffDays / 180));
 
                                 Object.keys(scores).forEach((key) => {
-                                    const evidence = obs[key];
-                                    if (evidence && typeof evidence === 'string' && evidence.trim().length > 3) {
-                                        weightedSums[key] = (weightedSums[key] || 0) + (scores[key] * weight);
-                                        totalWeights[key] = (totalWeights[key] || 0) + weight;
-                                    }
+                                    weightedSums[key] = (weightedSums[key] || 0) + (scores[key] * weight);
+                                    totalWeights[key] = (totalWeights[key] || 0) + weight;
                                 });
                             });
 
@@ -977,16 +974,22 @@ function DashboardContent({
                         <p className="text-slate-500 text-sm mb-6">Análisis basado en {latestInsight ? 'IA en tiempo real' : 'datos pedagógicos'}</p>
 
                         <div className="space-y-6">
-                            {latestInsight ? (
+                            {latestInsight && ((latestInsight.analysis || latestInsight).systemic_summary || (Array.isArray((latestInsight.analysis || latestInsight).top_3_gaps) && (latestInsight.analysis || latestInsight).top_3_gaps.length > 0)) ? (
                                 <>
                                     <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
                                         <h3 className="font-bold text-[#C87533] text-sm mb-2">🚨 Brechas Detectadas (Top 3)</h3>
                                         <ul className="space-y-2">
-                                            {latestInsight.top_3_gaps?.map((gap: any, i: number) => (
-                                                <li key={i} className="text-sm text-slate-700 leading-relaxed flex gap-2">
-                                                    <span className="font-bold">•</span> {typeof gap === 'string' ? gap : (gap.foco || gap.objetivo || JSON.stringify(gap))}
+                                            {Array.isArray((latestInsight.analysis || latestInsight).top_3_gaps) && (latestInsight.analysis || latestInsight).top_3_gaps.length > 0 ? (
+                                                (latestInsight.analysis || latestInsight).top_3_gaps.map((gap: any, i: number) => (
+                                                    <li key={i} className="text-sm text-slate-700 leading-relaxed flex gap-2">
+                                                        <span className="font-bold">•</span> {typeof gap === 'string' ? gap : (gap.foco || gap.objetivo || JSON.stringify(gap))}
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <li className="text-sm text-slate-500 italic flex gap-2">
+                                                    <span className="font-bold">•</span> No hay datos suficientes para mostrar brechas en este período.
                                                 </li>
-                                            ))}
+                                            )}
                                         </ul>
                                     </div>
 
@@ -994,9 +997,9 @@ function DashboardContent({
                                         <h3 className={"font-bold text-[#1B3C73] text-sm mb-3"}>💡 Recomendación Estratégica</h3>
                                         <div className={"bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-slate-700 mb-4 whitespace-pre-wrap"}>
                                             <span className={"block font-bold text-[#2A59A8] mb-1"}>Capacitación Sugerida:</span>
-                                            {typeof latestInsight.recommended_training === 'string'
-                                                ? latestInsight.recommended_training
-                                                : JSON.stringify(latestInsight.recommended_training, null, 2)}
+                                            {typeof (latestInsight.analysis || latestInsight).recommended_training === 'string'
+                                                ? (latestInsight.analysis || latestInsight).recommended_training
+                                                : JSON.stringify((latestInsight.analysis || latestInsight).recommended_training, null, 2)}
                                         </div>
 
                                         {/* EXPORT BUTTON */}
@@ -1005,10 +1008,21 @@ function DashboardContent({
                                                 const toastId = toast.loading("Generando documento...");
                                                 try {
                                                     const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+                                                    const metricsData = latestInsight.metrics || latestInsight.heatmap || {};
+                                                    const body = {
+                                                        systemic_summary: (latestInsight.analysis || latestInsight).systemic_summary || "",
+                                                        top_3_gaps: (latestInsight.analysis || latestInsight).top_3_gaps || [],
+                                                        recommended_training: (latestInsight.analysis || latestInsight).recommended_training || "",
+                                                        rigor_audit: metricsData.rigor_audit || null,
+                                                        heatmap: metricsData.heatmap || null,
+                                                        global_metrics: metricsData.global_metrics || null,
+                                                        highlights: metricsData.highlights || null,
+                                                        matriz: metricsData.matriz || null
+                                                    };
                                                     const res = await fetch(`${BE_URL}/export/executive-docx`, {
                                                         method: 'POST',
                                                         headers: { 'Content-Type': 'application/json' },
-                                                        body: JSON.stringify(latestInsight)
+                                                        body: JSON.stringify(body)
                                                     });
                                                     if (!res.ok) throw new Error("Error export");
                                                     const blob = await res.blob();
@@ -1042,6 +1056,16 @@ function DashboardContent({
                                         )}
                                     </div>
                                 </>
+                            ) : latestInsight ? (
+                                <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100 mb-6">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-100">
+                                        <AlertCircle size={28} className="text-slate-300" />
+                                    </div>
+                                    <h3 className="text-lg font-black text-slate-700 mb-2">Sin datos actuales</h3>
+                                    <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
+                                        El sistema interactuó con la base de datos pero la información está incompleta o vacía. Realiza más observaciones o genera un nuevo reporte para ver detalles.
+                                    </p>
+                                </div>
                             ) : (
                                 <div className="text-center py-10 text-slate-400">
                                     <p>Genera un reporte para ver el detalle.</p>
@@ -1138,13 +1162,14 @@ function DashboardContent({
                                             try {
                                                 const body = {
                                                     ...executiveData.analysis,
-                                                    heatmap: executiveData.metrics?.heatmap,
+                                                    rigor_audit: executiveData.metrics?.rigor_audit || null,
+                                                    heatmap: executiveData.metrics?.heatmap || null,
                                                     global_metrics: {
                                                         ...executiveData.metrics?.global_metrics,
-                                                        structural: executiveData.metrics?.structural
+                                                        structural: executiveData.metrics?.structural || null
                                                     },
-                                                    highlights: executiveData.metrics?.highlights,
-                                                    matriz: executiveData.metrics?.matriz
+                                                    highlights: executiveData.metrics?.highlights || null,
+                                                    matriz: executiveData.metrics?.matriz || null
                                                 };
                                                 const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
                                                 const res = await fetch(`${BE_URL}/export/executive-docx`, {
@@ -1264,13 +1289,15 @@ function DashboardContent({
                             />
                         </div>
 
-                        <Link href="/acompanamiento/docentes" className="bg-white text-slate-600 p-3 rounded-xl hover:bg-slate-50 border border-slate-200 shadow-sm transition-colors group tooltip" title="Gestión Docentes">
+                        <Link href="/acompanamiento/docentes" className="bg-white text-slate-600 p-3 rounded-xl hover:bg-slate-50 border border-slate-200 shadow-sm transition-colors group relative">
                             <Users size={20} className="group-hover:text-[#2A59A8]" />
+                            <div className="hidden group-hover:block absolute top-[120%] left-1/2 -translate-x-1/2 w-max px-3 py-1.5 bg-slate-800 text-white text-[10px] font-bold uppercase rounded-lg shadow-xl z-50 pointer-events-none">Gestión Docentes</div>
                         </Link>
 
                         {currentUser?.email === 're.se.alvarez@gmail.com' && (
-                            <Link href="/acompanamiento/admin/users" className="bg-white text-slate-600 p-3 rounded-xl hover:bg-slate-50 border border-slate-200 shadow-sm transition-colors group tooltip" title="Admin Usuarios">
+                            <Link href="/acompanamiento/admin/users" className="bg-white text-slate-600 p-3 rounded-xl hover:bg-slate-50 border border-slate-200 shadow-sm transition-colors group relative">
                                 <Settings size={20} className="group-hover:text-[#C87533]" />
+                                <div className="hidden group-hover:block absolute top-[120%] left-1/2 -translate-x-1/2 w-max px-3 py-1.5 bg-slate-800 text-white text-[10px] font-bold uppercase rounded-lg shadow-xl z-50 pointer-events-none">Admin Usuarios</div>
                             </Link>
                         )}
 
@@ -1358,9 +1385,12 @@ function DashboardContent({
                         <div className={`bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm flex flex-col items-center justify-center ${canManageTeachers ? 'md:col-span-2' : 'md:col-span-3'}`}>
                             <h3 className="font-bold text-[#1B3C73] mb-4 text-center w-full relative">
                                 Radar de Prácticas Pedagógicas
-                                <span className="absolute right-0 top-0 tooltip" data-tip="Basado únicamente en evidencia textual evaluativa.">
-                                    <Info size={16} className="text-slate-400" />
-                                </span>
+                                <div className="absolute right-0 top-0 group cursor-help">
+                                    <Info size={16} className="text-slate-400 hover:text-slate-600 transition-colors" />
+                                    <div className="hidden group-hover:block absolute right-full top-1/2 -translate-y-1/2 mr-2 w-48 p-2 bg-slate-800 text-white text-xs rounded-lg shadow-lg z-10 font-normal">
+                                        Basado únicamente en evidencia textual evaluativa.
+                                    </div>
+                                </div>
                             </h3>
                             <div className="w-full h-[280px]">
                                 <ResponsiveContainer width="100%" height="100%">
