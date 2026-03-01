@@ -34,9 +34,9 @@ const LandingPage = () => {
                         </div>
                     </div>
                     <div className="hidden md:flex items-center gap-10 text-sm font-bold text-slate-600">
-                        <Link href="/institucional" className="text-slate-500 hover:text-[#1B3C73] transition-colors py-3">
-                            Planes para Colegios
-                        </Link>
+                        <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud de Implementación - ProfeIC" className="text-slate-500 hover:text-[#1B3C73] transition-colors py-3">
+                            Implementar en tu Colegio
+                        </a>
                         <Link href="/login" className="bg-[#1B3C73] text-white px-8 py-3 rounded-xl border-2 border-[#1B3C73] hover:bg-[#2A59A8] transition-all font-black shadow-lg">
                             Acceso Privado
                         </Link>
@@ -62,9 +62,9 @@ const LandingPage = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
-                            <Link href="/institucional" className="bg-white text-[#1B3C73] border-2 border-[#1B3C73]/20 hover:border-[#1B3C73]/50 px-12 py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-3 text-xl hover:bg-slate-50">
-                                Contratar para mi Colegio
-                            </Link>
+                            <a href="mailto:re.se.alvarez@gmail.com?subject=Solicitud de Implementación - ProfeIC" className="bg-white text-[#1B3C73] border-2 border-[#1B3C73]/20 hover:border-[#1B3C73]/50 px-8 py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-3 text-lg hover:bg-slate-50 text-center">
+                                Contactar para implementar en tu colegio
+                            </a>
                             <Link href="/login" className="bg-[#1B3C73] text-white px-12 py-5 rounded-2xl font-black shadow-2xl shadow-blue-900/30 hover:scale-105 transition-all flex items-center justify-center gap-3 text-xl group">
                                 Acceso Profesores <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
