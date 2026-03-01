@@ -321,6 +321,7 @@ export default function Dashboard360() {
             const fetchMetrics = async () => {
                 setLoadingMetrics(true);
                 try {
+                    console.log("SUPERADMIN_FETCH: Requesting metrics for author:", currentUser?.id);
                     const res = await fetch(`${API_URL}/acompanamiento/executive-metrics`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -331,18 +332,25 @@ export default function Dashboard360() {
                             author_id: currentUser?.id
                         })
                     });
+
+                    console.log("SUPERADMIN_FETCH: Status Code:", res.status);
+
                     if (res.ok) {
                         const data = await res.json();
+                        console.log("SUPERADMIN_FETCH: Data received:", data);
                         setMetrics(data);
+                    } else {
+                        const errData = await res.text();
+                        console.error("SUPERADMIN_FETCH: Error response:", errData);
                     }
                 } catch (e) {
-                    console.error("Error fetching metrics", e);
+                    console.error("SUPERADMIN_FETCH: Network fetch error:", e);
                 } finally {
                     setLoadingMetrics(false);
                 }
             };
             fetchMetrics();
-        }, [filterDept, filterExp, filterAge]);
+        }, [filterDept, filterExp, filterAge, currentUser]);
 
         if (currentUser?.email !== 're.se.alvarez@gmail.com') return null;
 
