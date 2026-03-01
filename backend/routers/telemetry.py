@@ -14,7 +14,8 @@ router = APIRouter(
 
 # --- CONFIGURACIÓN ---
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+supabase_key = role_key if role_key and role_key != "false_role_key" else os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # --- WEIGHTS FOR SAVED HOURS (Minutes) ---
