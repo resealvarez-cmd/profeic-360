@@ -12,7 +12,8 @@ router = APIRouter()
 # --- CONFIGURACIÓN ---
 api_key = os.getenv("GOOGLE_API_KEY")
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+# Use Service Role Key to bypass RLS for administrative backend operations
+supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
 
 if api_key:
     genai.configure(api_key=api_key)
