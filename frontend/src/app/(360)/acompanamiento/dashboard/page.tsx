@@ -996,10 +996,23 @@ function DashboardContent({
                                     <div>
                                         <h3 className={"font-bold text-[#1B3C73] text-sm mb-3"}>💡 Recomendación Estratégica</h3>
                                         <div className={"bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-slate-700 mb-4 whitespace-pre-wrap"}>
-                                            <span className={"block font-bold text-[#2A59A8] mb-1"}>Capacitación Sugerida:</span>
-                                            {typeof (latestInsight.analysis || latestInsight).recommended_training === 'string'
-                                                ? (latestInsight.analysis || latestInsight).recommended_training
-                                                : JSON.stringify((latestInsight.analysis || latestInsight).recommended_training, null, 2)}
+                                            <span className={"block font-bold text-[#2A59A8] mb-3"}>Capacitación Sugerida:</span>
+                                            {Array.isArray((latestInsight.analysis || latestInsight).recommended_training) ? (
+                                                <div className="space-y-4">
+                                                    {(latestInsight.analysis || latestInsight).recommended_training.map((item: any, idx: number) => (
+                                                        <div key={idx} className="bg-white border border-blue-200/60 rounded-xl p-4 shadow-sm">
+                                                            <h5 className="font-bold text-[#1B3C73] mb-2">{item.foco || "Sugerencia de Capacitación"}</h5>
+                                                            <p className="text-slate-600 mb-2 leading-relaxed"><span className="font-semibold text-slate-700">Objetivo:</span> {item.objetivo}</p>
+                                                            <p className="text-slate-600 mb-2 leading-relaxed"><span className="font-semibold text-slate-700">Metodología:</span> {item.metodologia}</p>
+                                                            {item.kpi && <p className="text-blue-700 font-medium italic mt-2 bg-blue-50/50 p-2 rounded-lg border border-blue-100"><span className="text-slate-500 not-italic font-semibold">KPI Esperado:</span> {item.kpi}</p>}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                typeof (latestInsight.analysis || latestInsight).recommended_training === 'string'
+                                                    ? (latestInsight.analysis || latestInsight).recommended_training
+                                                    : JSON.stringify((latestInsight.analysis || latestInsight).recommended_training, null, 2)
+                                            )}
                                         </div>
 
                                         {/* EXPORT BUTTON */}
