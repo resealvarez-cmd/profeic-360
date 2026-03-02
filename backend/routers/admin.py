@@ -44,6 +44,9 @@ class CreateUserRequest(BaseModel):
     school_id: Optional[str] = None
     individual_plan_active: bool = False
 
+class DeleteUserRequest(BaseModel):
+    email: str
+
 # === DEPENDECIA DE SEGURIDAD ===
 async def verify_super_admin(authorization: str = Header(...)):
     """Verifica que quien llama sea el SuperAdmin."""
@@ -155,6 +158,38 @@ async def create_user(req: CreateUserRequest, _ = Depends(verify_super_admin)):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error creando usuario: {str(e)}")
+
+
+@router.post("/delete-user")
+async def delete_user(req: DeleteUserRequest, _ = Depends(verify_super_admin)):
+    """
+    1. Administrador elimina a un usuario completamente.
+    2. Se borra de Supabase Auth (Identity Provider).
+    3. Se borra de `authorized_users`.
+    """
+    if not supabase_admin:
+        raise HTTPException(status_code=500, detail="Falta Service Role Key")
+
+    try:
+        # Supabase API python no tiene admin.delete_user_by_email, buscamos su ID primero
+        # o en este caso, podemos sacar el ID buscando en Auth. Para más simplificación, 
+        # consultaremos la db interna (profiles/authorized_users si tuviéramos id)
+        
+        # Estrategia: Listar usuarios auth (limite de 50 o paginar) y buscarlo
+        # (Idealmente, el front nos pasaría el ID, pero como a veces no lo tiene si solo está en authorized_users...)
+        users_resp = supabase_admin.auth.admin.list_users()
+        user_to_delete = next((u for u in users_resp.users if u.email == req.email), None)
+
+        if user_to_delete:
+            supabase_admin.auth.admin.delete_user(user_to_delete.id)
+        
+        # Eliminar de las tablas DB
+        supabase_admin.table('authorized_users').delete().eq("email", req.email).execute()
+
+        return {"message": f"Usuario {req.email} eliminado de Auth y BD."}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error eliminando usuario: {str(e)}")
 
 
 @router.post("/school-plan")

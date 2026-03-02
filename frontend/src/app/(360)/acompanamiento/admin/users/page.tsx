@@ -225,12 +225,29 @@ export default function AdminUsersPage() {
     };
 
     const handleDelete = async (email: string) => {
-        if (!confirm("¿Seguro que deseas eliminar este usuario? Quitará su acceso.")) return;
+        if (!confirm("¿Seguro que deseas eliminar este usuario? Quitará su acceso y eliminará su cuenta por completo.")) return;
 
         try {
-            const { error } = await supabase.from('authorized_users').delete().eq('email', email);
-            if (error) throw error;
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("No session found");
+
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+            const response = await fetch(`${API_URL}/admin/delete-user`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ email })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Error eliminando usuario");
+            }
+
             setUsers(users.filter(u => u.email !== email));
+            alert("Usuario eliminado correctamente.");
         } catch (error: any) {
             alert("Error al eliminar: " + error.message);
         }
