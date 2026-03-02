@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Mail, Shield, ShieldAlert, User, CheckCircle, XCircle, Edit2 } from "lucide-react";
+import { Plus, Trash2, Mail, Shield, ShieldAlert, User, CheckCircle, XCircle, Edit2, KeyRound } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<any[]>([]);
@@ -253,6 +254,20 @@ export default function AdminUsersPage() {
         }
     };
 
+    const handleResetPassword = async (email: string) => {
+        if (!confirm(`¿Enviar un correo de restablecimiento de contraseña a ${email}?`)) return;
+        try {
+            const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${siteUrl}/set-password`,
+            });
+            if (error) throw error;
+            toast.success(`Correo de recuperación enviado a ${email}`);
+        } catch (error: any) {
+            toast.error("Error al enviar el correo: " + error.message);
+        }
+    };
+
     const openEditModal = (user: any) => {
         setEditingUser(user);
         setNewUser({
@@ -373,6 +388,13 @@ export default function AdminUsersPage() {
                                                 title="Editar Usuario"
                                             >
                                                 <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleResetPassword(user.email)}
+                                                className="p-2 text-slate-300 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
+                                                title="Resetear Contraseña"
+                                            >
+                                                <KeyRound size={18} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(user.email)}
