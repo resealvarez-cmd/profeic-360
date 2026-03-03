@@ -76,19 +76,30 @@ export default function AnalizadorPage() {
         setResult(null);
 
         try {
-            const response = await fetch(`${API_URL}/analizador/audit`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ objetivo_aprendizaje: objetivo, texto_evaluacion: instrumento })
-            });
+            let response: Response;
+            try {
+                response = await fetch(`${API_URL}/analizador/audit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ objetivo_aprendizaje: objetivo, texto_evaluacion: instrumento })
+                });
+            } catch (networkError) {
+                // Fallo de red: el backend no está disponible
+                alert(`⚠️ Error de conexión: No se pudo contactar al servidor (${API_URL}).\n\nVerifica que el backend de Cloud Run esté activo.`);
+                return;
+            }
 
-            if (!response.ok) throw new Error("Error de conexión");
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({ detail: `HTTP ${response.status}` }));
+                const detail = errorBody?.detail || `Error HTTP ${response.status}`;
+                alert(`❌ Error del servidor: ${detail}`);
+                return;
+            }
 
             const data = await response.json();
             setResult(data);
             setVerSoloCriticos(true);
 
-            // Telemetry: Generation Success
             trackEvent({
                 eventName: 'generation_success',
                 module: 'analizador',
@@ -98,9 +109,9 @@ export default function AnalizadorPage() {
                     score: data.score_coherencia
                 }
             });
-        } catch (error) {
-            console.error(error);
-            alert("No se pudo conectar con la IA. Asegúrate de que el backend esté corriendo.");
+        } catch (error: any) {
+            console.error("Error inesperado:", error);
+            alert(`Error inesperado: ${error.message}`);
         } finally {
             setIsAnalyzing(false);
         }
