@@ -24,7 +24,7 @@ from routers import (
     planificador, 
     rubricas, 
     curriculum, 
-    export,       # <--- CRÍTICO: Necesario para descargar Word
+    export,
     evaluaciones, 
     mentor, 
     contexto, 
@@ -32,10 +32,9 @@ from routers import (
     nee, 
     login,
     analizador,
-    analizador,
-    biblioteca,   # <--- CRÍTICO: Tu nueva estantería
-    community,    # <--- FASE V: Mercado Interno
-    social,       # <--- FASE SOCIAL: Noticias y Likes
+    biblioteca,
+    community,
+    social,
     acompanamiento, 
     lectura_inteligente,
     telemetry,
