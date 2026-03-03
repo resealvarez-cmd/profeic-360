@@ -79,13 +79,21 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
                 throw new Error("La configuración del servidor es incorrecta. Contacte a soporte.");
             }
 
-            const response = await fetch(`${apiUrl}/biblioteca/save`, { // Usamos la URL de la variable de entorno
+            const response = await fetch(`${apiUrl}/biblioteca/save`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
+                },
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error("Error al guardar en el servidor");
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({ detail: `Error HTTP ${response.status}` }));
+                const detail = errorBody?.detail || errorBody?.message || `Error HTTP ${response.status}`;
+                console.error("❌ Respuesta del servidor:", errorBody);
+                throw new Error(`Error del servidor: ${detail}`);
+            }
 
             setSuccess(true);
             setTimeout(() => setOpen(false), 1500);

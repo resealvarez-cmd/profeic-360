@@ -16,7 +16,8 @@ router = APIRouter(
 
 # --- CONFIGURACIÓN SUPABASE ---
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+# Usar Service Role Key para operaciones admin (bypassea RLS)
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
 
 supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY:
@@ -132,5 +133,5 @@ async def guardar_recurso(data: RecursoUniversal):
             raise Exception("No se recibió confirmación de Supabase")
         
     except Exception as e:
-        print(f"❌ Error guardando: {e}")
+        print(f"❌ Error guardando en biblioteca_recursos: {type(e).__name__}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
