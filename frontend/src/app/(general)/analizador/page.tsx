@@ -7,7 +7,7 @@ import {
     Microscope, ChevronRight, ChevronLeft, AlertOctagon, Info,
     ListChecks, AlertTriangle, Lightbulb, Check, Activity,
     PanelLeftClose, PanelLeftOpen, PieChart as PieIcon,
-    ArrowRight, TrendingUp
+    ArrowRight, TrendingUp, ThumbsUp, MessageCircleQuestion
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,16 +76,25 @@ export default function AnalizadorPage() {
         setResult(null);
 
         try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 90000); // 90 segundos
+
             let response: Response;
             try {
                 response = await fetch(`${API_URL}/analizador/audit`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ objetivo_aprendizaje: objetivo, texto_evaluacion: instrumento })
+                    body: JSON.stringify({ objetivo_aprendizaje: objetivo, texto_evaluacion: instrumento }),
+                    signal: controller.signal
                 });
-            } catch (networkError) {
-                // Fallo de red: el backend no está disponible
-                alert(`⚠️ Error de conexión: No se pudo contactar al servidor (${API_URL}).\n\nVerifica que el backend de Cloud Run esté activo.`);
+                clearTimeout(timeout);
+            } catch (networkError: any) {
+                clearTimeout(timeout);
+                if (networkError.name === 'AbortError') {
+                    alert(`⏱️ Tiempo agotado: El análisis tardó más de 90 segundos. Intenta con un instrumento más corto o vuelve a intentarlo.`);
+                } else {
+                    alert(`⚠️ Error de conexión: No se pudo contactar al servidor (${API_URL}).\n\nVerifica que el backend de Cloud Run esté activo.`);
+                }
                 return;
             }
 
@@ -124,7 +133,7 @@ export default function AnalizadorPage() {
     };
 
     const itemsParaMostrar = result?.items_analizados
-        ? (verSoloCriticos ? result.items_analizados.filter((i: any) => i.estado === "Crítico") : result.items_analizados)
+        ? (verSoloCriticos ? result.items_analizados.filter((i: any) => i.estado === "Mejorable") : result.items_analizados)
         : [];
 
     const openDetail = (item: any) => {
@@ -325,7 +334,7 @@ export default function AnalizadorPage() {
                                     <CardHeader className="pb-3 border-b bg-slate-50/50 flex justify-between items-center sticky top-0 z-10">
                                         <div className="flex items-center gap-2"><ListChecks className="w-4 h-4 text-[#f2ae60]" /><CardTitle className="text-[#2b546e] text-base">Reactivos</CardTitle></div>
                                         <div className="flex bg-slate-200/50 p-1 rounded">
-                                            <button onClick={() => setVerSoloCriticos(true)} className={cn("px-3 py-1 text-[10px] font-bold rounded", verSoloCriticos ? "bg-white text-red-600 shadow-sm" : "text-slate-500")}>Críticos</button>
+                                            <button onClick={() => setVerSoloCriticos(true)} className={cn("px-3 py-1 text-[10px] font-bold rounded", verSoloCriticos ? "bg-white text-amber-600 shadow-sm" : "text-slate-500")}>Mejorables</button>
                                             <button onClick={() => setVerSoloCriticos(false)} className={cn("px-3 py-1 text-[10px] font-bold rounded", !verSoloCriticos ? "bg-white text-[#2b546e] shadow-sm" : "text-slate-500")}>Todos</button>
                                         </div>
                                     </CardHeader>
@@ -333,8 +342,8 @@ export default function AnalizadorPage() {
                                         {itemsParaMostrar.length > 0 ? itemsParaMostrar.map((item: any) => (
                                             <div key={item.id} onClick={() => openDetail(item)} className="p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <Badge variant="outline" className={cn("text-[10px]", item.estado === "Crítico" ? "text-red-600 bg-red-50 border-red-200" : "text-green-600 bg-green-50 border-green-200")}>{item.dok_real}</Badge>
-                                                    {item.estado === "Crítico" && <AlertTriangle className="w-3 h-3 text-red-400" />}
+                                                    <Badge variant="outline" className={cn("text-[10px]", item.estado === "Mejorable" ? "text-amber-600 bg-amber-50 border-amber-200" : "text-green-600 bg-green-50 border-green-200")}>{item.dok_real}</Badge>
+                                                    {item.estado === "Mejorable" && <AlertTriangle className="w-3 h-3 text-amber-400" />}
                                                 </div>
                                                 <p className="text-sm text-slate-700 italic line-clamp-1">"{item.pregunta_extracto}"</p>
                                             </div>
@@ -342,6 +351,56 @@ export default function AnalizadorPage() {
                                     </CardContent>
                                 </Card>
                             </div>
+
+                            {/* FORTALEZAS */}
+                            {result.reconocimiento_fortalezas && result.reconocimiento_fortalezas.length > 0 && (
+                                <Card className="border-none shadow-md bg-white">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg text-[#2b546e] flex items-center gap-2">
+                                            <ThumbsUp className="w-5 h-5 text-green-500" /> Lo que funciona bien
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <ul className="list-disc list-inside space-y-2 text-sm text-slate-700">
+                                            {result.reconocimiento_fortalezas.map((f: any, index: number) => (
+                                                <li key={index}>{f.descripcion || f}</li>
+                                            ))}
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* FEED FORWARD */}
+                            {result.feed_forward && result.feed_forward.length > 0 && (
+                                <Card className="border-none shadow-md bg-white">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg text-[#2b546e] flex items-center gap-2">
+                                            <Lightbulb className="w-5 h-5 text-blue-500" /> Próximos pasos
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <ol className="list-decimal list-inside space-y-2 text-sm text-slate-700">
+                                            {(Array.isArray(result.feed_forward) ? result.feed_forward : [result.feed_forward]).map((step: string, index: number) => (
+                                                <li key={index}>{step}</li>
+                                            ))}
+                                        </ol>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* PREGUNTA DE CIERRE */}
+                            {result.pregunta_cierre && (
+                                <Card className="border-none shadow-md bg-amber-50 border border-amber-100">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-base text-[#2b546e] flex items-center gap-2">
+                                            <MessageCircleQuestion className="w-5 h-5 text-amber-500" /> Reflexión final
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-slate-700 italic">💬 {result.pregunta_cierre}</p>
+                                    </CardContent>
+                                </Card>
+                            )}
                         </div>
                     )}
                 </div >
@@ -351,49 +410,69 @@ export default function AnalizadorPage() {
             < Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen} >
                 <SheetContent className="w-[400px] sm:w-[550px] bg-[#fcfcfc] overflow-y-auto">
                     {selectedItem && (
-                        <div className="space-y-6 pt-6">
+                        <div className="space-y-5 pt-6">
+                            {/* HEADER */}
                             <div className="flex justify-between items-center border-b pb-4">
-                                <h3 className="font-bold text-[#2b546e]">Detalle Forense</h3>
-                                <Badge className={selectedItem.estado === "Crítico" ? "bg-red-500" : "bg-green-500"}>{selectedItem.estado}</Badge>
+                                <h3 className="font-bold text-[#2b546e]">Análisis del Reactivo</h3>
+                                <Badge className={selectedItem.estado === "Mejorable" ? "bg-amber-500" : "bg-green-500"}>{selectedItem.estado}</Badge>
                             </div>
 
-                            <div className="flex items-center justify-between bg-slate-100 p-3 rounded text-xs text-center">
-                                <div className="flex-1">
-                                    <p className="text-slate-400 font-bold mb-1">OA PIDE</p>
-                                    <div className="bg-[#2b546e] text-white px-2 py-1 rounded">{selectedItem.dok_declarado}</div>
+                            {/* HABILIDAD DECLARADA vs REAL */}
+                            <div className="bg-slate-50 rounded-lg p-4 space-y-3 border border-slate-200">
+                                <div>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Habilidad que dice medir</p>
+                                    <p className="text-sm text-[#2b546e] font-medium">{selectedItem.habilidad_declarada || "No declarada explícitamente"}</p>
                                 </div>
-                                <ArrowRight className="w-4 h-4 text-slate-400 mx-2" />
-                                <div className="flex-1">
-                                    <p className="text-slate-400 font-bold mb-1">ÍTEM MIDE</p>
-                                    <div className="bg-white border border-slate-300 px-2 py-1 rounded">{selectedItem.dok_real}</div>
+                                <div className="border-t border-slate-200 pt-3">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Habilidad que realmente mide</p>
+                                    <p className="text-sm text-slate-700 font-medium">{selectedItem.habilidad_real || selectedItem.dok_real}</p>
                                 </div>
                             </div>
 
+                            {/* PROCESO MENTAL */}
+                            {selectedItem.proceso_mental_estudiante && (
+                                <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        <BrainCircuit className="w-3 h-3" /> Lo que el estudiante hace mentalmente
+                                    </p>
+                                    <p className="text-sm text-slate-700 italic">{selectedItem.proceso_mental_estudiante}</p>
+                                </div>
+                            )}
+
+                            {/* PREGUNTA ORIGINAL */}
                             <div>
-                                <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Pregunta Original</h4>
+                                <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Reactivo</h4>
                                 <div className="bg-white p-3 rounded border border-slate-200 text-sm italic text-slate-600">"{selectedItem.pregunta_completa}"</div>
                             </div>
 
+                            {/* DIAGNÓSTICO */}
                             <div>
-                                <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Diagnóstico</h4>
-                                <div className="bg-blue-50 p-3 rounded border border-blue-100 text-sm text-slate-700">{selectedItem.analisis}</div>
+                                <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Análisis</h4>
+                                <div className="bg-white p-3 rounded border border-slate-200 text-sm text-slate-700">{selectedItem.analisis}</div>
                             </div>
 
-                            {selectedItem.estado === "Crítico" && (
+                            {/* SUGERENCIA (para Mejorable) */}
+                            {selectedItem.estado === "Mejorable" && selectedItem.sugerencia_reingenieria && (
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
-                                        <h4 className="text-xs font-bold text-[#2b546e] uppercase flex items-center gap-1"><Sparkles className="w-3 h-3" /> Propuesta IA</h4>
+                                        <h4 className="text-xs font-bold text-amber-600 uppercase flex items-center gap-1"><Sparkles className="w-3 h-3" /> Propuesta de mejora</h4>
                                         <Button size="sm" variant="ghost" onClick={handleCopy} className="h-6 text-[10px]">{copiado ? "Copiado" : "Copiar"}</Button>
                                     </div>
                                     <Textarea
                                         value={textoEditado}
                                         onChange={(e) => setTextoEditado(e.target.value)}
-                                        className="min-h-[120px] bg-white text-sm"
+                                        className="min-h-[100px] bg-white text-sm"
                                     />
-                                    <div className="mt-4 flex gap-2 p-3 bg-slate-50 rounded text-xs text-slate-500">
-                                        <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <p>Para profundizar, utiliza el módulo <strong>Elevador DOK</strong>.</p>
-                                    </div>
+                                </div>
+                            )}
+
+                            {/* PREGUNTA DE COACHING */}
+                            {selectedItem.pregunta_reflexion && (
+                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                                    <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                        <Lightbulb className="w-3 h-3" /> Reflexión para ti
+                                    </p>
+                                    <p className="text-sm text-slate-700 italic">💬 {selectedItem.pregunta_reflexion}</p>
                                 </div>
                             )}
                         </div>

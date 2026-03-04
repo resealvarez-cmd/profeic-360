@@ -3,10 +3,10 @@ from pydantic import BaseModel
 from typing import Optional
 import os
 import json
-import asyncio
 import google.generativeai as genai
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from collections import Counter
 
 load_dotenv()
 
@@ -47,81 +47,106 @@ class GuardarAnalisisRequest(BaseModel):
 
 
 # ==============================================================================
-# PROMPTS ANCLADOS EN WEBB (RIGOR PEDAGÓGICO)
+# MARCO PEDAGÓGICO COMPLETO
 # ==============================================================================
+
 WEBB_DESCRIPTORS = """
-## MARCO DE REFERENCIA: TAXONOMÍA WEBB (DOK) — DESCRIPTORES OFICIALES
+## TAXONOMÍA WEBB (DOK) — DESCRIPTORES OFICIALES
 
 DOK 1 — RECUERDO Y REPRODUCCIÓN
 - El estudiante recuerda, recupera o reproduce información o procedimientos memorizados.
-- Verbos clave: definir, enlistar, nombrar, recordar, repetir, completar, identificar (un hecho directo).
-- Ejemplo de pregunta DOK 1: "¿En qué año ocurrió la Batalla de Boyacá?" / "Define fotosíntesis."
-- Señal clave: La respuesta única y directa está en el texto o en la memoria. No hay interpretación.
+- Señal clave: La respuesta única está en el texto o en la memoria. Sin interpretación.
+- Ejemplos: "¿En qué año ocurrió X?" / "Define fotosíntesis." / "Identifica la alternativa correcta según el texto."
 
 DOK 2 — HABILIDADES Y CONCEPTOS
-- El estudiante interpreta, clasifica, organiza, identifica patrones o aplica un procedimiento en un contexto conocido.
-- Verbos clave: clasificar, resumir, interpretar, explicar (cómo), predecir, comparar, inferir (desde texto).
-- Ejemplo DOK 2: "¿Por qué el pH afecta la velocidad de la reacción?" / "Compara las causas de la I y II Guerra Mundial."
-- Señal clave: La respuesta requiere más de un paso o implica usar una idea, pero sigue dentro de un procedimiento conocido.
+- El estudiante interpreta, clasifica, organiza o aplica un procedimiento en contexto conocido.
+- Señal clave: Requiere más de un paso o aplicación de una idea, pero dentro de un procedimiento conocido.
+- Ejemplos: "Explica por qué X…" / "Compara las causas de X e Y." / "Predice qué sucederá si…"
 
 DOK 3 — RAZONAMIENTO ESTRATÉGICO
-- El estudiante razona, argumenta, construye, evalúa o diseña usando múltiples fuentes o perspectivas. Hay más de una respuesta posible válida.
-- Verbos clave: argumentar, evaluar, justificar (con evidencia), analizar (causas complejas), construir, formular hipótesis.
-- Ejemplo DOK 3: "Argumenta si el modelo económico actual es sostenible. Usa al menos 2 fuentes provistas."
-- Señal clave: No hay una única respuesta correcta; exige juicio, evidencia y razonamiento extendido.
+- El estudiante razona, argumenta, evalúa usando múltiples perspectivas. Más de una respuesta válida posible.
+- Señal clave: Exige juicio, evidencia propia y razonamiento extendido. No hay única respuesta correcta.
+- Ejemplos: "Argumenta si X es sostenible usando al menos 2 fuentes." / "Evalúa la decisión de X justificando con evidencia."
 
 DOK 4 — PENSAMIENTO EXTENDIDO
-- El estudiante diseña, investiga, crea o sintetiza conocimiento en proyectos que integran múltiples disciplinas o fuentes durante un período prolongado.
-- Verbos clave: diseñar (un proyecto), investigar, crear, sintetizar (entre disciplinas).
-- Ejemplo DOK 4: "Diseña un plan de acción comunitario para reducir la contaminación local usando biología, matemáticas y ciencias sociales."
-- Señal clave: Requiere tiempo extendido (días/semanas), es multidisciplinario y produce un producto original.
+- El estudiante diseña o sintetiza conocimiento entre disciplinas en un plazo extendido (días/semanas).
+- Señal clave: Multidisciplinario, produce un producto original, requiere tiempo extendido.
+- Ejemplos: "Diseña un plan comunitario integrando biología y ciencias sociales."
 """
 
-SYSTEM_PROMPT = f"""
-Eres un Coach Pedagógico Senior especializado en la Taxonomía de Profundidad del Conocimiento (DOK) de Norman Webb.
-Tu análisis debe ser riguroso, pedagógicamente fundamentado y AUDITABLEMENTE justificado.
+MENTOR_TONE = """
+## TONO Y ENFOQUE: MENTORÍA PEDAGÓGICA (OBLIGATORIO)
 
-{WEBB_DESCRIPTORS}
+Eres un MENTOR, no un juez. Tu función es:
+1. CELEBRAR primero lo que funciona bien. Siempre identificar al menos 1-2 fortalezas reales del instrumento.
+2. PROPONER mejoras en tono constructivo, nunca declarar "Error" o "Incorrecto".
+3. Usar lenguaje de ACOMPAÑAMIENTO: "Para fortalecer este reactivo…", "Una oportunidad de mejora sería…", "Te propongo…"
+4. El foco NO es juzgar el nivel DOK como bueno o malo. El foco es la COHERENCIA: ¿el reactivo mide lo que el OA declara querer medir?
+5. CRUCIAL: NO catalogues DOK 1 como malo ni DOK 4 como superior. Un instrumento puede requerir DOK 1 y estar perfectamente alineado.
+6. La pregunta central siempre es: ¿Este reactivo genera evidencia de que el estudiante logró el OA declarado?
+"""
 
-## REGLAS DE CLASIFICACIÓN ESTRICTAS
-1. Clasifica SIEMPRE según la DEMANDA COGNITIVA REAL de la tarea (lo que el cerebro del estudiante debe hacer), no por las palabras o verbos usados.
-2. Si un reactivo usa verbos de orden superior (argumentar, evaluar) pero la respuesta puede obtenerse directamente de una fuente sin razonar, es DOK 2 como máximo.
-3. Fundamenta CADA clasificación citando el descriptor DOK correspondiente.
-4. Si hay duda entre dos niveles, opta por el menor (más conservador).
-5. Antes de dar el nivel final, escribe explícitamente qué proceso cognitivo realiza el estudiante.
+CLASSIFICATION_RULES = """
+## REGLAS DE CLASIFICACIÓN (TEMPERATURA=0, RESULTADOS DETERMINISTAS)
+
+1. Clasifica según la DEMANDA COGNITIVA REAL (lo que el cerebro del estudiante debe hacer), nunca por verbos o palabras sofisticadas.
+2. Si hay duda entre dos niveles DOK, opta por el MENOR (posición conservadora).
+3. Fundamenta CADA clasificación citando el descriptor DOK correspondiente textualmente.
+4. La "habilidad declarada" es lo que el OA exige que el estudiante demuestre.
+5. La "habilidad real" es lo que el reactivo REALMENTE puede evidenciar dado cómo está redactado.
 """
 
 def build_analysis_prompt(oa: str, evaluacion: str) -> str:
     return f"""
-{SYSTEM_PROMPT}
+{WEBB_DESCRIPTORS}
+
+{MENTOR_TONE}
+
+{CLASSIFICATION_RULES}
 
 ## INPUTS DEL DOCENTE
 - **Objetivo de Aprendizaje (OA):** {oa}
 - **Instrumento de evaluación:**
 {evaluacion}
 
-## TU TAREA (sigue este orden OBLIGATORIO por cada reactivo):
-Para CADA pregunta o reactivo del instrumento:
-1. COPIA el texto completo del reactivo.
-2. RAZONA en voz alta: "El estudiante debe [describir el proceso cognitivo exacto]."
-3. COMPARA ese proceso contra los 4 descriptores DOK.
-4. ASIGNA el nivel DOK justificando con el descriptor.
-5. PROPÓN una versión mejorada si el nivel es DOK 1 o 2 (para elevar a DOK 3).
+## PROCESO DE ANÁLISIS (para cada reactivo, en este orden):
+1. Copia el texto completo del reactivo.
+2. Identifica: ¿qué habilidad dice medir el OA para este reactivo? ¿La declaró el docente explícitamente o está implícita?
+3. Describe en lenguaje simple: ¿qué proceso cognitivo realiza el estudiante para responder? (ej: "solo recuerda un dato del texto")
+4. Asigna el nivel DOK citando el descriptor correspondiente.
+5. Evalúa coherencia: ¿este reactivo genera evidencia de que el OA fue logrado?
+6. Si hay desalineación, propone una mejora concreta con tono de mentor.
+7. Formula UNA pregunta de coaching que invite al docente a reflexionar sobre este reactivo.
 
-Luego genera el JSON final con TODOS los campos completos.
+## AL FINAL DEL ANÁLISIS COMPLETO:
+- Identifica 1-3 fortalezas concretas del instrumento (reactivos o aspectos que funcionan bien).
+- Proporciona 2-3 pasos concretos de feed forward (acciones específicas para mejorar la alineación).
+- Formula UNA pregunta de cierre de alto impacto para provocar reflexión del docente.
+- Calcula el % de cobertura del OA (cuántas sub-habilidades del OA aparecen evidenciadas en la prueba).
 
-## FORMATO DE RESPUESTA (JSON ESTRICTO, sin markdown):
+## FORMATO JSON (ESTRICTO, sin bloques markdown):
 {{
     "metadata": {{
         "asignatura_detectada": "...",
         "nivel_detectado": "...",
-        "ejemplo_excelencia": {{
-            "pregunta": "...",
-            "explicacion": "Por qué es DOK 3: [citing descriptor]..."
-        }}
+        "subhabilidades_oa": ["sub-habilidad 1 del OA", "sub-habilidad 2...", "..."],
+        "cobertura_oa_porcentaje": 0,
+        "cobertura_oa_descripcion": "texto explicando qué sub-habilidades están cubiertas y cuáles no"
     }},
-    "diagnostico_global": "...",
+    "diagnostico_global": "Frase ejecutiva corta con tono mentor...",
     "score_coherencia": 0,
+    "reconocimiento_fortalezas": [
+        {{
+            "descripcion": "Texto celebrando lo que funciona bien en el instrumento...",
+            "reactivos_destacados": [1, 3]
+        }}
+    ],
+    "feed_forward": [
+        "Acción concreta 1 para mejorar la alineación...",
+        "Acción concreta 2...",
+        "Acción concreta 3 (opcional)..."
+    ],
+    "pregunta_cierre": "Una pregunta de coaching poderosa para que el docente reflexione al finalizar...",
     "niveles_data": [
         {{"nivel": "DOK 1", "nombre": "Memoria", "cantidad": 0, "esperado": 15, "color": "#94a3b8"}},
         {{"nivel": "DOK 2", "nombre": "Aplicación", "cantidad": 0, "esperado": 40, "color": "#60a5fa"}},
@@ -131,120 +156,71 @@ Luego genera el JSON final con TODOS los campos completos.
     "items_analizados": [
         {{
             "id": 1,
-            "pregunta_extracto": "Texto corto (máx 80 chars)...",
+            "pregunta_extracto": "Texto corto máx 80 chars...",
             "pregunta_completa": "Texto completo del reactivo...",
-            "razonamiento_cognitivo": "El estudiante debe [proceso exacto]...",
-            "dok_declarado": "DOK X (si el docente lo indicó, sino null)",
+            "habilidad_declarada": "Lo que el OA exige demostrar para este reactivo (o 'No declarada explícitamente' si el docente no lo especificó)",
+            "habilidad_real": "Lo que el reactivo realmente evidencia, en lenguaje simple y directo...",
+            "proceso_mental_estudiante": "Descripción simple de lo que el estudiante hace mentalmente: ej. 'El estudiante solo recuerda un dato del texto sin necesidad de interpretarlo'",
             "dok_real": "DOK X",
-            "estado": "Alineado | Mejorable",
-            "analisis": "Diagnóstico justificado citando el descriptor Webb...",
-            "sugerencia_reingenieria": "Versión mejorada del reactivo (solo si Mejorable)..."
+            "estado": "Logrado | Mejorable",
+            "analisis": "Diagnóstico mentor, propositivo, justificado. Celebra si está logrado. Propone si es mejorable...",
+            "sugerencia_reingenieria": "Versión mejorada del reactivo con tono propositivo. Obligatorio si estado = Mejorable. Vacío si Logrado.",
+            "pregunta_reflexion": "Una pregunta de coaching específica para este reactivo que invite al docente a reflexionar..."
         }}
     ],
     "conclusion": {{
-        "texto": "Resumen pedagógico fundamentado...",
-        "accion": "Consejo directo al docente..."
+        "texto": "Resumen pedagógico con tono de mentor, destacando el balance general...",
+        "accion": "Consejo directo y constructivo al docente..."
     }}
 }}
 """
 
 
-async def _single_analysis_call(prompt: str) -> dict:
-    """Hace UNA llamada a Gemini con temperature=0 y retorna el JSON parseado."""
-    model = genai.GenerativeModel(
-        model_name=MODEL_NAME,
-        generation_config={
-            "response_mime_type": "application/json",
-            "temperature": 0.0,          # DETERMINISMO: sin aleatoriedad
-            "top_p": 1.0,
-            "top_k": 1,
-        }
-    )
-    response = model.generate_content(prompt)
-    texto = response.text.strip()
-
-    # Limpieza robusta de markdown
-    if texto.startswith("```json"):
-        texto = texto[7:]
-    if texto.startswith("```"):
-        texto = texto[3:]
-    if texto.endswith("```"):
-        texto = texto[:-3]
-
-    return json.loads(texto.strip())
-
-
-def _compute_consensus(results: list[dict]) -> dict:
-    """
-    Toma 3 análisis y genera un consenso por mayoría de votos para cada reactivo.
-    El resultado base es el del primer análisis; los niveles DOK se corrigen por consenso.
-    """
-    if len(results) == 1:
-        return results[0]
-
-    base = results[0]
-    n_items = len(base.get("items_analizados", []))
-
-    for i in range(n_items):
-        votes = []
-        for r in results:
-            items = r.get("items_analizados", [])
-            if i < len(items):
-                votes.append(items[i].get("dok_real", "DOK 2"))
-
-        # Mayoría
-        from collections import Counter
-        counter = Counter(votes)
-        winner, count = counter.most_common(1)[0]
-
-        # Si ninguno tiene mayoría absoluta (todos distintos), elegir el mayor nivel (conservador alto)
-        if count < 2:
-            dok_order = {"DOK 1": 1, "DOK 2": 2, "DOK 3": 3, "DOK 4": 4}
-            winner = max(votes, key=lambda d: dok_order.get(d, 2))
-
-        base["items_analizados"][i]["dok_real"] = winner
-        base["items_analizados"][i]["analisis"] = (
-            f"[Consenso {count}/{len(results)} análisis] " + base["items_analizados"][i].get("analisis", "")
-        )
-        base["items_analizados"][i]["estado"] = (
-            "Alineado" if base["items_analizados"][i].get("dok_declarado") == winner else "Mejorable"
-        )
-
-    # Recalcular niveles_data con los DOK reales consolidados
-    from collections import Counter
-    final_levels = Counter(item["dok_real"] for item in base["items_analizados"])
-    for nivel_entry in base["niveles_data"]:
-        nivel_entry["cantidad"] = final_levels.get(nivel_entry["nivel"], 0)
-
-    return base
-
-
 # ==============================================================================
-# ENDPOINT 1: AUDITAR — ENSEMBLE x3 + TEMPERATURE=0 + CHAIN-OF-THOUGHT
+# ENDPOINT: AUDITAR
 # ==============================================================================
 @router.post("/audit")
 async def auditar_instrumento(request: AnalisisRequest):
     try:
-        print(f"🧠 Iniciando análisis DOK riguroso con {MODEL_NAME} (ensemble x3)...")
+        print(f"🧠 Iniciando análisis DOK con {MODEL_NAME} (temperatura=0, Webb+Mentoría)...")
 
         prompt = build_analysis_prompt(request.objetivo_aprendizaje, request.texto_evaluacion)
 
-        # ENSEMBLE x3: 3 llamadas paralelas independientes
-        tasks = [_single_analysis_call(prompt) for _ in range(3)]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        model = genai.GenerativeModel(
+            model_name=MODEL_NAME,
+            generation_config={
+                "response_mime_type": "application/json",
+                "temperature": 0.0,   # DETERMINISMO TOTAL
+                "top_p": 1.0,
+                "top_k": 1,
+            }
+        )
 
-        # Filtrar errores (si alguna llamada falla, usamos las que sí funcionaron)
-        valid_results = [r for r in results if isinstance(r, dict)]
+        response = model.generate_content(prompt)
+        texto = response.text.strip()
 
-        if not valid_results:
-            raise Exception("Las 3 llamadas al modelo fallaron. Revisa la API Key o el modelo.")
+        # Limpieza robusta de markdown
+        if texto.startswith("```json"):
+            texto = texto[7:]
+        if texto.startswith("```"):
+            texto = texto[3:]
+        if texto.endswith("```"):
+            texto = texto[:-3]
 
-        print(f"✅ {len(valid_results)}/3 análisis completados. Computando consenso...")
+        resultado = json.loads(texto.strip())
 
-        # CONSENSO por mayoría
-        consensus = _compute_consensus(valid_results)
+        # Recalcular niveles_data desde los ítems reales (garantiza consistencia)
+        conteo = Counter(item.get("dok_real", "DOK 2") for item in resultado.get("items_analizados", []))
+        for nivel_entry in resultado.get("niveles_data", []):
+            nivel_entry["cantidad"] = conteo.get(nivel_entry["nivel"], 0)
 
-        return consensus
+        # Asegurar campos opcionales existen (para compatibilidad con frontend)
+        resultado.setdefault("reconocimiento_fortalezas", [])
+        resultado.setdefault("feed_forward", [])
+        resultado.setdefault("pregunta_cierre", "")
+
+        print(f"✅ Análisis completado. Score: {resultado.get('score_coherencia')} | Items: {len(resultado.get('items_analizados', []))}")
+        return resultado
 
     except Exception as e:
         print(f"❌ Error en auditoría DOK: {type(e).__name__}: {str(e)}")
@@ -254,7 +230,7 @@ async def auditar_instrumento(request: AnalisisRequest):
 
 
 # ==============================================================================
-# ENDPOINT 2: GUARDAR (CONECTADO A DB)
+# ENDPOINT: GUARDAR
 # ==============================================================================
 @router.post("/save")
 async def guardar_analisis(request: GuardarAnalisisRequest, authorization: Optional[str] = Header(None)):
