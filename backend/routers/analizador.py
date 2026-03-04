@@ -190,13 +190,15 @@ async def auditar_instrumento(request: AnalisisRequest):
             model_name=MODEL_NAME,
             generation_config={
                 "response_mime_type": "application/json",
-                "temperature": 0.0,   # DETERMINISMO TOTAL
-                "top_p": 1.0,
-                "top_k": 1,
+                "temperature": 0.0,   # DETERMINISMO: misma entrada → misma salida
+                # top_k=1 no se usa: puede paralizar la generación de JSON complejo
             }
         )
 
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+            prompt,
+            request_options={"timeout": 120}  # 120s para evitar timeout silencioso
+        )
         texto = response.text.strip()
 
         # Limpieza robusta de markdown
