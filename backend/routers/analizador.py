@@ -52,10 +52,12 @@ def build_analysis_prompt(oa: str, evaluacion: str) -> str:
 ## REGLAS CLAVE
 1. Clasifica por la DEMANDA COGNITIVA REAL (lo que el estudiante debe hacer mentalmente), nunca por los verbos usados.
 2. Si hay duda entre dos niveles, usa el menor (conservador).
-3. ESTADO "Logrado": SOLO si el reactivo exige el mismo nivel cognitivo que el OA declara Y genera evidencia directa de que el OA fue alcanzado.
-4. ESTADO "Mejorable": si el reactivo exige MENOS profundidad cognitiva de la que el OA necesita, aunque el tema sea correcto. Un reactivo DOK 1/2 para un OA que exige análisis/argumentación (DOK 3) SIEMPRE es "Mejorable".
-5. Tono siempre propositivo: "Para fortalecer este reactivo..." nunca "Error:" o "Incorrecto:".
-6. Cuando el estado sea "Mejorable", la "sugerencia_reingenieria" es OBLIGATORIA: escribe una versión mejorada del reactivo que eleve su exigencia cognitiva al nivel real que el OA requiere.
+3. **CRÍTICO**: La comparación es SIEMPRE contra el OA declarado principal, NO contra etiquetas de sección del instrumento (ej: si una sección dice "Habilidad: Extraer información" pero el OA pide "Analizar", la habilidad base sigue siendo "Analizar").
+4. Determina el nivel DOK que el OA exige implícitamente (ej: "Analizar" → DOK 3, "Comprender" → DOK 2, "Identificar" → DOK 1).
+5. ESTADO "Logrado": SOLO si dok_real >= dok_exigido_por_el_OA Y el reactivo genera evidencia directa de que ese OA específico fue alcanzado.
+6. ESTADO "Mejorable": si dok_real < dok_exigido_por_el_OA. Un reactivo DOK 1 o 2 para un OA que exige análisis/argumentación SIEMPRE es "Mejorable", aunque el tema sea correcto.
+7. Tono siempre propositivo: "Para fortalecer este reactivo..." nunca "Error:" o "Incorrecto:".
+8. Cuando el estado sea "Mejorable", la "sugerencia_reingenieria" es OBLIGATORIA: escribe una versión concreta del reactivo que eleve su exigencia cognitiva al DOK que el OA requiere (generalmente DOK 3: argumentar, justificar con evidencia, evaluar una decisión del personaje).
 
 ## INPUTS
 OA declarado: {oa}
