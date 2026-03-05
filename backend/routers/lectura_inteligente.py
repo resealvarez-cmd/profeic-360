@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import Optional, List
 import os
 import json
+import httpx
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -16,6 +17,8 @@ if not api_key:
     print("⚠️ ERROR: No se encontró GOOGLE_API_KEY en el .env")
 
 genai.configure(api_key=api_key)
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+CONTEXTO_FALLBACK = "UBICACIÓN: Chile."
 
 router = APIRouter(
     prefix="/lectura-inteligente",
@@ -54,14 +57,33 @@ class RegenerarPreguntaRequest(BaseModel):
 # --- ENDPOINTS ---
 
 @router.post("/generar-texto")
-async def generar_texto(request: GenerarTextoRequest):
+async def generar_texto(request: GenerarTextoRequest, authorization: Optional[str] = Header(None)):
     try:
         print(f"🧠 Generando texto con {MODEL_NAME}...")
         
+        # Contexto institucional dinámico
+        contexto_institucional = CONTEXTO_FALLBACK
+        if authorization:
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    ctx_resp = await client.get(
+                        f"{API_BASE_URL}/profile/context",
+                        headers={"Authorization": authorization}
+                    )
+                    if ctx_resp.status_code == 200:
+                        block = ctx_resp.json().get("context_block", "")
+                        if block:
+                            contexto_institucional = block
+            except Exception:
+                pass
+
         model = genai.GenerativeModel(model_name=MODEL_NAME)
 
         prompt = f"""
         ACTÚA COMO: Un experto creador de material pedagógico para estudiantes de {request.nivel} de la asignatura de {request.asignatura}.
+        
+        CONTEXTO INSTITUCIONAL (para localizar el texto si es pertinente):
+        {contexto_institucional}
         
         OBJETIVO:
         El docente seleccionó el siguiente Objetivo de Aprendizaje (OA):

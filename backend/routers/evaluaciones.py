@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import List, Union, Optional
 import google.generativeai as genai
 import json
 import re
 import os
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,18 +15,13 @@ api_key = os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 
-# --- CONFIGURACIÓN DE IDENTIDAD LOCAL ---
-# Esto le da el "Sello" a todas las pruebas generadas
-CONTEXTO_LOCAL = """
-UBICACIÓN: Chiguayante, Región del Biobío, Chile.
-ENTORNO: Cercanía al Río Biobío, Cerro Manquimávida, clima templado.
-SELLO INSTITUCIONAL: Colegio Madre Paulina (Humanista-Cristiano, Excelencia, Respeto).
-INSTRUCCIÓN DE LOCALIZACIÓN: 
-Siempre que sea pertinente al OA, utiliza ejemplos locales.
-- En lugar de "Un águila come serpientes", usa "Un Peuco caza una lagartija".
-- En lugar de "Un bosque de pinos", prefiere "Bosque esclerófilo o Selva Valdiviana".
-- Contextualiza problemas matemáticos o físicos en situaciones cotidianas de la zona (ej: el Biotren, la Costanera).
+# --- CONTEXTO INSTITUCIONAL FALLBACK ---
+# Solo se usa si el profesor no tiene colegio configurado en su perfil
+CONTEXTO_FALLBACK = """
+UBICACIÓN: Chile.
 """
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 # --- MODELOS DE DATOS ---
 class DokDistribution(BaseModel):
@@ -56,7 +52,7 @@ class AssessmentConfig(BaseModel):
     quantities: Quantities
     quantities: Quantities
     points: PointsPerType 
-    num_alternatives: Optional[int] = 4 # Default 4 
+    num_alternatives: Optional[int] = 4 # Default 4  
 
 # --- LIMPIEZA JSON ---
 def limpiar_json(texto):
@@ -75,11 +71,29 @@ def limpiar_json(texto):
         return None
 
 @router.post("/generate-assessment")
-async def generate_assessment(config: AssessmentConfig):
+async def generate_assessment(config: AssessmentConfig, authorization: Optional[str] = Header(None)):
     print(f"⚡ [EVALUACIONES] Generando prueba contextualizada para {config.grade} - {config.subject}")
     
     try:
-        # Construir texto de OAs: preferir descripciones completas sobre IDs
+        # ── 1. Obtener contexto institucional del profesor ──
+        contexto_institucional = CONTEXTO_FALLBACK
+        if authorization:
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    ctx_resp = await client.get(
+                        f"{API_BASE_URL}/profile/context",
+                        headers={"Authorization": authorization}
+                    )
+                    if ctx_resp.status_code == 200:
+                        ctx_data = ctx_resp.json()
+                        block = ctx_data.get("context_block", "")
+                        if block:
+                            contexto_institucional = block
+            except Exception as ctx_err:
+                print(f"⚠️ No se pudo obtener contexto institucional: {ctx_err}")
+                # Continúa con el fallback, no falla la generación
+
+        # ── 2. Construir texto de OAs ──
         if config.oaTexts and len(config.oaTexts) > 0:
             # Usar las descripciones completas del currículum
             oas_texto = "\n".join([f"- {t}" for t in config.oaTexts if t])
@@ -115,14 +129,15 @@ async def generate_assessment(config: AssessmentConfig):
         =============================================
             """
 
-        # PROMPT ENRIQUECIDO CON CONTEXTO LOCAL
+        # PROMPT ENRIQUECIDO CON CONTEXTO INSTITUCIONAL REAL
         prompt = f"""
         {strict_block}
 
         ROL: Experto en Evaluación Educativa del Mineduc (Chile).
         TAREA: Crear una PRUEBA SUMATIVA rigurosa (Total: {total_pts} pts).
         
-        {CONTEXTO_LOCAL}
+        CONTEXTO INSTITUCIONAL (úsalo para personalizar ejemplos y situaciones):
+        {contexto_institucional}
         
         CONTEXTO DE LA PRUEBA:
         - Nivel: {config.grade}

@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from pydantic import BaseModel
 import google.generativeai as genai
 import json
 import re
 import os
+import httpx
 from dotenv import load_dotenv
 
 # Configuración
@@ -13,6 +14,9 @@ router = APIRouter()
 api_key = os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+CONTEXTO_FALLBACK = "UBICACIÓN: Chile."
 
 # --- MODELO COMPATIBLE CON PYTHON 3.14 ---
 class RubricRequest(BaseModel):
@@ -39,15 +43,32 @@ def limpiar_rubrica_json(texto):
             return {"titulo": "Error de Generación", "descripcion": "Intente nuevamente.", "tabla": []}
 
 @router.post("/generate-rubric")
-async def generar_rubrica(req: RubricRequest):
+async def generar_rubrica(req: RubricRequest, authorization: str = Header(None)):
     print(f"⚡ [RÚBRICA] Generando para: {req.actividad}")
     
     try:
+        # Obtener contexto institucional
+        contexto_institucional = CONTEXTO_FALLBACK
+        if authorization:
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    ctx_resp = await client.get(
+                        f"{API_BASE_URL}/profile/context",
+                        headers={"Authorization": authorization}
+                    )
+                    if ctx_resp.status_code == 200:
+                        block = ctx_resp.json().get("context_block", "")
+                        if block:
+                            contexto_institucional = block
+            except Exception:
+                pass
+
         # PROMPT V3: "PEDAGOGÍA DE HIERRO"
         prompt = f"""
         ROL: Experto en Evaluación Auténtica.
         TAREA: Crear Rúbrica Analítica para el PRODUCTO: "{req.actividad}".
         CONTEXTO: {req.nivel}, {req.asignatura}, OA: {req.oaDescripcion}.
+        CONTEXTO INSTITUCIONAL: {contexto_institucional}
         
         LISTA NEGRA (PALABRAS PROHIBIDAS):
         - Alumno, Estudiante, Él/Ella (NUNCA evaluar a la persona).

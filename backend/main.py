@@ -38,7 +38,8 @@ from routers import (
     acompanamiento, 
     lectura_inteligente,
     telemetry,
-    admin
+    admin,
+    profile
 )
 
 app = FastAPI(title="API ProfeIC", version="4.0.0")
@@ -71,6 +72,7 @@ app.include_router(acompanamiento.router)
 app.include_router(lectura_inteligente.router)
 app.include_router(telemetry.router)
 app.include_router(admin.router)
+app.include_router(profile.router)
 
 @app.get("/")
 def read_root():

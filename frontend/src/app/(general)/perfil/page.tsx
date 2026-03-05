@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Save, User, BookOpen, GraduationCap, Sparkles, Brain,
-    Lightbulb, Users, Wifi, Tv, Speaker, Monitor, Library, PenTool, Hash, Target
+    Lightbulb, Users, Wifi, Tv, Speaker, Monitor, Library, PenTool, Hash, Target, MapPin
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
@@ -78,9 +78,13 @@ const DESAFIOS_COMUNES = [
     "Aprendizaje Basado en Proyectos"
 ];
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [usarContextoGeo, setUsarContextoGeo] = useState(true); // Toggle contexto geográfico
+    const [schoolName, setSchoolName] = useState<string | null>(null); // Nombre del colegio para mostrar
 
     // Estado Principal
     const [profile, setProfile] = useState<PedagogicalProfile>({
@@ -138,6 +142,24 @@ export default function ProfilePage() {
             setOtherInfra(meta.infraestructura_otro || "");
             setDesafioTexto(meta.otro_desafio || "");
 
+            // Cargar preferencia de contexto geográfico desde el backend
+            try {
+                const session = await supabase.auth.getSession();
+                const token = session.data.session?.access_token;
+                if (token) {
+                    const ctxRes = await fetch(`${API_URL}/profile/context`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (ctxRes.ok) {
+                        const ctxData = await ctxRes.json();
+                        setUsarContextoGeo(ctxData.usar_contexto_geografico ?? true);
+                        setSchoolName(ctxData.school?.name || null);
+                    }
+                }
+            } catch {
+                // No es crítico si falla, sigue con el valor por defecto
+            }
+
         } catch (error) {
             console.error("Error cargando perfil", error);
             toast.error("Error al cargar datos");
@@ -178,6 +200,17 @@ export default function ProfilePage() {
                 department: profile.department,
                 years_experience: profile.years_experience
             }).eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+            // Guardar preferencia de contexto geográfico
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+            if (token) {
+                await fetch(`${API_URL}/profile/context`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ usar_contexto_geografico: usarContextoGeo })
+                });
+            }
 
             toast.success("Perfil actualizado correctamente");
         } catch (error) {
@@ -577,6 +610,46 @@ export default function ProfilePage() {
                             onChange={(e) => setDesafioTexto(e.target.value)}
                         />
                     </div>
+                </motion.div>
+                {/* 7. CONTEXTO DE IA (NUEVO) */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+                    className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 md:col-span-2"
+                >
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-teal-50 rounded-lg text-teal-600"><MapPin size={24} /></div>
+                        <div>
+                            <h3 className="text-xl font-bold text-[#1a2e3b]">Contexto de IA</h3>
+                            {schoolName && (
+                                <p className="text-xs text-slate-400 mt-0.5">Colegio: <span className="font-bold text-[#2b546e]">{schoolName}</span> — el sello institucional se aplica siempre por defecto.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                        <div>
+                            <p className="font-bold text-[#1a2e3b] text-base">Usar contexto geográfico local</p>
+                            <p className="text-sm text-slate-500 mt-1 max-w-md">
+                                Cuando está activo, la IA usará referencias locales en ejemplos y situaciones
+                                (ciudad, entorno, elementos regionales). Desactívalo para obtener recursos más genéricos.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setUsarContextoGeo(!usarContextoGeo)}
+                            className={`w-14 h-8 rounded-full p-1 transition-colors ml-6 shrink-0 ${usarContextoGeo ? "bg-teal-500" : "bg-slate-300"
+                                }`}
+                        >
+                            <div className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform ${usarContextoGeo ? "translate-x-6" : "translate-x-0"
+                                }`} />
+                        </button>
+                    </div>
+                    <p className="mt-3 text-xs text-slate-400 flex items-center gap-1">
+                        <Sparkles size={11} />
+                        {usarContextoGeo
+                            ? "Activado: la IA contextualizará con tu localidad cuando sea pertinente."
+                            : "Desactivado: la IA generará recursos genéricos sin referencias geográficas."
+                        }
+                    </p>
                 </motion.div>
             </div>
         </div>

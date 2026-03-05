@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
 import google.generativeai as genai
 import os
 import json
 import re
 import io
+import httpx
 from docx import Document
 from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -19,6 +20,9 @@ router = APIRouter()
 api_key = os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+CONTEXTO_FALLBACK = "UBICACIÓN: Chile."
 
 # --- MODELOS DE DATOS ---
 class NeeRequest(BaseModel):
@@ -56,7 +60,7 @@ class VariantesDUA(BaseModel):
 
 # --- PROMPT ESPECIALISTA EN INCLUSIÓN ---
 SYSTEM_PROMPT = """
-ROL: Eres un Experto en Educación Diferencial y DUA (Diseño Universal de Aprendizaje) del 'Colegio Madre Paulina'.
+ROL: Eres un Experto en Educación Diferencial y DUA (Diseño Universal de Aprendizaje).
 MISIÓN: Recibes una actividad de clase y un perfil de estudiante (NEE Transitoria o Permanente). Debes generar adecuaciones curriculares prácticas para el aula.
 
 ENTRADA:
@@ -68,10 +72,10 @@ ENTRADA:
 TU TAREA (JSON Estricto):
 Genera una respuesta estructurada con enfoque de AULA (Práctico, no burocrático):
 
-1. **Principios DUA:** Breve línea citando qué principio aplicas (Representación, Acción/Expresión, Compromiso).
-2. **Estrategia de Acceso (Antes):** ¿Qué cambiar en el ambiente, materiales o ubicación? (Ej: Uso de audífonos, material concreto, anticipación visual).
-3. **Adecuación de la Actividad (Durante):** Modificación de la instrucción o tarea. Si es TEA/Permanente, considera simplificar objetivos si es necesario.
-4. **Evaluación Diversificada (Cierre):** ¿Cómo puede demostrar aprendizaje de otra forma? (Ej: Oral en vez de escrito, dibujo, maqueta).
+1. Principios DUA: Breve línea citando qué principio aplicas (Representación, Acción/Expresión, Compromiso).
+2. Estrategia de Acceso (Antes): Qué cambiar en el ambiente, materiales o ubicación.
+3. Adecuación de la Actividad (Durante): Modificación de la instrucción o tarea.
+4. Evaluación Diversificada (Cierre): Cómo puede demostrar aprendizaje de otra forma.
 
 FORMATO JSON:
 {
@@ -85,12 +89,30 @@ FORMATO JSON:
 """
 
 @router.post("/nee/generate")
-async def generate_nee_strategies(req: NeeRequest):
+async def generate_nee_strategies(req: NeeRequest, authorization: Optional[str] = Header(None)):
     try:
+        # Contexto institucional dinámico
+        contexto_institucional = CONTEXTO_FALLBACK
+        if authorization:
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    ctx_resp = await client.get(
+                        f"{API_BASE_URL}/profile/context",
+                        headers={"Authorization": authorization}
+                    )
+                    if ctx_resp.status_code == 200:
+                        block = ctx_resp.json().get("context_block", "")
+                        if block:
+                            contexto_institucional = block
+            except Exception:
+                pass
+
         model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""
-        CONTEXTO:
+        CONTEXTO INSTITUCIONAL: {contexto_institucional}
+        
+        CONTEXTO DEL CASO:
         - Curso: {req.grade}
         - Asignatura: {req.subject}
         - Diagnóstico: {req.diagnosis}

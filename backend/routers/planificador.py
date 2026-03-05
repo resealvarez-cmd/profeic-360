@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from pydantic import BaseModel
 # Eliminamos "List" y "Optional" de typing porque daban problemas en Python 3.14
 import google.generativeai as genai
 import json
 import re
 import os
+import httpx
 from dotenv import load_dotenv
 
 # Configuración Inicial
@@ -14,6 +15,9 @@ router = APIRouter()
 api_key = os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+CONTEXTO_FALLBACK = "UBICACIÓN: Chile."
 
 # --- MODELOS (MODERNIZADOS PARA PYTHON 3.14) ---
 from typing import List, Optional, Dict, Union
@@ -63,11 +67,27 @@ def limpiar_y_reparar_json(texto_sucio):
 
 # --- ENDPOINT ---
 @router.post("/api/generate")
-async def generar_planificacion(request: GenerateRequest):
+async def generar_planificacion(request: GenerateRequest, authorization: str = Header(None)):
     print(f"⚡ [PLANIFICADOR] Procesando: {request.nivel} | {request.asignatura}")
     
     try:
         if not api_key: return {"error": "Falta API Key"}
+
+        # ── Obtener contexto institucional ──
+        contexto_institucional = CONTEXTO_FALLBACK
+        if authorization:
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    ctx_resp = await client.get(
+                        f"{API_BASE_URL}/profile/context",
+                        headers={"Authorization": authorization}
+                    )
+                    if ctx_resp.status_code == 200:
+                        block = ctx_resp.json().get("context_block", "")
+                        if block:
+                            contexto_institucional = block
+            except Exception as ctx_err:
+                print(f"⚠️ Contexto no disponible: {ctx_err}")
         
         # --- LOGICA DE CONTEXTO ---
         contexto_docente = ""
@@ -149,8 +169,11 @@ async def generar_planificacion(request: GenerateRequest):
             """
 
         prompt = f"""
-        ROL: Jefe Técnico Pedagógico del Colegio Madre Paulina.
+        ROL: Experto en Diseño Curricular alineado al curriculum chileno.
         TAREA: Diseñar una Unidad Didáctica en formato JSON estricto.
+        
+        CONTEXTO INSTITUCIONAL:
+        {contexto_institucional}
         
         INPUTS:
         - Nivel: {request.nivel}
