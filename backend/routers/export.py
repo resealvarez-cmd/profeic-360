@@ -89,11 +89,62 @@ class GenericExportRequest(BaseModel):
 # ==========================================
 
 def limpiar_latex_para_word(texto: str) -> str:
+    """Convierte LaTeX a Unicode legible en Word. NO elimina los símbolos, los transforma."""
     if not texto: return ""
     texto = str(texto)
-    texto = re.sub(r'\$\$(.*?)\$\$', r'\1', texto) 
-    texto = texto.replace('\\', '') 
-    return texto
+    
+    # 1. Convertir raíces cuadradas: \sqrt{x} -> √x | \sqrt{xy} -> √(xy)
+    texto = re.sub(r'\\sqrt\{([^}]*)\}', r'√(\1)', texto)
+    texto = re.sub(r'\\sqrt\s+(\S+)', r'√\1', texto)
+    
+    # 2. Convertir fracciones: \frac{a}{b} -> a/b
+    texto = re.sub(r'\\frac\{([^}]*)\}\{([^}]*)\}', r'(\1)/(\2)', texto)
+    
+    # 3. Potencias: x^{2} -> x², x^2 -> x²
+    superscript_map = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'}
+    def replace_superscript(m):
+        exp = m.group(1)
+        return ''.join(superscript_map.get(c, c) for c in exp)
+    texto = re.sub(r'\^\{([^}]*)\}', replace_superscript, texto)
+    texto = re.sub(r'\^([0-9])', lambda m: superscript_map.get(m.group(1), m.group(1)), texto)
+    
+    # 4. Subíndices: x_{2} -> x₂
+    subscript_map = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'}
+    def replace_subscript(m):
+        sub = m.group(1)
+        return ''.join(subscript_map.get(c, c) for c in sub)
+    texto = re.sub(r'_\{([^}]*)\}', replace_subscript, texto)
+    
+    # 5. Letras griegas y símbolos matemáticos comunes
+    replacements = {
+        r'\\pi': 'π', r'\\Pi': 'Π',
+        r'\\alpha': 'α', r'\\beta': 'β', r'\\gamma': 'γ', r'\\delta': 'δ',
+        r'\\theta': 'θ', r'\\lambda': 'λ', r'\\mu': 'μ', r'\\sigma': 'σ',
+        r'\\Sigma': 'Σ', r'\\omega': 'ω', r'\\Omega': 'Ω',
+        r'\\infty': '∞', r'\\approx': '≈', r'\\neq': '≠',
+        r'\\leq': '≤', r'\\geq': '≥', r'\\pm': '±',
+        r'\\times': '×', r'\\div': '÷', r'\\cdot': '·',
+        r'\\in': '∈', r'\\notin': '∉', r'\\subset': '⊂', r'\\cup': '∪', r'\\cap': '∩',
+        r'\\forall': '∀', r'\\exists': '∃', r'\\neg': '¬',
+        r'\\rightarrow': '→', r'\\leftarrow': '←', r'\\Rightarrow': '⇒',
+        r'\\angle': '∠', r'\\triangle': '△', r'\\degree': '°',
+        r'\\%': '%',
+    }
+    for latex, unicode_char in replacements.items():
+        texto = re.sub(latex, unicode_char, texto)
+    
+    # 6. Quitar delimitadores de fórmulas $...$ y $$...$$ (el contenido ya fue transformado)
+    texto = re.sub(r'\$\$([^$]*)\$\$', r'\1', texto)
+    texto = re.sub(r'\$([^$]*)\$', r'\1', texto)
+    
+    # 7. Limpiar backslashes residuales (comandos LaTeX no reconocidos)
+    texto = re.sub(r'\\[a-zA-Z]+', '', texto)
+    texto = texto.replace('\\', '')
+    
+    # 8. Limpiar llaves sobrantes
+    texto = texto.replace('{', '').replace('}', '')
+    
+    return texto.strip()
 
 def set_cell_background(cell, color_hex):
     shading_elm = parse_xml(r'<w:shd {} w:fill="{}"/>'.format(nsdecls('w'), color_hex))
@@ -502,7 +553,8 @@ async def export_generic_docx(req: GenericExportRequest):
         filename = f"{req.titulo_unidad}.docx".replace(" ", "_")
         return StreamingResponse(file_stream, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers={"Content-Disposition": f"attachment; filename={filename}"})
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error export genérico: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ==========================================
 # EXECUTIVE REPORT RENDERER (PREMIUM)

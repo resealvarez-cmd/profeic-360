@@ -108,7 +108,15 @@ async def get_curriculum_options(req: OptionsRequest):
         # C. OBJETIVOS
         if req.nivel and req.asignatura:
             raw_data = fetch_all_rows('curriculum_oas', 'id, oa_codigo, descripcion', {'nivel': req.nivel, 'asignatura': req.asignatura})
-            return {"type": "oas", "data": raw_data}
+            # Ordenar correlativamente por oa_codigo (OA 01, OA 02, OA 03...)
+            def sort_key(oa):
+                codigo = oa.get('oa_codigo', '') or ''
+                # Extraer el número al final del código (ej: 'MA08 OA 04' -> 4)
+                import re
+                nums = re.findall(r'\d+$', codigo.strip())
+                return int(nums[0]) if nums else 999
+            raw_data_sorted = sorted(raw_data, key=sort_key)
+            return {"type": "oas", "data": raw_data_sorted}
 
     except Exception as e:
         print(f"❌ ERROR: {str(e)}")

@@ -108,7 +108,7 @@ export default function GeneradorEvaluaciones() {
     const [oasDisponibles, setOasDisponibles] = useState<any[]>([]);
 
     const [config, setConfig] = useState({
-        grade: "", subject: "", oaIds: [] as string[], customOa: "",
+        grade: "", subject: "", oaIds: [] as string[], oaTexts: [] as string[], customOa: "",
         contextText: "", // <--- NUEVO STATE
         dokDistribution: { dok1: 20, dok2: 50, dok3: 30 },
         quantities: { multiple_choice: 10, true_false: 0, short_answer: 0, essay: 2 },
@@ -170,6 +170,7 @@ export default function GeneradorEvaluaciones() {
             // Mapeo manual de campos (camelCase -> snake_case) si es necesario
             const payload = {
                 ...config,
+                oaTexts: config.oaTexts, // Incluir descripciones completas para Gemini
                 context_text: config.contextText,
             };
 
@@ -347,10 +348,31 @@ export default function GeneradorEvaluaciones() {
                         {/* LISTA DE OAS (Solo si no es manual) */}
                         {!isManualSubject && oasDisponibles.length > 0 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                                {oasDisponibles.map((oa) => {
+                                {/* Ordenar por número de OA como seguridad adicional en el cliente */}
+                                {[...oasDisponibles].sort((a, b) => {
+                                    const numA = parseInt((a.oa_codigo || '').match(/\d+$/)?.[0] || '999');
+                                    const numB = parseInt((b.oa_codigo || '').match(/\d+$/)?.[0] || '999');
+                                    return numA - numB;
+                                }).map((oa) => {
                                     const isSelected = config.oaIds.includes(oa.id);
                                     return (
-                                        <div key={oa.id} onClick={() => { const newIds = isSelected ? config.oaIds.filter(id => id !== oa.id) : [...config.oaIds, oa.id]; setConfig({ ...config, oaIds: newIds }); }} className={cn("p-5 rounded-2xl border cursor-pointer transition-all duration-200 group relative", isSelected ? "bg-blue-50 border-[#1a2e3b] ring-1 ring-[#1a2e3b]" : "bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm")}>
+                                        <div key={oa.id} onClick={() => {
+                                            if (isSelected) {
+                                                // Deseleccionar: quitar tanto el id como el texto
+                                                setConfig({
+                                                    ...config,
+                                                    oaIds: config.oaIds.filter(id => id !== oa.id),
+                                                    oaTexts: config.oaTexts.filter(t => t !== (oa.descripcion || oa.oa_descripcion))
+                                                });
+                                            } else {
+                                                // Seleccionar: agregar id y descripción completa
+                                                setConfig({
+                                                    ...config,
+                                                    oaIds: [...config.oaIds, oa.id],
+                                                    oaTexts: [...config.oaTexts, oa.descripcion || oa.oa_descripcion || '']
+                                                });
+                                            }
+                                        }} className={cn("p-5 rounded-2xl border cursor-pointer transition-all duration-200 group relative", isSelected ? "bg-blue-50 border-[#1a2e3b] ring-1 ring-[#1a2e3b]" : "bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm")}>
                                             <div className="flex justify-between items-start mb-2"><span className={cn("text-[10px] font-bold px-2 py-1 rounded uppercase", isSelected ? "bg-[#1a2e3b] text-white" : "bg-slate-100 text-slate-500")}>{oa.oa_codigo || 'OA'}</span>{isSelected && <CheckCircle className="w-6 h-6 text-[#1a2e3b]" />}</div>
                                             <p className="text-sm text-slate-600 line-clamp-4 leading-relaxed">{oa.descripcion || oa.oa_descripcion}</p>
                                         </div>

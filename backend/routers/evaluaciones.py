@@ -49,6 +49,7 @@ class AssessmentConfig(BaseModel):
     grade: str
     subject: str
     oaIds: List[Union[str, int]] 
+    oaTexts: Optional[List[str]] = None  # Descripciones completas de los OAs seleccionados
     customOa: str
     context_text: Optional[str] = None # <--- RAG CTX
     dokDistribution: DokDistribution
@@ -78,11 +79,19 @@ async def generate_assessment(config: AssessmentConfig):
     print(f"⚡ [EVALUACIONES] Generando prueba contextualizada para {config.grade} - {config.subject}")
     
     try:
-        oa_ids_str = [str(x) for x in config.oaIds]
-        oas_texto = " | ".join(oa_ids_str)
+        # Construir texto de OAs: preferir descripciones completas sobre IDs
+        if config.oaTexts and len(config.oaTexts) > 0:
+            # Usar las descripciones completas del currículum
+            oas_texto = "\n".join([f"- {t}" for t in config.oaTexts if t])
+            oas_label = "DESCRIPCIONES COMPLETAS DE LOS OBJETIVOS DE APRENDIZAJE:"
+        else:
+            # Fallback: usar los IDs/códigos
+            oa_ids_str = [str(x) for x in config.oaIds]
+            oas_texto = " | ".join(oa_ids_str)
+            oas_label = "Objetivos (Códigos):"
         
         if config.customOa:
-            oas_texto += f" | OA Extra: {config.customOa}"
+            oas_texto += f"\n- Objetivo extra/personalizado: {config.customOa}"
 
         total_pts = (
             (config.quantities.multiple_choice * config.points.multiple_choice) +
@@ -118,7 +127,12 @@ async def generate_assessment(config: AssessmentConfig):
         CONTEXTO DE LA PRUEBA:
         - Nivel: {config.grade}
         - Asignatura: {config.subject}
-        - Objetivos (IDs/Textos): {oas_texto}
+        - {oas_label}
+{oas_texto}
+        
+        INSTRUCCION CRITICA: La prueba DEBE abordar EXCLUSIVAMENTE los contenidos descritos en los objetivos anteriores.
+        NO uses otros contenidos de la asignatura. Si el objetivo habla de raíces cuadradas, la prueba es de raíces cuadradas.
+        Si el objetivo habla de fracciones, la prueba es de fracciones. Respeta siempre el contenido exacto del OA.
         
         ESTRUCTURA OBLIGATORIA:
         ESTRUCTURA OBLIGATORIA:

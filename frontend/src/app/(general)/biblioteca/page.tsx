@@ -334,7 +334,7 @@ export default function BibliotecaPage() {
         if (e) e.stopPropagation(); // Evita abrir el modal
         setDownloading(true);
         try {
-            const endpoint = "https://profeic-backend-484019506864.us-central1.run.app/export/generic-docx";
+            const endpoint = `${API_URL}/export/generic-docx`;
             const payload = {
                 titulo_unidad: item.titulo,
                 nivel: item.nivel,
