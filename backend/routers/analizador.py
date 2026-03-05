@@ -52,8 +52,10 @@ def build_analysis_prompt(oa: str, evaluacion: str) -> str:
 ## REGLAS CLAVE
 1. Clasifica por la DEMANDA COGNITIVA REAL (lo que el estudiante debe hacer mentalmente), nunca por los verbos usados.
 2. Si hay duda entre dos niveles, usa el menor (conservador).
-3. El foco es: ¿este reactivo genera evidencia de que el OA fue logrado? No juzgues DOK 1 como malo.
-4. Tono siempre propositivo: "Para fortalecer este reactivo..." nunca "Error:" o "Incorrecto:".
+3. ESTADO "Logrado": SOLO si el reactivo exige el mismo nivel cognitivo que el OA declara Y genera evidencia directa de que el OA fue alcanzado.
+4. ESTADO "Mejorable": si el reactivo exige MENOS profundidad cognitiva de la que el OA necesita, aunque el tema sea correcto. Un reactivo DOK 1/2 para un OA que exige análisis/argumentación (DOK 3) SIEMPRE es "Mejorable".
+5. Tono siempre propositivo: "Para fortalecer este reactivo..." nunca "Error:" o "Incorrecto:".
+6. Cuando el estado sea "Mejorable", la "sugerencia_reingenieria" es OBLIGATORIA: escribe una versión mejorada del reactivo que eleve su exigencia cognitiva al nivel real que el OA requiere.
 
 ## INPUTS
 OA declarado: {oa}
@@ -130,8 +132,18 @@ async def auditar_instrumento(request: AnalisisRequest):
 
         resultado = json.loads(texto.strip())
 
+        # === SCORE DETERMINÍSTICO ===
+        # El score NO lo decide la IA (varía entre llamadas).
+        # Lo calculamos nosotros: % de ítems marcados como "Logrado".
+        items = resultado.get("items_analizados", [])
+        if items:
+            logrado_count = sum(1 for i in items if i.get("estado") == "Logrado")
+            resultado["score_coherencia"] = round((logrado_count / len(items)) * 100)
+        else:
+            resultado["score_coherencia"] = 0
+
         # Recalcular niveles_data desde los ítems reales
-        conteo = Counter(item.get("dok_real", "DOK 2") for item in resultado.get("items_analizados", []))
+        conteo = Counter(item.get("dok_real", "DOK 2") for item in items)
         for nivel_entry in resultado.get("niveles_data", []):
             nivel_entry["cantidad"] = conteo.get(nivel_entry["nivel"], 0)
 
