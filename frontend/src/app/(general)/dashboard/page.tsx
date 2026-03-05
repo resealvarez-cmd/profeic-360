@@ -15,6 +15,7 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 import { NewsWall } from "@/components/NewsWall";
 import { MissionsCarousel } from "@/components/dashboard/MissionsCarousel";
+import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -354,10 +355,13 @@ export default function Dashboard() {
                 {/* CONDITIONAL CONTENT */}
                 {activeTab === 'tools' ? (
                     <div className="space-y-8">
-                        {/* 1. FEEDBACK WIDGET (Always visible or relevant for Tools too?) - Let's keep it here for now as "My Work" */}
+                        {/* 1. FEEDBACK WIDGET */}
                         <FeedbackWidget feedbacks={feedbacks} loading={loading} />
 
-                        {/* 2. TOOLS CAROUSEL */}
+                        {/* 2. INSIGHTS WIDGET — Mentor IA Pedagógico */}
+                        <InsightsWidget />
+
+                        {/* 3. TOOLS CAROUSEL */}
                         <MissionsCarousel />
                     </div>
                 ) : (
