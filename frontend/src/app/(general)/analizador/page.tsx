@@ -461,7 +461,7 @@ export default function AnalizadorPage() {
                                     <Textarea
                                         value={textoEditado}
                                         onChange={(e) => setTextoEditado(e.target.value)}
-                                        className="min-h-[100px] bg-white text-sm"
+                                        className="min-h-[100px] bg-white text-sm text-slate-700"
                                     />
                                 </div>
                             )}
