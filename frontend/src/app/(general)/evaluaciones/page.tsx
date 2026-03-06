@@ -161,7 +161,7 @@ export default function GeneradorEvaluaciones() {
                             teacher_guide: saved.teacher_guide || {},
                             student_version: saved.student_version || {}
                         });
-                        setStep(4);
+                        setStep(3); // El paso de resultados es el 3 en evaluaciones
                     }
                 } catch (err) {
                     console.error("Excepción cargando recurso", err);

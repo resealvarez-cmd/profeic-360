@@ -581,9 +581,9 @@ export default function BibliotecaPage() {
                         </div>
                     </ScrollArea>
 
-                    <DialogFooter className="p-4 border-t bg-slate-50 flex justify-between gap-2">
-                        <Button variant="outline" onClick={() => setSelectedResource(null)}>Cerrar</Button>
-                        <div className="flex gap-2">
+                    <div className="p-4 border-t bg-slate-50 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 w-full">
+                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => setSelectedResource(null)}>Cerrar</Button>
+                        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-end">
                             {selectedResource && (
                                 <Button
                                     variant="outline"
@@ -604,16 +604,16 @@ export default function BibliotecaPage() {
                                             alert("Editor no disponible para este tipo de recurso.");
                                         }
                                     }}
-                                    className="border-[#2b546e] text-[#2b546e] hover:bg-slate-50 font-bold"
+                                    className="border-[#2b546e] text-[#2b546e] hover:bg-slate-50 font-bold w-full sm:w-auto"
                                 >
                                     <Edit3 className="w-4 h-4 mr-2" /> Abrir en Editor
                                 </Button>
                             )}
-                            <Button onClick={() => selectedResource && handleDownload(selectedResource)} disabled={downloading} className="bg-[#1a2e3b] text-white hover:bg-[#2b546e]">
+                            <Button onClick={() => selectedResource && handleDownload(selectedResource)} disabled={downloading} className="bg-[#1a2e3b] text-white hover:bg-[#2b546e] w-full sm:w-auto">
                                 {downloading ? "Descargando..." : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
                             </Button>
                         </div>
-                    </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
