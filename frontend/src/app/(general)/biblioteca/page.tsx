@@ -121,48 +121,116 @@ const VisorDeRecursos = ({ data }: { data: any }) => {
         );
     }
 
-    // 3. EVALUACIÓN (PRUEBA)
+    // 3. EVALUACIÓN (PRUEBA) - Vista Resumen Rica
     // La evaluación puede guardar items a nivel top o dentro de student_version
     const evalItems = safeData.student_version?.items || (Array.isArray(safeData.items) ? safeData.items : null);
     const evalTitle = safeData.student_version?.title || safeData.title;
-    const evalSections = safeData.student_version?.sections || safeData.sections;
     // Si detectamos items de evaluación en cualquier nivel, mostramos el visor
     if (evalItems && Array.isArray(evalItems) && evalItems.length > 0) {
+        // Composición: contar por tipo de reactivo
+        const composition: Record<string, number> = {};
+        let totalPts = 0;
+        evalItems.forEach((item: any) => {
+            const t = item.type || 'otro';
+            composition[t] = (composition[t] || 0) + 1;
+            totalPts += item.points || 0;
+        });
+        const typeLabels: Record<string, string> = {
+            multiple_choice: 'Selección Múltiple',
+            true_false: 'Verdadero/Falso',
+            short_answer: 'Resp. Corta',
+            essay: 'Desarrollo',
+        };
+        // OAs medidos (guardados en config como oaTexts)
+        const oaTexts: string[] = safeData.oaTexts || [];
+        // DOK distribution
+        const dok = safeData.dokDistribution;
+
         return (
-            <div className="space-y-6">
-                {evalTitle && <div className="text-center border-b pb-3 mb-3">
-                    <p className="font-bold text-slate-800 text-base">{evalTitle}</p>
-                </div>}
-                <div>
-                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
-                        <FileQuestion className="w-4 h-4" /> Reactivos ({evalItems.length})
-                    </h4>
-                    <div className="space-y-3">
-                        {evalItems.slice(0, 6).map((item: any, i: number) => (
-                            <div key={i} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-[10px] font-bold uppercase border px-2 py-0.5 rounded text-slate-500">{item.type}</span>
-                                    <span className="text-xs font-bold text-[#2b546e]">{item.points} pts</span>
-                                </div>
-                                <p className="text-sm text-slate-800 font-medium">{item.stem}</p>
-                                {item.options && item.options.length > 0 && (
-                                    <div className="mt-2 pl-3 space-y-1">
-                                        {item.options.slice(0, 2).map((opt: any, idx: number) => (
-                                            <p key={idx} className="text-xs text-slate-600">{String.fromCharCode(65 + idx)}) {opt.text || opt}</p>
-                                        ))}
-                                        {item.options.length > 2 && <p className="text-xs text-slate-400">...</p>}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        {evalItems.length > 6 && (
-                            <p className="text-xs text-center text-slate-400 mt-2">...y {evalItems.length - 6} reactivos más</p>
-                        )}
+            <div className="space-y-5">
+                {/* --- RESUMEN CLAVE --- */}
+                <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <p className="text-2xl font-black text-[#2b546e]">{evalItems.length}</p>
+                        <p className="text-[10px] font-bold text-blue-600 uppercase mt-1">Reactivos</p>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-xl border border-green-100">
+                        <p className="text-2xl font-black text-green-700">{totalPts}</p>
+                        <p className="text-[10px] font-bold text-green-600 uppercase mt-1">Puntos</p>
+                    </div>
+                    <div className="bg-purple-50 p-3 rounded-xl border border-purple-100">
+                        <p className="text-2xl font-black text-purple-700">{safeData.num_alternatives || '–'}</p>
+                        <p className="text-[10px] font-bold text-purple-600 uppercase mt-1">Alternativas</p>
                     </div>
                 </div>
+
+                {/* --- COMPOSICIÓN DE PREGUNTAS --- */}
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
+                        <FileQuestion className="w-4 h-4" /> Composición de la Prueba
+                    </h4>
+                    <div className="space-y-2">
+                        {Object.entries(composition).map(([type, count]) => {
+                            const pct = Math.round((count / evalItems.length) * 100);
+                            return (
+                                <div key={type} className="flex items-center gap-3">
+                                    <span className="text-xs text-slate-600 w-36 shrink-0">{typeLabels[type] || type} ({count})</span>
+                                    <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                        <div className="bg-[#2b546e] h-2 rounded-full" style={{ width: `${pct}%` }} />
+                                    </div>
+                                    <span className="text-xs text-slate-500 font-bold w-8 text-right">{pct}%</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* --- DOK DISTRIBUTION --- */}
+                {dok && (
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
+                            <Target className="w-4 h-4" /> Calibración DOK
+                        </h4>
+                        <div className="flex gap-2">
+                            {[{ label: 'DOK 1', value: dok.dok1, color: 'bg-green-400' }, { label: 'DOK 2', value: dok.dok2, color: 'bg-yellow-400' }, { label: 'DOK 3', value: dok.dok3, color: 'bg-red-400' }].map(d => (
+                                <div key={d.label} className="flex-1 text-center">
+                                    <div className="text-xs text-slate-500 mb-1">{d.label}</div>
+                                    <div className="bg-slate-200 rounded-full h-2 mb-1">
+                                        <div className={`${d.color} h-2 rounded-full`} style={{ width: `${d.value || 0}%` }} />
+                                    </div>
+                                    <div className="text-xs font-bold text-slate-700">{d.value || 0}%</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* --- OA MEDIDOS --- */}
+                {oaTexts.length > 0 && (
+                    <div>
+                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-500" /> Objetivos Medidos ({oaTexts.length})
+                        </h4>
+                        <div className="space-y-2">
+                            {oaTexts.slice(0, 2).map((oa: string, i: number) => (
+                                <div key={i} className="text-xs text-slate-600 bg-green-50 border border-green-100 p-3 rounded-xl leading-relaxed line-clamp-3 italic">
+                                    "{oa}"
+                                </div>
+                            ))}
+                            {oaTexts.length > 2 && <p className="text-xs text-slate-400 text-center">...y {oaTexts.length - 2} objetivos más</p>}
+                        </div>
+                    </div>
+                )}
+                {!oaTexts.length && safeData.customOa && (
+                    <div className="text-xs text-slate-600 bg-amber-50 border border-amber-100 p-3 rounded-xl italic">
+                        <span className="font-bold text-amber-700 block mb-1">Objetivo personalizado:</span>
+                        "{safeData.customOa}"
+                    </div>
+                )}
             </div>
         );
     }
+
 
     // 4. ELEVADOR COGNITIVO
     if (safeData.escalera) {
