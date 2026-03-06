@@ -216,7 +216,84 @@ const VisorDeRecursos = ({ data }: { data: any }) => {
         );
     }
 
-    // 6. FALLBACK
+    // 6. AUDITORIA
+    if (safeData.score_coherencia !== undefined) {
+        return (
+            <div className="space-y-6">
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div className="flex justify-between items-start mb-2">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <BrainCircuit className="w-4 h-4 text-red-500" /> Score de Coherencia
+                        </h4>
+                        <span className={`text-xl font-black ${safeData.score_coherencia < 60 ? 'text-red-500' : 'text-green-500'}`}>
+                            {safeData.score_coherencia}%
+                        </span>
+                    </div>
+                    <p className="text-sm text-slate-700 font-medium mb-1">{safeData.diagnostico_global}</p>
+                    {safeData.conclusion && <p className="text-xs text-slate-500 italic mt-2">{safeData.conclusion.accion}</p>}
+                </div>
+                {safeData.items_analizados && (
+                    <div>
+                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
+                            <Target className="w-4 h-4" /> Reactivos Analizados ({safeData.items_analizados.length})
+                        </h4>
+                        <div className="space-y-2">
+                            {safeData.items_analizados.slice(0, 5).map((item: any, i: number) => (
+                                <div key={i} className="p-3 bg-white border border-slate-100 rounded-lg shadow-sm">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Badge variant="outline" className={`text-[10px] ${item.estado === 'Mejorable' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-green-600 bg-green-50 border-green-200'}`}>{item.dok_real}</Badge>
+                                    </div>
+                                    <p className="text-sm text-slate-700 italic line-clamp-2">"{item.pregunta_extracto}"</p>
+                                </div>
+                            ))}
+                            {safeData.items_analizados.length > 5 && (
+                                <p className="text-xs text-center text-slate-400 mt-2">...y {safeData.items_analizados.length - 5} reactivos más</p>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // 7. LECTURA INTELIGENTE
+    if (safeData.texto && safeData.preguntas) {
+        return (
+            <div className="space-y-6">
+                <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-[#f2ae60]" /> Texto Insumo
+                    </h4>
+                    <p className="text-sm text-slate-700 italic line-clamp-4 font-serif leading-relaxed">
+                        "{safeData.texto}"
+                    </p>
+                </div>
+                <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
+                        <FileQuestion className="w-4 h-4" /> Preguntas Taxonómicas ({safeData.preguntas.length})
+                    </h4>
+                    <div className="space-y-3">
+                        {safeData.preguntas.slice(0, 3).map((q: any, i: number) => (
+                            <div key={i} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                                <p className="text-sm text-slate-800 font-medium mb-2">{i + 1}. {q.pregunta}</p>
+                                <div className="pl-4 border-l-2 border-slate-100 space-y-1">
+                                    {q.alternativas?.slice(0, 2).map((alt: string, aIdx: number) => (
+                                        <p key={aIdx} className="text-xs text-slate-600">{String.fromCharCode(65 + aIdx)}) {alt}</p>
+                                    ))}
+                                    {q.alternativas?.length > 2 && <p className="text-xs text-slate-400">...</p>}
+                                </div>
+                            </div>
+                        ))}
+                        {safeData.preguntas.length > 3 && (
+                            <p className="text-xs text-center text-slate-400 mt-2">...y {safeData.preguntas.length - 3} preguntas más</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // 8. FALLBACK
     return (
         <div className="bg-slate-900 text-slate-300 p-4 rounded-xl font-mono text-xs overflow-auto max-h-[300px]">
             <p className="mb-2 text-slate-500 uppercase font-bold text-[10px]">Datos Crudos:</p>
