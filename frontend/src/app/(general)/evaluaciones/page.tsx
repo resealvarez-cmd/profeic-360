@@ -13,7 +13,7 @@ import { BotonGuardar } from "@/components/BotonGuardar";
 import { trackEvent } from "@/lib/telemetry";
 import { UploadZone } from "@/components/ui/UploadZone"; // <--- Import nuevo
 import HeroSection from "@/components/ui/HeroSection"; // <--- Import Hero (opcional, para test)
-
+import { supabase } from "@/lib/supabaseClient";
 
 // --- CONSTANTES ---
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
@@ -127,6 +127,52 @@ export default function GeneradorEvaluaciones() {
             return () => clearInterval(interval);
         }
     }, [loading]);
+
+    // EFECTO PARA CARGAR RECURSO DESDE LA BIBLIOTECA
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const loadId = params.get('loadId');
+        if (loadId) {
+            setLoading(true);
+            setMensajeCarga("Cargando evaluación desde Biblioteca...");
+            const loadResource = async () => {
+                try {
+                    const { data, error } = await supabase.from("biblioteca_recursos").select("*").eq("id", loadId).single();
+                    if (!error && data && data.contenido) {
+                        const saved = data.contenido;
+                        // Restauramos la configuración guardada (excluyendo lo propio del resultado puro si queremos que se mezclen, 
+                        // pero BotonGuardar nos envía todo junto `{ ...config, ...resultado }`)
+                        setConfig(prev => ({
+                            ...prev,
+                            grade: saved.grade || saved.nivel || prev.grade,
+                            subject: saved.subject || saved.asignatura || prev.subject,
+                            oaIds: saved.oaIds || prev.oaIds,
+                            oaTexts: saved.oaTexts || prev.oaTexts,
+                            customOa: saved.customOa || prev.customOa,
+                            dokDistribution: saved.dokDistribution || prev.dokDistribution,
+                            quantities: saved.quantities || prev.quantities,
+                            points: saved.points || prev.points,
+                            num_alternatives: saved.num_alternatives || prev.num_alternatives
+                        }));
+                        setResultado({
+                            title: saved.title || "",
+                            metadata: saved.metadata || {},
+                            sections: saved.sections || [],
+                            teacher_guide: saved.teacher_guide || {},
+                            student_version: saved.student_version || {}
+                        });
+                        setStep(4);
+                    }
+                } catch (err) {
+                    console.error("Excepción cargando recurso", err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadResource();
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
 
     const handleDistributionChange = (type: 'dok1' | 'dok2' | 'dok3', newValue: number) => {
         if (newValue < 0) newValue = 0; if (newValue > 100) newValue = 100;

@@ -6,7 +6,7 @@ import {
     Library, Book, Search, Calendar, GraduationCap, Layout,
     BrainCircuit, Target, CheckCircle2, Layers, FileQuestion,
     Puzzle, TrendingUp, AlertCircle, Download, Trash2, X,
-    FileText, Loader2, MoreVertical, Share2, Globe
+    FileText, Loader2, MoreVertical, Share2, Globe, Edit3
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -506,9 +506,36 @@ export default function BibliotecaPage() {
 
                     <DialogFooter className="p-4 border-t bg-slate-50 flex justify-between gap-2">
                         <Button variant="outline" onClick={() => setSelectedResource(null)}>Cerrar</Button>
-                        <Button onClick={() => selectedResource && handleDownload(selectedResource)} disabled={downloading} className="bg-[#1a2e3b] text-white hover:bg-[#2b546e]">
-                            {downloading ? "Descargando..." : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
-                        </Button>
+                        <div className="flex gap-2">
+                            {selectedResource && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        const typeToUrl: Record<string, string> = {
+                                            "PLANIFICACION": "/planificador",
+                                            "RUBRICA": "/rubricas",
+                                            "EVALUACION": "/evaluaciones",
+                                            "AUDITORIA": "/analizador",
+                                            "ESTRATEGIA": "/nee",
+                                            "ELEVADOR": "/elevador",
+                                            "LECTURA": "/lectura-inteligente"
+                                        };
+                                        const url = typeToUrl[selectedResource.tipo];
+                                        if (url) {
+                                            window.location.href = `${url}?loadId=${selectedResource.id}`;
+                                        } else {
+                                            alert("Editor no disponible para este tipo de recurso.");
+                                        }
+                                    }}
+                                    className="border-[#2b546e] text-[#2b546e] hover:bg-slate-50 font-bold"
+                                >
+                                    <Edit3 className="w-4 h-4 mr-2" /> Abrir en Editor
+                                </Button>
+                            )}
+                            <Button onClick={() => selectedResource && handleDownload(selectedResource)} disabled={downloading} className="bg-[#1a2e3b] text-white hover:bg-[#2b546e]">
+                                {downloading ? "Descargando..." : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
+                            </Button>
+                        </div>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles } from "lucide-react";
+import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon } from "lucide-react";
 
 // ─── Modal de edición del perfil institucional ───────────────────────────────
 interface School {
@@ -29,6 +29,102 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
         proyecto_educativo: school.proyecto_educativo || "",
     });
     const [saving, setSaving] = useState(false);
+    const [activeTab, setActiveTab] = useState<"profile" | "docs">("profile");
+
+    // --- Document Manager States ---
+    const [docs, setDocs] = useState<any[]>([]);
+    const [loadingDocs, setLoadingDocs] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [tipoDocSeleccionado, setTipoDocSeleccionado] = useState("general");
+
+    const fetchDocs = async () => {
+        setLoadingDocs(true);
+        try {
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+            if (!token) return;
+
+            const res = await fetch(`${BE_URL}/documentos/${school.id}`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setDocs(data.documents || []);
+            }
+        } catch (e) {
+            console.error("Error cargando docs", e);
+        } finally {
+            setLoadingDocs(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === "docs") fetchDocs();
+    }, [activeTab]);
+
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        const toastId = toast.loading("Procesando y vectorizando documento...");
+
+        try {
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+            if (!token) throw new Error("No hay sesión");
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("school_id", school.id);
+            formData.append("tipo_documento", tipoDocSeleccionado);
+
+            const res = await fetch(`${BE_URL}/upload-contexto`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+                body: formData
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.detail || "Error subiendo archivo");
+            }
+
+            toast.success("Documento procesado con éxito", { id: toastId });
+            fetchDocs();
+        } catch (err: any) {
+            toast.error(err.message || "Error al subir", { id: toastId });
+        } finally {
+            setUploading(false);
+            if (e.target) e.target.value = ""; // reset input
+        }
+    };
+
+    const handleDeleteDoc = async (filename: string) => {
+        if (!confirm(`¿Eliminar ${filename}? La IA ya no lo usará.`)) return;
+
+        const toastId = toast.loading("Eliminando documento...");
+        try {
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+            if (!token) throw new Error("No hay sesión");
+
+            const res = await fetch(`${BE_URL}/documentos/${school.id}/${encodeURIComponent(filename)}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (!res.ok) throw new Error("Error eliminando documento");
+
+            toast.success("Documento eliminado", { id: toastId });
+            fetchDocs();
+        } catch (e: any) {
+            toast.error("Error al eliminar", { id: toastId });
+        }
+    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -74,102 +170,204 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                     </button>
                 </div>
 
-                {/* Info banner */}
-                <div className="mx-6 mt-5 p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl flex gap-2">
-                    <Sparkles size={14} className="text-teal-400 shrink-0 mt-0.5" />
-                    <p className="text-teal-300 text-xs leading-relaxed">
-                        Esta información se inyecta automáticamente en todos los prompts de IA de los profesores de este colegio. Completa todos los campos para mejores resultados.
-                    </p>
+                {/* --- TABS --- */}
+                <div className="flex border-b border-slate-700 px-6 mt-4 gap-6">
+                    <button
+                        onClick={() => setActiveTab("profile")}
+                        className={`pb-3 text-sm font-bold border-b-2 transition-colors ${activeTab === "profile" ? "border-teal-400 text-teal-400" : "border-transparent text-slate-500 hover:text-slate-300"
+                            }`}
+                    >
+                        📝 Perfil Texto
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("docs")}
+                        className={`pb-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === "docs" ? "border-teal-400 text-teal-400" : "border-transparent text-slate-500 hover:text-slate-300"
+                            }`}
+                    >
+                        📚 Contexto Base de Conocimientos (RAG)
+                    </button>
                 </div>
 
-                {/* Form */}
-                <div className="p-6 space-y-5">
-                    {/* Ubicación */}
-                    <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            <MapPin size={12} /> Ubicación
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            <input
-                                type="text"
-                                placeholder="Ciudad (ej: Chiguayante)"
-                                value={form.city}
-                                onChange={e => setForm({ ...form, city: e.target.value })}
-                                className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Región (ej: Biobío)"
-                                value={form.region}
-                                onChange={e => setForm({ ...form, region: e.target.value })}
-                                className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
-                            />
+                {activeTab === "profile" ? (
+                    <>
+                        {/* Info banner */}
+                        <div className="mx-6 mt-5 p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl flex gap-2">
+                            <Sparkles size={14} className="text-teal-400 shrink-0 mt-0.5" />
+                            <p className="text-teal-300 text-xs leading-relaxed">
+                                Esta información se inyecta automáticamente en todos los prompts de IA de los profesores de este colegio. Completa todos los campos para mejores resultados.
+                            </p>
                         </div>
-                    </div>
 
-                    {/* Sello */}
-                    <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            <Sparkles size={12} /> Sello Institucional
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="ej: Humanista-Cristiano con Excelencia Académica"
-                            value={form.sello_institucional}
-                            onChange={e => setForm({ ...form, sello_institucional: e.target.value })}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
-                        />
-                        <p className="text-slate-500 text-xs mt-1.5">Frase corta que identifica la identidad del colegio.</p>
-                    </div>
+                        {/* Form */}
+                        <div className="p-6 space-y-5">
+                            {/* Ubicación */}
+                            <div>
+                                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                    <MapPin size={12} /> Ubicación
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <input
+                                        type="text"
+                                        placeholder="Ciudad (ej: Chiguayante)"
+                                        value={form.city}
+                                        onChange={e => setForm({ ...form, city: e.target.value })}
+                                        className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Región (ej: Biobío)"
+                                        value={form.region}
+                                        onChange={e => setForm({ ...form, region: e.target.value })}
+                                        className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                            </div>
 
-                    {/* Valores */}
-                    <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            ✨ Valores Institucionales
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="ej: Respeto, Fe, Servicio, Excelencia, Alegría"
-                            value={form.valores}
-                            onChange={e => setForm({ ...form, valores: e.target.value })}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
-                        />
-                        <p className="text-slate-500 text-xs mt-1.5">Separados por coma. Se incluyen en los recursos pedagógicos.</p>
-                    </div>
+                            {/* Sello */}
+                            <div>
+                                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                    <Sparkles size={12} /> Sello Institucional
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="ej: Humanista-Cristiano con Excelencia Académica"
+                                    value={form.sello_institucional}
+                                    onChange={e => setForm({ ...form, sello_institucional: e.target.value })}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
+                                />
+                                <p className="text-slate-500 text-xs mt-1.5">Frase corta que identifica la identidad del colegio.</p>
+                            </div>
 
-                    {/* PEI / Proyecto Educativo */}
-                    <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            <BookOpen size={12} /> Proyecto Educativo Institucional (PEI)
-                        </label>
-                        <textarea
-                            rows={5}
-                            placeholder="Descripción breve del PEI o misión del colegio. Ejemplo: 'Formar personas íntegras en la fe católica, con excelencia académica y compromiso social, preparadas para los desafíos del siglo XXI...'"
-                            value={form.proyecto_educativo}
-                            onChange={e => setForm({ ...form, proyecto_educativo: e.target.value })}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none resize-none"
-                        />
-                        <p className="text-slate-500 text-xs mt-1.5">La IA usará esto para alinear el contenido pedagógico con la identidad del colegio. Máximo 3-4 frases.</p>
-                    </div>
-                </div>
+                            {/* Valores */}
+                            <div>
+                                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                    ✨ Valores Institucionales
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="ej: Respeto, Fe, Servicio, Excelencia, Alegría"
+                                    value={form.valores}
+                                    onChange={e => setForm({ ...form, valores: e.target.value })}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none"
+                                />
+                                <p className="text-slate-500 text-xs mt-1.5">Separados por coma. Se incluyen en los recursos pedagógicos.</p>
+                            </div>
 
-                {/* Footer */}
-                <div className="flex justify-end gap-3 px-6 pb-6">
-                    <button
-                        onClick={onClose}
-                        className="px-5 py-2.5 rounded-xl bg-slate-700 text-slate-300 font-bold text-sm hover:bg-slate-600 transition-colors"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="px-5 py-2.5 rounded-xl bg-teal-500 text-white font-bold text-sm hover:bg-teal-400 transition-colors flex items-center gap-2 disabled:opacity-60"
-                    >
-                        {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                        Guardar Perfil
-                    </button>
-                </div>
+                            {/* PEI / Proyecto Educativo */}
+                            <div>
+                                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                    <BookOpen size={12} /> Proyecto Educativo Institucional (PEI)
+                                </label>
+                                <textarea
+                                    rows={5}
+                                    placeholder="Descripción breve del PEI o misión del colegio."
+                                    value={form.proyecto_educativo}
+                                    onChange={e => setForm({ ...form, proyecto_educativo: e.target.value })}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 outline-none resize-none"
+                                />
+                                <p className="text-slate-500 text-xs mt-1.5">La IA usará esto para alinear el contenido pedagógico con la identidad del colegio. Máximo 3-4 frases.</p>
+                            </div>
+                        </div>
+
+                        {/* Footer Profile */}
+                        <div className="flex justify-end gap-3 px-6 pb-6">
+                            <button
+                                onClick={onClose}
+                                className="px-5 py-2.5 rounded-xl bg-slate-700 text-slate-300 font-bold text-sm hover:bg-slate-600 transition-colors"
+                            >
+                                Cerrar
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="px-5 py-2.5 rounded-xl bg-teal-500 text-white font-bold text-sm hover:bg-teal-400 transition-colors flex items-center gap-2 disabled:opacity-60"
+                            >
+                                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                Guardar Perfil Texto
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* DOCS TAB */}
+                        <div className="p-6 space-y-6">
+                            <div className="bg-slate-800/50 border border-slate-700 p-5 rounded-2xl">
+                                <h3 className="text-white font-bold text-sm mb-3">Subir Nuevo Documento (PDF)</h3>
+                                <div className="flex items-center gap-3">
+                                    <select
+                                        value={tipoDocSeleccionado}
+                                        onChange={(e) => setTipoDocSeleccionado(e.target.value)}
+                                        className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm outline-none w-1/3"
+                                    >
+                                        <option value="pei">Doc. PEI (Institucional)</option>
+                                        <option value="rice">Doc. RICE (Convivencia)</option>
+                                        <option value="reglamento_evaluacion">Reglamento Evaluación</option>
+                                        <option value="general">Otro / General</option>
+                                    </select>
+
+                                    <label className={`flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 border-dashed rounded-xl px-4 py-2 cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        {uploading ? <Loader2 size={18} className="text-slate-300 animate-spin" /> : <Upload size={18} className="text-slate-300" />}
+                                        <span className="text-sm text-slate-200 font-bold">
+                                            {uploading ? "Procesando Vectorización (RAG)..." : "Seleccionar y Vectorizar PDF"}
+                                        </span>
+                                        <input
+                                            type="file"
+                                            accept="application/pdf"
+                                            className="hidden"
+                                            onChange={handleUpload}
+                                            disabled={uploading}
+                                        />
+                                    </label>
+                                </div>
+                                <p className="text-slate-500 text-[11px] mt-3">
+                                    Los PDFs subidos aquí serán fragmentados (chunking) y convertidos a vectores. El Mentor y otros asistentes de IA leerán esta base de conocimientos cuando un profesor de {school.name} haga preguntas relacionadas (RAG).
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <h3 className="text-white font-bold text-sm mb-2">Base de Conocimientos Activa ({docs.length})</h3>
+                                {loadingDocs ? (
+                                    <div className="animate-pulse space-y-2">
+                                        {[1, 2].map(i => <div key={i} className="h-14 bg-slate-800 rounded-xl" />)}
+                                    </div>
+                                ) : docs.length === 0 ? (
+                                    <div className="text-center py-6 bg-slate-800/30 rounded-xl border border-slate-700/50 border-dashed">
+                                        <FileIcon className="mx-auto text-slate-600 mb-2" size={32} />
+                                        <p className="text-slate-400 text-sm">No hay documentos vectorizados aún.</p>
+                                    </div>
+                                ) : (
+                                    docs.map((doc, i) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-800 rounded-xl border border-slate-700">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg">
+                                                    <FileText size={16} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-white text-sm font-bold truncate max-w-[200px] sm:max-w-xs">{doc.filename}</p>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-[10px] uppercase font-bold text-indigo-300 bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                                                            TIPO: {doc.tipo_documento}
+                                                        </span>
+                                                        <span className="text-[10px] text-slate-500">
+                                                            {doc.chunks} fragmentos (chunks) embebidos
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteDoc(doc.filename)}
+                                                className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                title="Eliminar documento del modelo RAG"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

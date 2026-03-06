@@ -84,13 +84,19 @@ export default function MentorPage() {
         setLoading(true);
 
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token || "";
+
             const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const res = await fetch(`${API_URL}/chat-mentor`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({
                     history: newHistory,
-                    user_name: userName // <--- Enviamos el nombre
+                    user_name: userName
                 })
             });
             const data = await res.json();

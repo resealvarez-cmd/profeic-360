@@ -20,6 +20,7 @@ import { trackEvent } from "@/lib/telemetry";
 
 // --- IMPORTACIÓN ÚNICA DEL BOTÓN ---
 import { BotonGuardar } from "@/components/BotonGuardar";
+import { supabase } from "@/lib/supabaseClient";
 
 // --- COLORES ---
 const COLORS = ["#94a3b8", "#60a5fa", "#2b546e", "#f2ae60"];
@@ -58,6 +59,33 @@ export default function AnalizadorPage() {
     useEffect(() => {
         setMounted(true);
         trackEvent({ eventName: 'page_view', module: 'analizador' });
+    }, []);
+
+    // EFECTO PARA CARGAR RECURSO DESDE LA BIBLIOTECA
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const loadId = params.get('loadId');
+        if (loadId) {
+            setIsAnalyzing(true);
+            const loadResource = async () => {
+                try {
+                    const { data, error } = await supabase.from("biblioteca_recursos").select("*").eq("id", loadId).single();
+                    if (!error && data && data.contenido) {
+                        const saved = data.contenido;
+                        if (saved.objetivo_aprendizaje) setObjetivo(saved.objetivo_aprendizaje);
+                        if (saved.texto_evaluacion) setInstrumento(saved.texto_evaluacion);
+
+                        setResult(saved);
+                    }
+                } catch (err) {
+                    console.error("Excepción cargando recurso", err);
+                } finally {
+                    setIsAnalyzing(false);
+                }
+            };
+            loadResource();
+            window.history.replaceState({}, '', window.location.pathname);
+        }
     }, []);
 
     useEffect(() => {

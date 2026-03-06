@@ -213,6 +213,41 @@ export default function PlanificadorWizard() {
         if (loading) { let i = 0; const interval = setInterval(() => { i = (i + 1) % MENSAJES_CARGA.length; setMensajeCarga(MENSAJES_CARGA[i]); }, 3000); return () => clearInterval(interval); }
     }, [loading]);
 
+    // EFECTO PARA CARGAR RECURSO DESDE LA BIBLIOTECA
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const loadId = params.get('loadId');
+        if (loadId) {
+            setLoading(true);
+            setMensajeCarga("Cargando planificación desde Biblioteca...");
+
+            const loadResource = async () => {
+                try {
+                    const { data, error } = await supabase.from("biblioteca_recursos").select("*").eq("id", loadId).single();
+                    if (error) {
+                        console.error("Error cargando recurso", error);
+                    } else if (data && data.contenido) {
+                        const saved = data.contenido;
+                        if (saved.nivel) setNivel(saved.nivel);
+                        if (saved.asignaturaActiva) setAsignaturaActiva(saved.asignaturaActiva);
+                        if (saved.valor_panel) setValorSeleccionado(saved.valor_panel);
+                        setResultado(saved);
+                        setStep(4);
+                    }
+                } catch (err) {
+                    console.error("Excepción cargando recurso", err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            loadResource();
+
+            // Limpia la URL para evitar recargas accidentales
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
+
     React.useEffect(() => {
         if (!nivel) return;
         const fetchAsignaturas = async () => {

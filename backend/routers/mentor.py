@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
 import google.generativeai as genai
 import os
 from datetime import datetime
@@ -57,23 +57,24 @@ def get_query_embedding(text: str):
 # --- PERSONALIDAD REFORZADA (Con Pragmatismo Didáctico) ---
 fecha_hoy = datetime.now().strftime("%A %d de %B de %Y")
 
-def get_system_prompt(nombre_usuario="Docente"):
+def get_system_prompt(nombre_usuario="Docente", nombre_colegio="tu colegio", sello=""):
+    sello_line = f"SELLO: {sello}.\n" if sello else ""
     return f"""
-ROL: Eres 'Mentor IC', el consejero pedagógico y pastoral del Colegio Madre Paulina de Chiguayante.
+ROL: Eres 'Mentor IC', el consejero pedagógico y pastoral de {nombre_colegio}.
 FECHA: {fecha_hoy}.
 USUARIO: Estás hablando con {nombre_usuario}. Llámalo por su nombre de vez en cuando para generar cercanía.
-
+{sello_line}
 TUS 4 PILARES FUNDAMENTALES:
 
-1. **RAÍCES Y ALAS:** Valora la identidad local (Chiguayante, Río Biobío), pero conéctala con lo universal para ampliar el bagaje cultural de los estudiantes.
-2. **IDENTIDAD CATÓLICA:** Eres acogedor y ético. Si es pertinente al contexto, ofrece una breve "píldora de luz" basada en el Evangelio o valores cristianos, pero sin ser invasivo.
+1. **RAÍCES Y ALAS:** Valora la identidad local e institucional de {nombre_colegio}, pero conéctala con lo universal.
+2. **IDENTIDAD INSTITUCIONAL:** Eres acogedor y ético. Refleja los valores propios de {nombre_colegio} en tus respuestas.
 3. **EXPERTO INSTITUCIONAL (Rigor):** Tus respuestas se basan estrictamente en la DOCUMENTACIÓN OFICIAL (RICE, PEI) cuando está disponible.
    - *Regla de Honestidad:* Si no encuentras una norma específica en el texto recuperado, DILO claramente ("No encontré un artículo específico, pero..."). NO inventes citas.
 
 4. **PRAGMATISMO DIDÁCTICO (Nuevo):**
    - Cuando sugieras una idea pedagógica, NO te quedes en la teoría. Propón una **Estrategia Didáctica Concreta** (ej: Rutina de Pensamiento, Debate, ABP, Cuadro Comparativo).
-   - Explica el "Cómo": da un ejemplo breve de la actividad paso a paso.
-   - Conexión Curricular: Si el tema es académico, vincúlalo implícitamente con los **Objetivos de Aprendizaje (OA)** del Currículum Nacional chileno (ej: "Esto tributa al OA de Lectura Crítica...").
+   - Explica el “Cómo”: da un ejemplo breve de la actividad paso a paso.
+   - Conexión Curricular: Si el tema es académico, vincúlalo implícitamente con los **Objetivos de Aprendizaje (OA)** del Currículum Nacional chileno.
 
 ESTILO:
 - Usa Markdown (Negritas, listas) para facilitar la lectura rápida.
@@ -81,46 +82,72 @@ ESTILO:
 """
 
 @router.post("/chat-mentor")
-async def chat_mentor(req: ChatRequest):
+async def chat_mentor(req: ChatRequest, authorization: Optional[str] = Header(None)):
     try:
-        # 1. Identificar la última pregunta del usuario
         if not req.history:
             return {"response": f"Hola {req.user_name}, soy Mentor IC. ¿En qué puedo ayudarte hoy?"}
-            
+
         ultima_pregunta = req.history[-1].content
+
+        # ── 1. Resolver school_id y nombre del colegio del profesor ──
+        school_id = None
+        nombre_colegio = "tu colegio"
+        sello_colegio = ""
+        if authorization and supabase:
+            try:
+                token = authorization.split("Bearer ")[-1]
+                user_resp = supabase.auth.get_user(token)
+                if user_resp and user_resp.user:
+                    user_id = user_resp.user.id
+                    profile_resp = supabase.table("profiles").select(
+                        "school_id"
+                    ).eq("id", user_id).maybe_single().execute()
+                    profile_data = profile_resp.data or {}
+                    school_id = profile_data.get("school_id")
+
+                    if school_id:
+                        school_resp = supabase.table("schools").select(
+                            "name, sello_institucional"
+                        ).eq("id", school_id).maybe_single().execute()
+                        school_data = school_resp.data or {}
+                        nombre_colegio = school_data.get("name", "tu colegio")
+                        sello_colegio = school_data.get("sello_institucional", "")
+            except Exception as e_auth:
+                print(f"⚠️ No se pudo resolver school: {e_auth}")
         
-        # 2. BUSCAR EN SUPABASE (RAG)
+        # ── 2. BUSCAR EN SUPABASE (RAG multi-tenant) ──
         rag_data = []
         try:
-            # Generamos el vector de búsqueda
             query_vector = get_query_embedding(ultima_pregunta)
             
-            # Consultamos la Base de Datos
-            matches = supabase.rpc(
-                "match_documents", 
-                {
-                    "query_embedding": query_vector,
-                    "match_threshold": 0.4, 
-                    "match_count": 4
-                }
-            ).execute()
-            
+            rpc_params = {
+                "query_embedding": query_vector,
+                "match_threshold": 0.4,
+                "match_count": 4
+            }
+            # Filtrar por colegio si está disponible
+            if school_id:
+                rpc_params["filter_school_id"] = school_id
+
+            matches = supabase.rpc("match_documents", rpc_params).execute()
             rag_data = matches.data
         except Exception as e_rag:
-            print(f"⚠️ Advertencia RAG (Continuando sin contexto): {e_rag}")
+            print(f"⚠️ RAG (sin contexto): {e_rag}")
             rag_data = []
 
-        # 3. Construir el Contexto Institucional
+        # ── 3. Construir contexto institucional ──
         contexto_institucional = ""
         if rag_data:
             contexto_institucional = "\n\n--- DOCUMENTACIÓN INSTITUCIONAL ENCONTRADA (Prioriza esta información para lo normativo) ---\n"
             for match in rag_data:
                 source = match.get('metadata', {}).get('source', 'Documento Interno')
+                tipo = match.get('tipo_documento', '')
                 content = match.get('content', '').replace("\n", " ")
-                contexto_institucional += f"FUENTE: {source}\nFRAGMENTO: {content}\n\n"
+                tipo_label = f" [{tipo.upper()}]" if tipo and tipo != 'general' else ""
+                contexto_institucional += f"FUENTE{tipo_label}: {source}\nFRAGMENTO: {content}\n\n"
         
-        # 4. Armar el Prompt Completo
-        SYSTEM_PROMPT = get_system_prompt(req.user_name)
+        # ── 4. Armar Prompt ──
+        SYSTEM_PROMPT = get_system_prompt(req.user_name, nombre_colegio, sello_colegio)
         full_prompt = SYSTEM_PROMPT + contexto_institucional + "\n--- HISTORIAL DE CONVERSACIÓN ---\n"
         
         for msg in req.history:

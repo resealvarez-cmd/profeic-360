@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 // --- 1. IMPORTAMOS EL BOTÓN INTELIGENTE ---
 import { BotonGuardar } from "@/components/BotonGuardar";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function ElevadorPage() {
     const [loading, setLoading] = useState(false);
@@ -20,6 +21,34 @@ export default function ElevadorPage() {
         grade: "",
         subject: ""
     });
+
+    // EFECTO PARA CARGAR RECURSO DESDE LA BIBLIOTECA
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const loadId = params.get('loadId');
+        if (loadId) {
+            setLoading(true);
+            const loadResource = async () => {
+                try {
+                    const { data, error } = await supabase.from("biblioteca_recursos").select("*").eq("id", loadId).single();
+                    if (!error && data && data.contenido) {
+                        const saved = data.contenido;
+                        if (saved.grade) setForm(prev => ({ ...prev, grade: saved.grade }));
+                        if (saved.subject) setForm(prev => ({ ...prev, subject: saved.subject }));
+                        if (saved.activity) setForm(prev => ({ ...prev, activity: saved.activity }));
+
+                        setResult(saved);
+                    }
+                } catch (err) {
+                    console.error("Excepción cargando recurso", err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadResource();
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
 
     useEffect(() => {
         async function fetchGrades() {

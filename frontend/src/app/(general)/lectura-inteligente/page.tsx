@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { trackEvent } from "@/lib/telemetry";
+import { supabase } from "@/lib/supabaseClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
@@ -30,7 +31,7 @@ const ModernSelect = ({ label, value, options, onChange, placeholder = "Seleccio
                 <span className={cn("text-sm font-medium truncate pr-4", !value && "text-slate-400")}>{selectedLabel || placeholder}</span>
                 <ChevronDown size={16} className={cn("text-slate-400 transition-transform duration-200", isOpen && "rotate-180")} />
             </button>
-            {isOpen && <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">{options.length === 0 ? <div className="p-4 text-xs text-slate-400 text-center">No hay opciones</div> : options.map((opt: any) => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={cn("px-4 py-3 text-sm cursor-pointer transition-colors border-b border-slate-50 last:border-0", value === opt.value ? "bg-[#4a6b8c]/10 text-[#2b546e] font-bold" : "text-slate-600 hover:bg-slate-50 hover:text-[#2b546e]")}>{opt.label}</div>))}</div>}
+            {isOpen && <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">{options.length === 0 ? <div className="p-4 text-xs text-slate-400 text-center">No hay opciones</div> : options.map((opt: any) => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={cn("px-4 py-3 text-sm cursor-pointer transition-colors border-b border-slate-50 last:border-0", value === opt.value ? "bg-[#4a6b8c]/10 text-[#2b546e] font-bold" : "text-slate-600 hover:bg-slate-50 hover:text-[#4a6b8c]")}>{opt.label}</div>))}</div>}
         </div>
     );
 };
@@ -83,6 +84,46 @@ export default function LecturaInteligente() {
     const [generatedText, setGeneratedText] = useState("");
     const [questions, setQuestions] = useState<any[]>([]);
     const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+
+    // EFECTO PARA CARGAR RECURSO DESDE LA BIBLIOTECA
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const loadId = params.get('loadId');
+        if (loadId) {
+            setLoading(true);
+            setMensajeCarga("Cargando guía desde Biblioteca...");
+            const loadResource = async () => {
+                try {
+                    const { data, error } = await supabase.from("biblioteca_recursos").select("*").eq("id", loadId).single();
+                    if (!error && data && data.contenido) {
+                        const saved = data.contenido;
+
+                        // Restauramos config
+                        if (saved.grade) setConfig(prev => ({ ...prev, grade: saved.grade }));
+                        if (saved.subject) setConfig(prev => ({ ...prev, subject: saved.subject }));
+                        if (saved.oaText) setConfig(prev => ({ ...prev, oaText: saved.oaText }));
+                        if (saved.customOaId) setConfig(prev => ({ ...prev, customOaId: saved.customOaId }));
+                        if (saved.sourceText) setConfig(prev => ({ ...prev, sourceText: saved.sourceText }));
+                        if (saved.numQuestions) setConfig(prev => ({ ...prev, numQuestions: saved.numQuestions }));
+
+                        // Restauramos resultado final
+                        if (saved.texto) setGeneratedText(saved.texto);
+                        if (saved.preguntas) setQuestions(saved.preguntas);
+
+                        // Saltar a la vista de resultados (paso 3 o 2) dependiendo de si prefiere editar o ver 
+                        setStep(3);
+                    }
+                } catch (err) {
+                    console.error("Excepción cargando recurso", err);
+                } finally {
+                    setLoading(false);
+                    setMensajeCarga("");
+                }
+            };
+            loadResource();
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
 
     useEffect(() => {
         fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })

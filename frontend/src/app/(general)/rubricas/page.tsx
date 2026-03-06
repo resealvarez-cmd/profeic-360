@@ -8,6 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
 import { BotonGuardar } from "@/components/BotonGuardar";
+import { supabase } from "@/lib/supabaseClient";
 
 interface OA { id: number; oa_codigo: string; descripcion: string; }
 interface RubricCriteria { criterio: string; porcentaje: number; niveles: { insuficiente: string; elemental: string; adecuado: string; destacado: string; }; }
@@ -74,6 +75,47 @@ export default function RubricasPage() {
         trackEvent({ eventName: 'page_view', module: 'rubricas' });
         const fetchLevels = async () => { try { const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }); const data = await res.json(); if (data.type === "niveles") setLevels(data.data.sort((a: string, b: string) => (NIVEL_ORDER.indexOf(a) === -1 ? 999 : NIVEL_ORDER.indexOf(a)) - (NIVEL_ORDER.indexOf(b) === -1 ? 999 : NIVEL_ORDER.indexOf(b)))); } catch (e) { console.error(e); } };
         fetchLevels();
+    }, []);
+
+    // EFECTO PARA CARGAR RECURSO DESDE LA BIBLIOTECA
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const loadId = params.get('loadId');
+        if (loadId) {
+            setGenerating(true);
+            const loadResource = async () => {
+                try {
+                    const { data, error } = await supabase.from("biblioteca_recursos").select("*").eq("id", loadId).single();
+                    if (!error && data && data.contenido) {
+                        const saved = data.contenido;
+                        if (saved.nivel) setForm(prev => ({ ...prev, nivel: saved.nivel }));
+                        if (saved.asignatura) setForm(prev => ({ ...prev, asignatura: saved.asignatura }));
+                        if (saved.oaId) setForm(prev => ({ ...prev, oaId: saved.oaId }));
+                        if (saved.oaDescripcion) setForm(prev => ({ ...prev, oaDescripcion: saved.oaDescripcion }));
+                        if (saved.actividad) setForm(prev => ({ ...prev, actividad: saved.actividad }));
+
+                        // Si era un "modo libre", mode tiene que pasar a manual.
+                        if (saved.oaId === "manual") {
+                            setMode("manual");
+                        }
+
+                        setResult({
+                            titulo: saved.titulo || "",
+                            descripcion: saved.descripcion || "",
+                            tabla: saved.tabla || []
+                        });
+
+                        if (saved.puntaje_total) setTotalScore(saved.puntaje_total);
+                    }
+                } catch (err) {
+                    console.error("Excepción cargando recurso", err);
+                } finally {
+                    setGenerating(false);
+                }
+            };
+            loadResource();
+            window.history.replaceState({}, '', window.location.pathname);
+        }
     }, []);
 
     // Carga de Asignaturas (Solo si no es manual)
