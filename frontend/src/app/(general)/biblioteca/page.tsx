@@ -666,7 +666,7 @@ export default function BibliotecaPage() {
                     </ScrollArea>
 
                     <div className="p-4 border-t bg-slate-50 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 w-full">
-                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => setSelectedResource(null)}>Cerrar</Button>
+                        <Button variant="outline" className="w-full sm:w-auto text-slate-700 font-bold border-slate-300 hover:bg-slate-100" onClick={() => setSelectedResource(null)}>Cerrar</Button>
                         <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-end">
                             {selectedResource && (
                                 <Button
