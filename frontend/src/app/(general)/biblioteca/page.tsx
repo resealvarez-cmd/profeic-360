@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/lib/supabaseClient";
 
 // --- ICONO AUXILIAR ---
@@ -122,26 +122,42 @@ const VisorDeRecursos = ({ data }: { data: any }) => {
     }
 
     // 3. EVALUACIÓN (PRUEBA)
-    if (safeData.items && Array.isArray(safeData.items)) {
+    // La evaluación puede guardar items a nivel top o dentro de student_version
+    const evalItems = safeData.student_version?.items || (Array.isArray(safeData.items) ? safeData.items : null);
+    const evalTitle = safeData.student_version?.title || safeData.title;
+    const evalSections = safeData.student_version?.sections || safeData.sections;
+    // Si detectamos items de evaluación en cualquier nivel, mostramos el visor
+    if (evalItems && Array.isArray(evalItems) && evalItems.length > 0) {
         return (
             <div className="space-y-6">
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 italic text-slate-600 text-sm">
-                    "{safeData.description}"
-                </div>
+                {evalTitle && <div className="text-center border-b pb-3 mb-3">
+                    <p className="font-bold text-slate-800 text-base">{evalTitle}</p>
+                </div>}
                 <div>
                     <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
-                        <FileQuestion className="w-4 h-4" /> Reactivos ({safeData.items.length})
+                        <FileQuestion className="w-4 h-4" /> Reactivos ({evalItems.length})
                     </h4>
                     <div className="space-y-3">
-                        {safeData.items.map((item: any, i: number) => (
+                        {evalItems.slice(0, 6).map((item: any, i: number) => (
                             <div key={i} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
                                 <div className="flex justify-between mb-2">
                                     <span className="text-[10px] font-bold uppercase border px-2 py-0.5 rounded text-slate-500">{item.type}</span>
                                     <span className="text-xs font-bold text-[#2b546e]">{item.points} pts</span>
                                 </div>
                                 <p className="text-sm text-slate-800 font-medium">{item.stem}</p>
+                                {item.options && item.options.length > 0 && (
+                                    <div className="mt-2 pl-3 space-y-1">
+                                        {item.options.slice(0, 2).map((opt: any, idx: number) => (
+                                            <p key={idx} className="text-xs text-slate-600">{String.fromCharCode(65 + idx)}) {opt.text || opt}</p>
+                                        ))}
+                                        {item.options.length > 2 && <p className="text-xs text-slate-400">...</p>}
+                                    </div>
+                                )}
                             </div>
                         ))}
+                        {evalItems.length > 6 && (
+                            <p className="text-xs text-center text-slate-400 mt-2">...y {evalItems.length - 6} reactivos más</p>
+                        )}
                     </div>
                 </div>
             </div>
