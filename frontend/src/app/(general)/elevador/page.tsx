@@ -7,7 +7,7 @@ import {
 // --- 1. IMPORTAMOS EL BOTÓN INTELIGENTE ---
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { supabase } from "@/lib/supabaseClient";
-
+import { toast } from "sonner";
 export default function ElevadorPage() {
     const [loading, setLoading] = useState(false);
     const [downloading, setDownloading] = useState(false);
@@ -106,7 +106,7 @@ export default function ElevadorPage() {
             if (!res.ok) throw new Error("Error");
             const data = await res.json();
             setResult(data);
-        } catch (error) { alert("Error de conexión."); }
+        } catch (error) { toast.error("Error de conexión con el Elevador Cognitivo."); }
         finally { setLoading(false); }
     };
 
@@ -129,7 +129,7 @@ export default function ElevadorPage() {
             document.body.appendChild(a);
             a.click();
             a.remove();
-        } catch (e) { alert("Error al descargar."); }
+        } catch (e) { toast.error("Error al descargar."); }
         finally { setDownloading(false); }
     };
 

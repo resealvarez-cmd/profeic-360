@@ -21,7 +21,7 @@ import { trackEvent } from "@/lib/telemetry";
 // --- IMPORTACIÓN ÚNICA DEL BOTÓN ---
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { supabase } from "@/lib/supabaseClient";
-
+import { toast } from "sonner";
 // --- COLORES ---
 const COLORS = ["#94a3b8", "#60a5fa", "#2b546e", "#f2ae60"];
 

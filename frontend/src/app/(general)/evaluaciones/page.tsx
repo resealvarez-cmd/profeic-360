@@ -14,7 +14,7 @@ import { trackEvent } from "@/lib/telemetry";
 import { UploadZone } from "@/components/ui/UploadZone"; // <--- Import nuevo
 import HeroSection from "@/components/ui/HeroSection"; // <--- Import Hero (opcional, para test)
 import { supabase } from "@/lib/supabaseClient";
-
+import { toast } from "sonner";
 // --- CONSTANTES ---
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -208,8 +208,8 @@ export default function GeneradorEvaluaciones() {
 
     const generarPrueba = async () => {
         const totalQ = Object.values(config.quantities).reduce((a, b) => a + b, 0);
-        if (totalQ === 0) { alert("Agrega al menos una pregunta."); return; }
-        if (config.oaIds.length === 0 && !config.customOa) { alert("Selecciona al menos un Objetivo o escribe uno manual."); return; }
+        if (totalQ === 0) { toast.warning("Agrega al menos una pregunta."); return; }
+        if (config.oaIds.length === 0 && !config.customOa) { toast.warning("Selecciona al menos un Objetivo o escribe uno manual."); return; }
 
         setLoading(true);
         try {
@@ -247,7 +247,7 @@ export default function GeneradorEvaluaciones() {
             });
 
             setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }), 500);
-        } catch (e: any) { alert(`Error al generar: ${e.message}`); } finally { setLoading(false); }
+        } catch (e: any) { toast.error(`Error al generar: ${e.message}`); } finally { setLoading(false); }
     };
 
     const descargarWord = async () => {
@@ -267,7 +267,7 @@ export default function GeneradorEvaluaciones() {
             };
             const res = await fetch(`${API_URL}/export/evaluacion-docx`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
             if (res.ok) { const blob = await res.blob(); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Evaluacion_${config.subject}.docx`; document.body.appendChild(a); a.click(); a.remove(); }
-        } catch (e) { alert("Error descarga"); } finally { setDownloading(false); }
+        } catch (e) { toast.error("Error al descargar. Intenta nuevamente."); } finally { setDownloading(false); }
     };
 
     const updateQty = (type: keyof typeof config.quantities, val: number) => setConfig({ ...config, quantities: { ...config.quantities, [type]: val } });

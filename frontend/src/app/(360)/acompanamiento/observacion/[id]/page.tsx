@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ChevronRight, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
@@ -150,17 +151,15 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
             if (stage === 'execution') setActiveStage('reflection');
 
             if (stage !== 'reflection') {
-                alert("¡Datos guardados exitosamente!");
+                toast.success("¡Datos guardados correctamente!");
             } else {
-                // If we are here, it means AI failed or we just want to close.
-                // But normally we return early if AI succeeds.
-                alert("Ciclo cerrado exitosamente.");
+                toast.success("Ciclo cerrado exitosamente.");
                 router.push('/acompanamiento/dashboard');
             }
 
         } catch (error: any) {
             console.error("Error saving data:", error);
-            alert("Error al guardar: " + error.message);
+            toast.error("Error al guardar: " + error.message);
         } finally {
             if (!showFlashModal) setLoading(false);
         }

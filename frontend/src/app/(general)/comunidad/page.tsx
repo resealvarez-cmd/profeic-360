@@ -70,7 +70,7 @@ export default function CommunityPage() {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) {
-                alert("Debes iniciar sesión para clonar recursos.");
+                toast.error("Debes iniciar sesión para clonar recursos.");
                 return;
             }
 
@@ -87,15 +87,14 @@ export default function CommunityPage() {
             if (res.ok) {
                 const data = await res.json();
                 toast.success(`¡Recurso clonado con éxito!`, {
-                    description: "Lo encontrarás en tu Dashboard personal."
+                    description: "Lo encontrarás en tu Biblioteca personal."
                 });
-                alert("✨ ¡Recurso clonado! Lo encontrarás en tu Dashboard."); // Fallback
             } else {
-                alert("Error al clonar el recurso.");
+                toast.error("Error al clonar el recurso.");
             }
         } catch (e) {
             console.error(e);
-            alert("Error de conexión.");
+            toast.error("Error de conexión.");
         } finally {
             setCloningId(null);
         }

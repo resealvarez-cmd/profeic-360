@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon } from "lucide-react";
+import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle } from "lucide-react";
 
 // ─── Modal de edición del perfil institucional ───────────────────────────────
 interface School {
@@ -18,6 +18,13 @@ interface School {
     sello_institucional?: string;
     valores?: string;
     proyecto_educativo?: string;
+}
+
+interface UserProfile {
+    id: string;          // auth.users uuid
+    email: string;
+    full_name?: string;
+    role?: string;
 }
 
 function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose: () => void; onSaved: () => void }) {
@@ -393,8 +400,15 @@ export default function SuperAdminDashboard() {
     // Edit modal
     const [editingSchool, setEditingSchool] = useState<School | null>(null);
 
+    // Unassigned users
+    const [unassignedUsers, setUnassignedUsers] = useState<UserProfile[]>([]);
+    const [loadingUnassigned, setLoadingUnassigned] = useState(false);
+    const [assigningMap, setAssigningMap] = useState<Record<string, boolean>>({});
+    const [schoolSelectionMap, setSchoolSelectionMap] = useState<Record<string, string>>({});
+
     useEffect(() => {
         fetchSchools();
+        fetchUnassignedUsers();
     }, []);
 
     const fetchSchools = async () => {
@@ -414,6 +428,56 @@ export default function SuperAdminDashboard() {
             toast.error("Error al cargar colegios: " + error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchUnassignedUsers = async () => {
+        setLoadingUnassigned(true);
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('id, email, full_name, role')
+                .is('school_id', null)
+                .order('email', { ascending: true });
+
+            if (error) throw error;
+            setUnassignedUsers(data || []);
+
+            // Pre-populate selection map with first school
+            const { data: schoolData } = await supabase.from('schools').select('id').limit(1);
+            if (schoolData && schoolData.length > 0) {
+                const defaults: Record<string, string> = {};
+                (data || []).forEach((u: UserProfile) => { defaults[u.id] = schoolData[0].id; });
+                setSchoolSelectionMap(prev => ({ ...defaults, ...prev }));
+            }
+        } catch (err: any) {
+            toast.error("Error cargando usuarios sin colegio: " + err.message);
+        } finally {
+            setLoadingUnassigned(false);
+        }
+    };
+
+    const handleAssignSchool = async (userId: string) => {
+        const selectedSchoolId = schoolSelectionMap[userId];
+        if (!selectedSchoolId) { toast.error("Selecciona un colegio primero"); return; }
+
+        setAssigningMap(prev => ({ ...prev, [userId]: true }));
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ school_id: selectedSchoolId })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            const school = schools.find(s => s.id === selectedSchoolId);
+            toast.success(`Usuario asignado a ${school?.name || 'colegio'} ✓`);
+            // Remove from list
+            setUnassignedUsers(prev => prev.filter(u => u.id !== userId));
+        } catch (err: any) {
+            toast.error("Error al asignar: " + err.message);
+        } finally {
+            setAssigningMap(prev => ({ ...prev, [userId]: false }));
         }
     };
 
@@ -727,6 +791,87 @@ export default function SuperAdminDashboard() {
                 </div>
 
             </div>
+
+            {/* ─── USUARIOS SIN COLEGIO ─────────────────────────────────────────────── */}
+            <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-amber-500/20 text-amber-400 rounded-lg">
+                            <UserX size={24} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-white">Usuarios sin Colegio Asignado</h2>
+                            <p className="text-slate-400 text-sm mt-0.5">Perfiles creados en Supabase sin <code className="text-amber-300 bg-amber-500/10 px-1 rounded">school_id</code>. Asígnales un colegio aquí.</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={fetchUnassignedUsers}
+                        disabled={loadingUnassigned}
+                        className="text-xs text-slate-400 hover:text-white font-bold flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg transition-colors"
+                    >
+                        {loadingUnassigned ? <Loader2 size={14} className="animate-spin" /> : <Users size={14} />}
+                        Actualizar
+                    </button>
+                </div>
+
+                {loadingUnassigned ? (
+                    <div className="animate-pulse space-y-3">
+                        {[1, 2, 3].map(i => <div key={i} className="h-16 bg-slate-700 rounded-xl" />)}
+                    </div>
+                ) : unassignedUsers.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 bg-slate-900/50 rounded-xl border border-slate-700/50 border-dashed gap-3">
+                        <CheckCircle size={36} className="text-emerald-500" />
+                        <p className="text-slate-400 text-sm font-bold">¡Todos los usuarios tienen colegio asignado!</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {unassignedUsers.map(user => (
+                            <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-slate-900 border border-slate-700/80 p-4 rounded-xl">
+                                {/* User info */}
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-white font-bold text-sm truncate">{user.email}</p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        {user.full_name && (
+                                            <span className="text-slate-400 text-xs">{user.full_name}</span>
+                                        )}
+                                        {user.role && (
+                                            <span className="text-[10px] px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full font-bold uppercase">{user.role}</span>
+                                        )}
+                                        <span className="text-[10px] font-mono text-slate-600">{user.id.substring(0, 8)}...</span>
+                                    </div>
+                                </div>
+
+                                {/* School selector */}
+                                <select
+                                    value={schoolSelectionMap[user.id] || ""}
+                                    onChange={(e) => setSchoolSelectionMap(prev => ({ ...prev, [user.id]: e.target.value }))}
+                                    className="bg-slate-800 border border-slate-600 rounded-xl px-3 py-2 text-white text-sm outline-none focus:ring-2 focus:ring-amber-500 min-w-[200px]"
+                                >
+                                    <option value="" disabled>— Seleccionar colegio —</option>
+                                    {schools.map(s => (
+                                        <option key={s.id} value={s.id}>🏫 {s.name}</option>
+                                    ))}
+                                </select>
+
+                                {/* Assign button */}
+                                <button
+                                    onClick={() => handleAssignSchool(user.id)}
+                                    disabled={assigningMap[user.id] || !schoolSelectionMap[user.id]}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-sm rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                >
+                                    {assigningMap[user.id] ? (
+                                        <Loader2 size={14} className="animate-spin" />
+                                    ) : (
+                                        <CheckCircle size={14} />
+                                    )}
+                                    Asignar
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
         </div>
     );
 }

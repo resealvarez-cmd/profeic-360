@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react"; // Added Suspense
 import { useRouter, useSearchParams } from "next/navigation"; // Added useSearchParams
 import { Search, Calendar, Mail, FileText, MoreVertical, Plus } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-
+import { toast } from "sonner";
 function TeachersList() { // Converted to inner component to usage Suspense in parent if needed (Next.js requirement for useSearchParams)
     const [teachers, setTeachers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);

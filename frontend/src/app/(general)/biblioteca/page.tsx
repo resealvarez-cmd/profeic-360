@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 // --- ICONO AUXILIAR ---
 const SparklesIcon = ({ className }: { className?: string }) => (
@@ -399,10 +400,23 @@ type LibraryItem = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+// Tipos para filtrar, incluyendo "TODOS"
+const FILTER_TYPES = [
+    { key: "TODOS", label: "Todos" },
+    { key: "PLANIFICACION", label: "Planificaciones" },
+    { key: "EVALUACION", label: "Evaluaciones" },
+    { key: "RUBRICA", label: "Rúbricas" },
+    { key: "ELEVADOR", label: "Elevador" },
+    { key: "AUDITORIA", label: "Auditoría" },
+    { key: "NEE", label: "NEE" },
+    { key: "LECTURA", label: "Lecturas" },
+];
+
 export default function BibliotecaPage() {
     const [items, setItems] = useState<LibraryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [activeFilter, setActiveFilter] = useState<string>("TODOS");
     const [selectedResource, setSelectedResource] = useState<LibraryItem | null>(null);
     const [downloading, setDownloading] = useState(false);
 
@@ -427,15 +441,17 @@ export default function BibliotecaPage() {
     };
 
     const handleDelete = async (id: number, e: any) => {
-        e.stopPropagation(); // Evita abrir el modal
+        e.stopPropagation();
         if (!confirm("¿Estás seguro de eliminar este recurso?")) return;
         try {
             const { error } = await supabase.from("biblioteca_recursos").delete().eq("id", id);
             if (error) throw error;
             setItems(items.filter((item) => item.id !== id));
             if (selectedResource?.id === id) setSelectedResource(null);
+            toast.success("Recurso eliminado correctamente.");
         } catch (error) {
             console.error("Error eliminando:", error);
+            toast.error("No se pudo eliminar el recurso.");
         }
     };
 
@@ -471,23 +487,19 @@ export default function BibliotecaPage() {
             });
 
             if (res.ok) {
-                // Actualizar estado local
                 setItems(prevItems => prevItems.map(i => String(i.id) === String(item.id) ? { ...i, is_public: newStatus } : i));
-
                 if (selectedResource && String(selectedResource.id) === String(item.id)) {
                     setSelectedResource({ ...selectedResource, is_public: newStatus });
                 }
-
-                alert(newStatus ? "¡Publicado exitosamente!" : "Recurso ocultado.");
+                toast.success(newStatus ? "¡Publicado en Sala de Profesores! 🌐" : "Recurso ocultado.");
             } else {
                 const errData = await res.json();
                 console.error("Backend Error:", errData);
-                // Fallback amigable si el error es de base de datos/permisos
-                alert(`No se pudo actualizar. Verifica tu conexión o intenta más tarde.`);
+                toast.error("No se pudo actualizar. Verifica tu conexión.");
             }
         } catch (error) {
             console.error(error);
-            alert("Error de conexión al intentar publicar.");
+            toast.error("Error de conexión al intentar publicar.");
         }
     };
 
@@ -519,9 +531,10 @@ export default function BibliotecaPage() {
             document.body.appendChild(a);
             a.click();
             a.remove();
+            toast.success("¡Descarga completada! 📄");
         } catch (error) {
             console.error(error);
-            alert("No se pudo descargar el archivo.");
+            toast.error("No se pudo descargar el archivo.");
         } finally {
             setDownloading(false);
         }
@@ -545,11 +558,14 @@ export default function BibliotecaPage() {
         return new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
 
-    const filteredItems = items.filter(item =>
-        item.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.asignatura?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tipo.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredItems = items.filter(item => {
+        const matchesSearch =
+            item.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.asignatura?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.tipo.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesFilter = activeFilter === "TODOS" || item.tipo === activeFilter;
+        return matchesSearch && matchesFilter;
+    });
 
     return (
         <div className="min-h-screen bg-[#f8fafc] p-8 font-sans">
@@ -569,11 +585,31 @@ export default function BibliotecaPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                         <Input
                             placeholder="Buscar por título, asignatura o tipo..."
-                            className="pl-10 bg-white border-slate-200 focus:ring-[#f2ae60]"
+                            className="pl-10 bg-white border-slate-200 focus:ring-[#f2ae60] text-slate-800 placeholder:text-slate-400"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+                </div>
+
+                {/* FILTROS POR TIPO */}
+                <div className="flex flex-wrap gap-2">
+                    {FILTER_TYPES.map(({ key, label }) => {
+                        const count = key === "TODOS" ? items.length : items.filter(i => i.tipo === key).length;
+                        if (count === 0 && key !== "TODOS") return null;
+                        return (
+                            <button
+                                key={key}
+                                onClick={() => setActiveFilter(key)}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeFilter === key
+                                        ? "bg-[#1a2e3b] text-white border-[#1a2e3b] shadow-sm"
+                                        : "bg-white text-slate-500 border-slate-200 hover:border-[#f2ae60] hover:text-[#1a2e3b]"
+                                    }`}
+                            >
+                                {label} <span className={`ml-1 ${activeFilter === key ? "opacity-70" : "opacity-50"}`}>({count})</span>
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Grid */}
@@ -693,8 +729,14 @@ export default function BibliotecaPage() {
                                     <Edit3 className="w-4 h-4 mr-2" /> Abrir en Editor
                                 </Button>
                             )}
-                            <Button onClick={() => selectedResource && handleDownload(selectedResource)} disabled={downloading} className="bg-[#1a2e3b] text-white hover:bg-[#2b546e] w-full sm:w-auto">
-                                {downloading ? "Descargando..." : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
+                            <Button
+                                onClick={() => selectedResource && handleDownload(selectedResource)}
+                                disabled={downloading}
+                                className="bg-[#1a2e3b] text-white hover:bg-[#2b546e] w-full sm:w-auto"
+                            >
+                                {downloading
+                                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Descargando...</>
+                                    : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
                             </Button>
                         </div>
                     </div>

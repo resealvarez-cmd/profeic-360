@@ -8,7 +8,7 @@ import {
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { trackEvent } from "@/lib/telemetry";
 import { supabase } from "@/lib/supabaseClient";
-
+import { toast } from "sonner";
 // Lista de Diagnósticos Comunes (Para agilizar)
 const DIAGNOSES = [
     "TDAH (Déficit Atencional)",
@@ -137,7 +137,7 @@ export default function NeePage() {
                     diagnosis: form.diagnosis
                 }
             });
-        } catch (error) { alert("Error de conexión con el Asistente de Inclusión."); }
+        } catch (error) { toast.error("Error de conexión con el Asistente de Inclusión."); }
         finally { setLoading(false); }
     };
 
@@ -157,7 +157,7 @@ export default function NeePage() {
             document.body.appendChild(a);
             a.click();
             a.remove();
-        } catch (e) { alert("Error al descargar."); }
+        } catch (e) { toast.error("Error al descargar."); }
         finally { setDownloading(false); }
     };
 

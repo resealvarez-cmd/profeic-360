@@ -17,13 +17,19 @@ load_dotenv()
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")  # anon key — solo para validar tokens
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or SUPABASE_KEY  # service role — bypassea RLS
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
+# Cliente anon: valida tokens de usuario
+supabase_auth: Optional[Client] = None
+# Cliente service role: lee datos bypasseando RLS
 supabase: Optional[Client] = None
 try:
     if SUPABASE_URL and SUPABASE_KEY:
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        supabase_auth = create_client(SUPABASE_URL, SUPABASE_KEY)
+    if SUPABASE_URL and SUPABASE_SERVICE_KEY:
+        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 except Exception as e:
     print(f"❌ [INSIGHTS] Error conectando Supabase: {e}")
 
@@ -44,19 +50,19 @@ async def get_dashboard_insights(authorization: str = Header(...)):
     - Cobertura de OAs por asignatura
     - Meses sin actividad por asignatura
     """
-    if not supabase:
+    if not supabase or not supabase_auth:
         raise HTTPException(status_code=500, detail="Supabase no configurado")
 
     try:
-        # 1. Obtener usuario
+        # 1. Obtener usuario (usando cliente anon para validar el token)
         token = authorization.split("Bearer ")[-1]
-        user_resp = supabase.auth.get_user(token)
+        user_resp = supabase_auth.auth.get_user(token)
         if not user_resp or not user_resp.user:
             raise HTTPException(status_code=401, detail="Token inválido")
 
         user_id = user_resp.user.id
 
-        # 2. Obtener recursos de la Biblioteca (últimos 90 días max 50)
+        # 2. Obtener recursos de la Biblioteca usando service role (bypassea RLS)
         recursos_resp = supabase.table("biblioteca_recursos").select(
             "tipo, asignatura, nivel, titulo, created_at, contenido"
         ).eq("user_id", user_id).order("created_at", desc=True).limit(50).execute()

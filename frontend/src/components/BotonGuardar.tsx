@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 interface BotonGuardarProps {
     tipo: "PLANIFICACION" | "RUBRICA" | "EVALUACION" | "AUDITORIA" | "ESTRATEGIA" | "ELEVADOR" | "LECTURA";
@@ -100,7 +101,7 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
 
         } catch (error: any) {
             console.error("Error detallado al guardar:", error);
-            alert(error.message || "Error al guardar el recurso.");
+            toast.error(error.message || "Error al guardar el recurso.");
         } finally {
             setLoading(false);
         }

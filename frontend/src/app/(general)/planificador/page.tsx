@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
 import { trackEvent } from "@/lib/telemetry";
@@ -306,7 +307,7 @@ export default function PlanificadorWizard() {
             const data = await res.json();
 
             if (data.error) {
-                alert(`Error IA: ${data.error}`);
+                toast.error(`Error IA: ${data.error}`);
                 console.error("Error IA:", data.error);
                 return;
             }
@@ -328,12 +329,12 @@ export default function PlanificadorWizard() {
 
                 setTimeout(() => { confetti({ particleCount: 180, spread: 100, origin: { y: 0.6 } }); }, 500);
             } else {
-                alert("Respuesta vacía del servidor.");
+                toast.error("Respuesta vacía del servidor.");
             }
 
         } catch (e: any) {
             console.error(e);
-            alert(`Error de conexión: ${e.message}`);
+            toast.error(`Error de conexión: ${e.message}`);
         } finally {
             setLoading(false);
         }
@@ -355,7 +356,7 @@ export default function PlanificadorWizard() {
             const data = await res.json();
             setDuaResult(data);
             setShowDUAModal(false);
-        } catch (e) { console.error(e); alert("Error generando DUA"); } finally { setLoadingDUA(false); }
+        } catch (e) { console.error(e); toast.error("Error generando DUA."); } finally { setLoadingDUA(false); }
     };
 
     // --- EXPORTACIÓN WORD ---
@@ -388,11 +389,11 @@ export default function PlanificadorWizard() {
                 a.click();
                 a.remove();
             } else {
-                alert("Error generando el archivo");
+                toast.error("Error generando el archivo Word.");
             }
         } catch (e) {
             console.error(e);
-            alert("Error de conexión");
+            toast.error("Error de conexión.");
         } finally {
             setDownloading(false);
         }
@@ -402,7 +403,7 @@ export default function PlanificadorWizard() {
         if (!resultado) return;
         const htmlContent = `<div style="font-family: Arial;"><h1>${resultado.titulo_unidad_creativo}</h1><hr/>${resultado.planificacion_clases.map(c => `<h2>Clase ${c.numero_clase}</h2><p>${c.contenido_editable.inicio}</p>`).join('')}</div>`;
         const blob = new Blob([htmlContent], { type: 'text/html' });
-        navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]).then(() => alert("Copiado al portapapeles"));
+        navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })]).then(() => toast.success("¡Copiado al portapapeles!"));
     };
 
     const getStepClassName = (s: number) => {

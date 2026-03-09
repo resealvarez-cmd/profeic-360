@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { supabase } from "@/lib/supabaseClient";
-
+import { toast } from "sonner";
 interface OA { id: number; oa_codigo: string; descripcion: string; }
 interface RubricCriteria { criterio: string; porcentaje: number; niveles: { insuficiente: string; elemental: string; adecuado: string; destacado: string; }; }
 interface RubricResult { titulo: string; descripcion: string; tabla: RubricCriteria[]; }
@@ -139,7 +139,7 @@ export default function RubricasPage() {
     }, [form.asignatura, mode, isManualSubject]);
 
     const generar = async () => {
-        if (!form.oaDescripcion || !form.actividad) { alert("Faltan datos: Asegúrate de tener un Objetivo y una Actividad."); return; }
+        if (!form.oaDescripcion || !form.actividad) { toast.warning("Faltan datos: Asegúrate de tener un Objetivo y una Actividad."); return; }
         setGenerating(true);
         try {
             const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/generate-rubric", {
@@ -162,7 +162,7 @@ export default function RubricasPage() {
             });
 
             setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }), 500);
-        } catch (e) { alert("Error al generar la rúbrica."); } finally { setGenerating(false); }
+        } catch (e) { toast.error("Error al generar la rúbrica."); } finally { setGenerating(false); }
     };
 
     const updateCell = (rowIdx: number, field: string, subfield: string | null, value: string) => {
@@ -193,7 +193,7 @@ export default function RubricasPage() {
                 const blob = await res.blob(); const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a"); a.href = url; a.download = `Rubrica_${form.asignatura}.docx`; document.body.appendChild(a); a.click(); a.remove();
             }
-        } catch (e) { alert("Error de conexión"); } finally { setDownloading(false); }
+        } catch (e) { toast.error("Error de conexión al descargar."); } finally { setDownloading(false); }
     };
 
     const calculatePoints = (percent: number, factor: number) => (totalScore * (percent / 100) * factor).toFixed(1);
