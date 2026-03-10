@@ -6,7 +6,7 @@ import {
     Library, Book, Search, Calendar, GraduationCap, Layout,
     BrainCircuit, Target, CheckCircle2, Layers, FileQuestion,
     Puzzle, TrendingUp, AlertCircle, Download, Trash2, X,
-    FileText, Loader2, MoreVertical, Share2, Globe, Edit3
+    FileText, Loader2, MoreVertical, Share2, Globe, Edit3, CheckSquare, Square
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import { saveAs } from "file-saver";
 
 // --- ICONO AUXILIAR ---
 const SparklesIcon = ({ className }: { className?: string }) => (
@@ -419,6 +420,8 @@ export default function BibliotecaPage() {
     const [activeFilter, setActiveFilter] = useState<string>("TODOS");
     const [selectedResource, setSelectedResource] = useState<LibraryItem | null>(null);
     const [downloading, setDownloading] = useState(false);
+    const [selectedForPackage, setSelectedForPackage] = useState<Set<number>>(new Set());
+    const [generatingPackage, setGeneratingPackage] = useState(false);
 
     useEffect(() => {
         fetchItems();
@@ -507,7 +510,8 @@ export default function BibliotecaPage() {
         if (e) e.stopPropagation(); // Evita abrir el modal
         setDownloading(true);
         try {
-            const endpoint = `${API_URL}/export/generic-docx`;
+            const CURRENT_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const endpoint = `${CURRENT_API_URL}/export/prepare-generic`;
             const payload = {
                 titulo_unidad: item.titulo,
                 nivel: item.nivel,
@@ -523,20 +527,75 @@ export default function BibliotecaPage() {
 
             if (!response.ok) throw new Error("Error en la descarga");
 
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${item.titulo.replace(/\s+/g, "_")}.docx`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            toast.success("¡Descarga completada! 📄");
+            const { download_id } = await response.json();
+
+            // Limpiar nombre de archivo de caracteres prohibidos por el OS (como ":") que rompen el encabezado y obligan el UUID
+            const safeTitle = (item.titulo || "Documento_ProfeIC")
+                .replace(/[^a-zA-Z0-9_\u00C0-\u017F\- ]/g, "")
+                .replace(/\s+/g, "_");
+
+            // Abrir en una pestaña nueva aisla completamente la acción del DOM de React y fuerza al OS a manejar el archivo de manera nativa
+            const downloadUrl = `${CURRENT_API_URL}/export/download-generic/${download_id}/${safeTitle}.docx`;
+            window.open(downloadUrl, "_blank");
+
+            toast.success("¡Descarga iniciada! 📄");
         } catch (error) {
             console.error(error);
             toast.error("No se pudo descargar el archivo.");
         } finally {
             setDownloading(false);
+        }
+    };
+
+    const toggleSelection = (id: number, e: any) => {
+        e.stopPropagation();
+        const newSet = new Set(selectedForPackage);
+        if (newSet.has(id)) newSet.delete(id);
+        else newSet.add(id);
+        setSelectedForPackage(newSet);
+    };
+
+    const handleCreatePackage = async () => {
+        if (selectedForPackage.size === 0) return;
+        setGeneratingPackage(true);
+        toast.info(`Preparando documento DOCX con ${selectedForPackage.size} recursos. Por favor espera...`);
+
+        try {
+            const documentos = Array.from(selectedForPackage)
+                .map(id => items.find(i => i.id === id))
+                .filter(doc => doc !== undefined)
+                .map(doc => ({
+                    titulo_unidad: doc!.titulo || "",
+                    nivel: doc!.nivel || "",
+                    asignatura: doc!.asignatura || "",
+                    contenido: doc!.contenido || {}
+                }));
+
+            const CURRENT_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const endpoint = `${CURRENT_API_URL}/export/prepare-paquete`;
+            const payload = { documentos };
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error("Error en la petición de DOCX");
+
+            const { download_id } = await response.json();
+
+            // Aislar en nueva pestaña para forzar el gestor de descargas nativo
+            const downloadUrl = `${CURRENT_API_URL}/export/download-paquete/${download_id}/Paquete_Didactico_ProfeIC.docx`;
+            window.open(downloadUrl, "_blank");
+
+            toast.success("¡Paquete DOCX forzado! 🎉");
+            setSelectedForPackage(new Set());
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al preparar el paquete DOCX.");
+        } finally {
+            setGeneratingPackage(false);
         }
     };
 
@@ -568,180 +627,241 @@ export default function BibliotecaPage() {
     });
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] p-8 font-sans">
-            {loading && <LoadingOverlay />}
+        <>
+            <style>{`
+            @media print {
+                @page { margin: 15mm; size: auto; }
+                body {
+                    background-color: white !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                /* Hide nextjs dev overlays and external UI */
+                #nextjs-dev-overlay { display: none !important; }
+                nav, header, aside, .toaster { display: none !important; }
+                
+                /* Container overrides */
+                .print\\:hidden { display: none !important; }
+                .print\\:block { display: block !important; }
+                .print\\:py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
+                .print\\:px-0 { padding-left: 0 !important; padding-right: 0 !important; }
+            }
+        `}</style>
+            <div className="min-h-screen bg-[#f8fafc] p-8 font-sans print:p-0 print:m-0 print:bg-white">
+                {loading && <LoadingOverlay />}
 
-            <div className="max-w-7xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h1 className="text-3xl font-extrabold text-[#1a2e3b] flex items-center gap-3">
-                            <Book className="w-8 h-8 text-[#f2ae60]" />
-                            Biblioteca Docente
-                        </h1>
-                        <p className="text-slate-500 mt-1">Repositorio central de tus recursos educativos.</p>
-                    </div>
-                    <div className="relative w-full md:w-96">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                        <Input
-                            placeholder="Buscar por título, asignatura o tipo..."
-                            className="pl-10 bg-white border-slate-200 focus:ring-[#f2ae60] text-slate-900 dark:text-slate-900 font-medium placeholder:text-slate-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                {/* FILTROS POR TIPO */}
-                <div className="flex flex-wrap gap-2">
-                    {FILTER_TYPES.map(({ key, label }) => {
-                        const count = key === "TODOS" ? items.length : items.filter(i => i.tipo === key).length;
-                        if (count === 0 && key !== "TODOS") return null;
-                        return (
-                            <button
-                                key={key}
-                                onClick={() => setActiveFilter(key)}
-                                className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeFilter === key
-                                    ? "bg-[#1a2e3b] text-white border-[#1a2e3b] shadow-sm"
-                                    : "bg-white text-slate-500 border-slate-200 hover:border-[#f2ae60] hover:text-[#1a2e3b]"
-                                    }`}
-                            >
-                                {label} <span className={`ml-1 ${activeFilter === key ? "opacity-70" : "opacity-50"}`}>({count})</span>
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* Grid */}
-                {!loading && filteredItems.length === 0 ? (
-                    <div className="text-center py-20 text-slate-400 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-                        <Book className="w-16 h-16 mx-auto mb-4 opacity-20" />
-                        <p>No se encontraron recursos.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredItems.map((item) => (
-                            <Card key={item.id} className="group hover:shadow-lg transition-all border-slate-200 hover:border-[#f2ae60]/50 cursor-pointer" onClick={() => setSelectedResource(item)}>
-                                <CardHeader className="flex flex-row items-start justify-between pb-2">
-                                    <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-[#f2ae60]/10 transition-colors">
-                                        {getIcon(item.tipo)}
-                                    </div>
-                                    <Badge variant="secondary" className="text-[10px] font-bold text-slate-500 bg-slate-100 uppercase tracking-wider border border-slate-100">
-                                        {formatDate(item.created_at)}
-                                    </Badge>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex gap-2 mb-3">
-                                        <Badge variant="outline" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                            {item.tipo}
-                                        </Badge>
-                                    </div>
-                                    <CardTitle className="text-lg font-bold text-[#1a2e3b] leading-tight mb-2 line-clamp-2 group-hover:text-[#2b546e] transition-colors">
-                                        {item.titulo}
-                                    </CardTitle>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-                                        <GraduationCap className="w-3 h-3" />
-                                        <span>{item.asignatura || "General"}</span>
-                                        <span className="text-slate-300">•</span>
-                                        <span>{item.nivel || "Sin nivel"}</span>
-                                    </div>
-                                </CardContent>
-                                {/* Botones Directos en la Tarjeta */}
-                                <div className="px-6 pb-6 pt-0 mt-auto flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="flex-1 text-xs font-bold text-slate-600 hover:text-[#1a2e3b] hover:border-[#1a2e3b]"
-                                        onClick={(e: any) => handleDownload(item, e)}
-                                    >
-                                        <Download className="w-3 h-3 mr-2" /> DOCX
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className={`flex-1 text-xs font-bold ${item.is_public ? 'text-teal-600 bg-teal-50 hover:bg-teal-100' : 'text-slate-400 hover:text-[#f2ae60] hover:bg-orange-50'}`}
-                                        onClick={(e: any) => handlePublish(item, e)}
-                                    >
-                                        {item.is_public ? <><Globe className="w-3 h-3 mr-2" /> Público</> : <><Share2 className="w-3 h-3 mr-2" /> Publicar</>}
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-red-400 hover:text-red-600 hover:bg-red-50"
-                                        onClick={(e: any) => handleDelete(item.id, e)}
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* MODAL DE VISTA PREVIA (VISOR) */}
-            <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
-                <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col p-0 gap-0">
-                    <DialogHeader className="p-6 pb-4 bg-slate-50 border-b border-slate-100">
-                        <div className="flex gap-2 mb-3">
-                            <Badge className="bg-[#2b546e] hover:bg-[#2b546e]">{selectedResource?.tipo}</Badge>
-                            <Badge variant="outline" className="text-slate-500 border-slate-300">{selectedResource?.asignatura}</Badge>
+                <div className="max-w-7xl mx-auto space-y-8 print:hidden">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h1 className="text-3xl font-extrabold text-[#1a2e3b] flex items-center gap-3">
+                                <Book className="w-8 h-8 text-[#f2ae60]" />
+                                Biblioteca Docente
+                            </h1>
+                            <p className="text-slate-500 mt-1">Repositorio central de tus recursos educativos.</p>
                         </div>
-                        <DialogTitle className="text-xl font-extrabold text-[#1a2e3b] leading-snug">
-                            {selectedResource?.titulo}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {selectedResource?.nivel} • Creado el {formatDate(selectedResource?.created_at || "")}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <ScrollArea className="flex-1 p-6 bg-white">
-                        <div className="prose prose-sm max-w-none text-slate-600">
-                            {selectedResource && <VisorDeRecursos data={selectedResource.contenido} />}
+                        <div className="relative w-full md:w-96">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                            <Input
+                                placeholder="Buscar por título, asignatura o tipo..."
+                                className="pl-10 bg-white border-slate-200 focus:ring-[#f2ae60] text-slate-900 dark:text-slate-900 font-medium placeholder:text-slate-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                    </ScrollArea>
+                    </div>
 
-                    <div className="p-4 border-t bg-slate-50 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 w-full">
-                        <Button variant="outline" className="w-full sm:w-auto text-slate-700 font-bold border-slate-300 hover:bg-slate-100" onClick={() => setSelectedResource(null)}>Cerrar</Button>
-                        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-end">
-                            {selectedResource && (
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        const typeToUrl: Record<string, string> = {
-                                            "PLANIFICACION": "/planificador",
-                                            "RUBRICA": "/rubricas",
-                                            "EVALUACION": "/evaluaciones",
-                                            "AUDITORIA": "/analizador",
-                                            "ESTRATEGIA": "/nee",
-                                            "ELEVADOR": "/elevador",
-                                            "LECTURA": "/lectura-inteligente"
-                                        };
-                                        const url = typeToUrl[selectedResource.tipo];
-                                        if (url) {
-                                            window.location.href = `${url}?loadId=${selectedResource.id}`;
-                                        } else {
-                                            toast.error("Editor no disponible para este tipo de recurso.");
-                                        }
-                                    }}
-                                    className="border-[#2b546e] text-[#2b546e] hover:bg-slate-50 font-bold w-full sm:w-auto"
+                    {/* FILTROS POR TIPO */}
+                    <div className="flex flex-wrap gap-2">
+                        {FILTER_TYPES.map(({ key, label }) => {
+                            const count = key === "TODOS" ? items.length : items.filter(i => i.tipo === key).length;
+                            if (count === 0 && key !== "TODOS") return null;
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => setActiveFilter(key)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeFilter === key
+                                        ? "bg-[#1a2e3b] text-white border-[#1a2e3b] shadow-sm"
+                                        : "bg-white text-slate-500 border-slate-200 hover:border-[#f2ae60] hover:text-[#1a2e3b]"
+                                        }`}
                                 >
-                                    <Edit3 className="w-4 h-4 mr-2" /> Abrir en Editor
-                                </Button>
-                            )}
+                                    {label} <span className={`ml-1 ${activeFilter === key ? "opacity-70" : "opacity-50"}`}>({count})</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Grid */}
+                    {!loading && filteredItems.length === 0 ? (
+                        <div className="text-center py-20 text-slate-400 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+                            <Book className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                            <p>No se encontraron recursos.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredItems.map((item) => {
+                                const isSelected = selectedForPackage.has(item.id);
+                                return (
+                                    <Card key={item.id} className={`group hover:shadow-lg transition-all border-slate-200 hover:border-[#f2ae60]/50 cursor-pointer relative ${isSelected ? 'ring-2 ring-[#f2ae60] bg-orange-50/10' : ''}`} onClick={() => setSelectedResource(item)}>
+                                        <CardHeader className="flex flex-row items-start justify-between pb-2">
+                                            <div className="flex gap-3 items-center">
+                                                <button
+                                                    onClick={(e) => toggleSelection(item.id, e)}
+                                                    className="text-slate-300 hover:text-[#f2ae60] transition-colors z-10 p-1"
+                                                    title="Seleccionar para paquete"
+                                                >
+                                                    {isSelected ? <CheckSquare className="w-5 h-5 text-[#f2ae60]" /> : <Square className="w-5 h-5" />}
+                                                </button>
+                                                <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-[#f2ae60]/10 transition-colors">
+                                                    {getIcon(item.tipo)}
+                                                </div>
+                                            </div>
+                                            <Badge variant="secondary" className="text-[10px] font-bold text-slate-500 bg-slate-100 uppercase tracking-wider border border-slate-100">
+                                                {formatDate(item.created_at)}
+                                            </Badge>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="flex gap-2 mb-3">
+                                                <Badge variant="outline" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                                    {item.tipo}
+                                                </Badge>
+                                            </div>
+                                            <CardTitle className="text-lg font-bold text-[#1a2e3b] leading-tight mb-2 line-clamp-2 group-hover:text-[#2b546e] transition-colors">
+                                                {item.titulo}
+                                            </CardTitle>
+                                            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                                                <GraduationCap className="w-3 h-3" />
+                                                <span>{item.asignatura || "General"}</span>
+                                                <span className="text-slate-300">•</span>
+                                                <span>{item.nivel || "Sin nivel"}</span>
+                                            </div>
+                                        </CardContent>
+                                        {/* Botones Directos en la Tarjeta */}
+                                        <div className="px-6 pb-6 pt-0 mt-auto flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1 text-xs font-bold text-slate-600 hover:text-[#1a2e3b] hover:border-[#1a2e3b]"
+                                                onClick={(e: any) => handleDownload(item, e)}
+                                            >
+                                                <Download className="w-3 h-3 mr-2" /> DOCX
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className={`flex-1 text-xs font-bold ${item.is_public ? 'text-teal-600 bg-teal-50 hover:bg-teal-100' : 'text-slate-400 hover:text-[#f2ae60] hover:bg-orange-50'}`}
+                                                onClick={(e: any) => handlePublish(item, e)}
+                                            >
+                                                {item.is_public ? <><Globe className="w-3 h-3 mr-2" /> Público</> : <><Share2 className="w-3 h-3 mr-2" /> Publicar</>}
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                                                onClick={(e: any) => handleDelete(item.id, e)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* BARRA FLOTANTE DE PAQUETE DIDÁCTICO */}
+                {selectedForPackage.size > 0 && (
+                    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#1a2e3b] px-6 py-4 rounded-full shadow-2xl flex items-center gap-6 animate-in slide-in-from-bottom-10 border border-slate-700 print:hidden">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-[#f2ae60] text-white w-8 h-8 rounded-full flex items-center justify-center font-black">
+                                {selectedForPackage.size}
+                            </div>
+                            <span className="text-white font-medium text-sm hidden sm:inline">documentos seleccionados</span>
+                        </div>
+                        <div className="flex items-center gap-3">
                             <Button
-                                onClick={() => selectedResource && handleDownload(selectedResource)}
-                                disabled={downloading}
-                                className="bg-[#1a2e3b] text-white hover:bg-[#2b546e] w-full sm:w-auto"
+                                variant="ghost"
+                                className="text-slate-300 hover:text-white hover:bg-slate-800 rounded-full text-xs"
+                                onClick={() => setSelectedForPackage(new Set())}
                             >
-                                {downloading
-                                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Descargando...</>
-                                    : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
+                                Cancelar
+                            </Button>
+                            <Button
+                                onClick={handleCreatePackage}
+                                disabled={generatingPackage}
+                                className="bg-[#f2ae60] hover:bg-[#d99a50] text-white rounded-full font-bold shadow-lg"
+                            >
+                                {generatingPackage ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generando...</> : <><Download className="w-4 h-4 mr-2" /> Crear Paquete DOCX</>}
                             </Button>
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
-        </div>
+                )}
+
+                {/* MODAL DE VISTA PREVIA (VISOR) */}
+                <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
+                    <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col p-0 gap-0">
+                        <DialogHeader className="p-6 pb-4 bg-slate-50 border-b border-slate-100">
+                            <div className="flex gap-2 mb-3">
+                                <Badge className="bg-[#2b546e] hover:bg-[#2b546e]">{selectedResource?.tipo}</Badge>
+                                <Badge variant="outline" className="text-slate-500 border-slate-300">{selectedResource?.asignatura}</Badge>
+                            </div>
+                            <DialogTitle className="text-xl font-extrabold text-[#1a2e3b] leading-snug">
+                                {selectedResource?.titulo}
+                            </DialogTitle>
+                            <DialogDescription>
+                                {selectedResource?.nivel} • Creado el {formatDate(selectedResource?.created_at || "")}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <ScrollArea className="flex-1 p-6 bg-white">
+                            <div className="prose prose-sm max-w-none text-slate-600">
+                                {selectedResource && <VisorDeRecursos data={selectedResource.contenido} />}
+                            </div>
+                        </ScrollArea>
+
+                        <div className="p-4 border-t bg-slate-50 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 w-full">
+                            <Button variant="outline" className="w-full sm:w-auto text-slate-700 font-bold border-slate-300 hover:bg-slate-100" onClick={() => setSelectedResource(null)}>Cerrar</Button>
+                            <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto justify-end">
+                                {selectedResource && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            const typeToUrl: Record<string, string> = {
+                                                "PLANIFICACION": "/planificador",
+                                                "RUBRICA": "/rubricas",
+                                                "EVALUACION": "/evaluaciones",
+                                                "AUDITORIA": "/analizador",
+                                                "ESTRATEGIA": "/nee",
+                                                "ELEVADOR": "/elevador",
+                                                "LECTURA": "/lectura-inteligente"
+                                            };
+                                            const url = typeToUrl[selectedResource.tipo];
+                                            if (url) {
+                                                window.location.href = `${url}?loadId=${selectedResource.id}`;
+                                            } else {
+                                                toast.error("Editor no disponible para este tipo de recurso.");
+                                            }
+                                        }}
+                                        className="border-[#2b546e] text-[#2b546e] hover:bg-slate-50 font-bold w-full sm:w-auto"
+                                    >
+                                        <Edit3 className="w-4 h-4 mr-2" /> Abrir en Editor
+                                    </Button>
+                                )}
+                                <Button
+                                    onClick={() => selectedResource && handleDownload(selectedResource)}
+                                    disabled={downloading}
+                                    className="bg-[#1a2e3b] text-white hover:bg-[#2b546e] w-full sm:w-auto"
+                                >
+                                    {downloading
+                                        ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Descargando...</>
+                                        : <><Download className="w-4 h-4 mr-2" /> Descargar DOCX</>}
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </>
     );
 }

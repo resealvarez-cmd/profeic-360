@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Form
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional, Union
@@ -11,8 +11,36 @@ import io
 import os
 import re
 import json
+import json
+import traceback
+import base64
+import uuid
+import unicodedata
+from urllib.parse import quote
+
+download_cache = {}
 
 router = APIRouter()
+
+def es_evaluacion(content: Any) -> bool:
+    if isinstance(content, list) and len(content) > 0 and isinstance(content[0], dict) and ("stem" in content[0] or "type" in content[0]):
+        return True
+    if isinstance(content, dict):
+        if "items" in content and isinstance(content.get("items"), list): return True
+        if "student_version" in content and isinstance(content.get("student_version"), dict) and "items" in content["student_version"]: return True
+        if "teacher_guide" in content and "answers" in content.get("teacher_guide", {}): return True
+        if "quantities" in content and "points" in content: return True
+    return False
+
+def get_safe_headers(filename: str) -> dict:
+    # 1. Normalizar ASCII para navegadores viejos/estrictos
+    safe_ascii = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore').decode('utf-8')
+    safe_ascii = re.sub(r'[^\w\s\.-]', '', safe_ascii).replace(' ', '_')
+    # 2. Codificar UTF-8 RFC 5987 para navegadores modernos
+    safe_utf8 = quote(filename.replace(' ', '_'))
+    return {
+        "Content-Disposition": f"attachment; filename=\"{safe_ascii}\"; filename*=UTF-8''{safe_utf8}"
+    }
 
 # ==========================================
 # 1. MODELOS DE DATOS
@@ -82,7 +110,10 @@ class GenericExportRequest(BaseModel):
     titulo_unidad: str
     nivel: str
     asignatura: str
-    contenido: Dict[str, Any]
+    contenido: Union[Dict[str, Any], List[Any]]
+
+class PaqueteExportRequest(BaseModel):
+    documentos: List[GenericExportRequest]
 
 # ==========================================
 # 2. UTILIDADES DE DISEÑO
@@ -309,12 +340,23 @@ def renderizar_rubrica(doc, data):
 
 def renderizar_evaluacion(doc, data):
     """Motor Visual para Pruebas"""
-    titulo = data.get('title') or "Evaluación"
+    titulo = data.get('title') or data.get('titulo') or "Evaluación"
+    desc = data.get('description', '')
+    items = data.get('items', [])
+
+    if isinstance(data, dict) and "student_version" in data and isinstance(data['student_version'], dict):
+        titulo = data['student_version'].get('title', titulo)
+        desc = data['student_version'].get('description', desc)
+        items = data['student_version'].get('items', items)
+        
+    if not items and isinstance(data, dict) and "preguntas" in data:
+        items = data.get("preguntas", [])
+
     h = doc.add_heading(limpiar_latex_para_word(titulo), level=1)
     h.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
-    if data.get('description'):
-        p = doc.add_paragraph(limpiar_latex_para_word(data.get('description')))
+    if desc:
+        p = doc.add_paragraph(limpiar_latex_para_word(desc))
         p.italic = True
     
     doc.add_paragraph()
@@ -324,7 +366,6 @@ def renderizar_evaluacion(doc, data):
     t.cell(0,0).text = "Nombre: __________________________________"; t.cell(0,1).text = "Fecha: __________"
     doc.add_paragraph()
 
-    items = data.get('items', [])
     for i, item in enumerate(items):
         p = doc.add_paragraph()
         run = p.add_run(f"{i+1}. {limpiar_latex_para_word(item.get('stem',''))}")
@@ -504,56 +545,199 @@ async def export_lectura_docx(req: LecturaInteligenteExportRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- GENÉRICO (BIBLIOTECA) ---
-@router.post("/export/generic-docx")
-async def export_generic_docx(req: GenericExportRequest):
+
+@router.post("/export/prepare-generic")
+async def prepare_generic(req: GenericExportRequest):
+    req_id = str(uuid.uuid4())
+    download_cache[req_id] = req
+    return {"download_id": req_id}
+
+@router.get("/export/download-generic/{req_id}/{filename}")
+async def download_generic_get(req_id: str, filename: str):
+    if req_id not in download_cache:
+        raise HTTPException(status_code=404, detail="Descarga expirada o inválida")
+    req = download_cache.pop(req_id)
+    return await render_export_generic_docx(req)
+
+def detectar_y_renderizar(doc, content: Any, titulo: str):
+    """Dispatcher universal: detecta el tipo de documento y llama al motor de renderizado correcto."""
+    if not isinstance(content, (dict, list)) or content is None:
+        doc.add_paragraph(str(content))
+        return
+
+    # 1. PLANIFICACIÓN
+    if isinstance(content, dict) and ("planificacion_clases" in content or ("clases" in content and isinstance(content.get('clases'), list))):
+        if "titulo_unidad_creativo" in content: content["titulo_unidad"] = content["titulo_unidad_creativo"]
+        if "estrategia_aprendizaje_sentencia" in content: content["estrategia"] = content["estrategia_aprendizaje_sentencia"]
+        renderizar_planificacion(doc, content)
+
+    # 2. RÚBRICA
+    elif isinstance(content, dict) and "tabla" in content and isinstance(content.get('tabla'), list) and len(content['tabla']) > 0 and "criterio" in content['tabla'][0]:
+        renderizar_rubrica(doc, content)
+
+    # 3. EVALUACIÓN (todos los formatos)
+    elif es_evaluacion(content):
+        if isinstance(content, list):
+            renderizar_evaluacion(doc, {"title": titulo, "items": content})
+        else:
+            renderizar_evaluacion(doc, content)
+
+    # 4. LECTURA INTELIGENTE
+    elif isinstance(content, dict) and "texto" in content and ("preguntas" in content or "oa" in content):
+        renderizar_lectura_inteligente(doc, content)
+
+    # 5. ELEVADOR COGNITIVO
+    elif isinstance(content, dict) and ("escalera" in content or ("propuestas" in content and "dok_actual" in content)):
+        doc.add_heading("Elevador Cognitivo", level=1)
+        doc.add_paragraph(f"Actividad Base: {limpiar_latex_para_word(str(content.get('activity', content.get('actividad', ''))))}") 
+        if content.get('dok_actual'): doc.add_paragraph(f"Nivel DOK Actual: {content.get('dok_actual')}").runs[0].bold = True
+        if content.get('diagnostico'): doc.add_paragraph(limpiar_latex_para_word(str(content.get('diagnostico')))).italic = True
+        escalera = content.get('escalera', [])
+        if escalera:
+            doc.add_heading("Escalera de Complejidad", level=2)
+            for paso in escalera:
+                p = doc.add_paragraph(style='List Number')
+                p.add_run(f"DOK {paso.get('dok_level', '?')}: ").bold = True
+                p.add_run(limpiar_latex_para_word(str(paso.get('actividad', paso.get('activity', '')))))
+        propuestas = content.get('propuestas', {})
+        if propuestas:
+            doc.add_heading("Propuestas de Mejora", level=2)
+            for clave, val in propuestas.items():
+                doc.add_paragraph(f"• {clave.upper()}: {limpiar_latex_para_word(str(val))}")
+
+    # 6. NEE / ADECUACIÓN
+    elif isinstance(content, dict) and ("estrategias" in content or "barrier" in content or "adaptaciones" in content):
+        doc.add_heading("Plan de Adecuación Curricular (NEE)", level=1)
+        if content.get('diagnosis'):
+            p = doc.add_paragraph(); p.add_run("Diagnóstico: ").bold = True; p.add_run(content.get('diagnosis'))
+        if content.get('barrier'):
+            p = doc.add_paragraph(); p.add_run("Barrera Principal: ").bold = True; p.add_run(content.get('barrier'))
+        estrategias = content.get('estrategias', content.get('adaptaciones', {}))
+        if isinstance(estrategias, dict):
+            for seccion, texto in estrategias.items():
+                doc.add_heading(seccion.replace('_', ' ').title(), level=2)
+                doc.add_paragraph(limpiar_latex_para_word(str(texto)))
+        elif isinstance(estrategias, list):
+            for est in estrategias:
+                if isinstance(est, dict):
+                    doc.add_paragraph(f"• {limpiar_latex_para_word(str(est.get('descripcion', est.get('text', str(est)))))}", style='List Bullet')
+
+    # 7. AUDITORÍA / ANALIZADOR
+    elif isinstance(content, dict) and "diagnostico_global" in content:
+        doc.add_heading("Reporte de Auditoría Pedagógica", level=1)
+        p = doc.add_paragraph(); p.add_run("Diagnóstico: ").bold = True; p.add_run(limpiar_latex_para_word(str(content.get('diagnostico_global', 'N/A'))))
+        score = content.get('score_coherencia', 0)
+        p2 = doc.add_paragraph()
+        r = p2.add_run(f"Score de Coherencia: {score}%"); r.bold = True
+        if isinstance(score, (int, float)) and score < 60: r.font.color.rgb = RGBColor(200, 0, 0)
+        fortalezas = content.get('fortalezas', [])
+        if fortalezas:
+            doc.add_heading("Fortalezas", level=2)
+            for f in fortalezas: doc.add_paragraph(f"✓ {limpiar_latex_para_word(str(f))}", style='List Bullet')
+        brechas = content.get('brechas', content.get('oportunidades', []))
+        if brechas:
+            doc.add_heading("Oportunidades de Mejora", level=2)
+            for b in brechas: doc.add_paragraph(f"→ {limpiar_latex_para_word(str(b))}", style='List Bullet')
+
+    # FALLBACK INTELIGENTE: texto legible en lugar de JSON crudo
+    else:
+        doc.add_heading(titulo or "Recurso", level=1)
+        if isinstance(content, dict):
+            for key, val in content.items():
+                if isinstance(val, str) and len(val) > 0:
+                    p = doc.add_paragraph()
+                    p.add_run(f"{key.replace('_', ' ').title()}: ").bold = True
+                    p.add_run(limpiar_latex_para_word(val))
+                elif isinstance(val, list) and len(val) > 0:
+                    doc.add_heading(key.replace('_', ' ').title(), level=2)
+                    for elem in val:
+                        if isinstance(elem, str): doc.add_paragraph(f"• {elem}", style='List Bullet')
+                        elif isinstance(elem, dict) and 'text' in elem: doc.add_paragraph(f"• {elem['text']}", style='List Bullet')
+
+async def render_export_generic_docx(req: GenericExportRequest):
     try:
         doc = Document()
         add_header_logo(doc, req.asignatura, req.nivel, "Documento Exportado")
-        content = req.contenido
+        detectar_y_renderizar(doc, req.contenido, req.titulo_unidad)
 
-        # 1. PLANIFICACIÓN
-        if "planificacion_clases" in content or ("clases" in content and isinstance(content['clases'], list)):
-            print("Detectado: Planificación")
-            # Normalización
-            if "titulo_unidad_creativo" in content: content["titulo_unidad"] = content["titulo_unidad_creativo"]
-            if "estrategia_aprendizaje_sentencia" in content: content["estrategia"] = content["estrategia_aprendizaje_sentencia"]
-            renderizar_planificacion(doc, content)
-
-        # 2. RÚBRICA (¡AQUÍ ESTÁ LA MAGIA QUE FALTABA!)
-        elif "tabla" in content and isinstance(content['tabla'], list) and "criterio" in content['tabla'][0]:
-            print("Detectado: Rúbrica")
-            renderizar_rubrica(doc, content)
-
-        # 3. EVALUACIÓN (PRUEBA)
-        elif "items" in content and isinstance(content['items'], list):
-            print("Detectado: Evaluación")
-            renderizar_evaluacion(doc, content)
-
-        # 4. AUDITORÍA
-        elif "diagnostico_global" in content:
-            doc.add_heading("Reporte de Auditoría", 1)
-            doc.add_paragraph(f"Diagnóstico: {content.get('diagnostico_global')}")
-            p = doc.add_paragraph(f"Score: {content.get('score_coherencia')}%")
-            if content.get('score_coherencia', 0) < 60: p.runs[0].font.color.rgb = RGBColor(255, 0, 0)
-
-        # 5. NEE / OTROS
-        elif "estrategias" in content:
-            doc.add_heading(f"Adecuación: {content.get('diagnosis')}", 1)
-            doc.add_paragraph(f"Barrera: {content.get('barrier')}")
-            est = content.get('estrategias', {})
-            doc.add_heading("Acceso", 2); doc.add_paragraph(est.get('acceso', ''))
-            doc.add_heading("Actividad", 2); doc.add_paragraph(est.get('actividad', ''))
-            doc.add_heading("Evaluación", 2); doc.add_paragraph(est.get('evaluacion', ''))
-
-        # 6. DEFAULT
-        else:
-             doc.add_paragraph(json.dumps(content, indent=4, ensure_ascii=False))
-
-        file_stream = io.BytesIO(); doc.save(file_stream); file_stream.seek(0)
-        filename = f"{req.titulo_unidad}.docx".replace(" ", "_")
-        return StreamingResponse(file_stream, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers={"Content-Disposition": f"attachment; filename={filename}"})
+        file_stream = io.BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+        
+        filename = f"{req.titulo_unidad}.docx"
+        headers = get_safe_headers(filename)
+        headers["Access-Control-Expose-Headers"] = "Content-Disposition"
+        
+        return StreamingResponse(
+            file_stream, 
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+            headers=headers
+        )
     except Exception as e:
         print(f"Error export genérico: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/export/prepare-paquete")
+async def prepare_paquete(req: PaqueteExportRequest):
+    req_id = str(uuid.uuid4())
+    download_cache[req_id] = req
+    return {"download_id": req_id}
+
+@router.get("/export/download-paquete/{req_id}/{filename}")
+async def download_paquete_get(req_id: str, filename: str):
+    if req_id not in download_cache:
+        raise HTTPException(status_code=404, detail="Descarga expirada o inválida")
+    req = download_cache.pop(req_id)
+    return await render_export_paquete_docx(req)
+
+async def render_export_paquete_docx(req: PaqueteExportRequest):
+    try:
+        doc = Document()
+        
+        add_header_logo(doc, "Paquete Didáctico", "Múltiples Niveles", "Documento Consolidado")
+        
+        for _ in range(5): doc.add_paragraph()
+        
+        main_title = doc.add_heading("PAQUETE DIDÁCTICO ÍNTEGRO", level=1)
+        main_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in main_title.runs:
+            run.font.size = Pt(24)
+            run.font.color.rgb = RGBColor(27, 60, 115)
+            
+        subtitle = doc.add_paragraph("ProfeIC - Transformando la Educación")
+        subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        subtitle.runs[0].font.size = Pt(16)
+        subtitle.runs[0].font.color.rgb = RGBColor(242, 174, 96)
+        
+        doc.add_paragraph(f"Total de recursos incluidos: {len(req.documentos)}").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_page_break()
+
+        for idx, item in enumerate(req.documentos):
+            sep = doc.add_heading(f"--- DOCUMENTO {idx + 1}: {item.titulo_unidad} ---", level=2)
+            sep.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            doc.add_paragraph(f"Asignatura: {item.asignatura} | Nivel: {item.nivel}").alignment = WD_ALIGN_PARAGRAPH.CENTER
+            doc.add_paragraph()
+
+            detectar_y_renderizar(doc, item.contenido, item.titulo_unidad)
+
+            if idx < len(req.documentos) - 1:
+                doc.add_page_break()
+
+        file_stream = io.BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+        
+        headers = get_safe_headers("Paquete_Didactico_ProfeIC.docx")
+        headers["Access-Control-Expose-Headers"] = "Content-Disposition"
+        
+        return StreamingResponse(
+            file_stream, 
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+            headers=headers
+        )
+    except Exception as e:
+        print("====== ERROR EN PAQUETE DOCX ======")
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==========================================

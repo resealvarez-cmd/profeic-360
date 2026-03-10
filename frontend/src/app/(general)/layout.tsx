@@ -138,11 +138,11 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
 
             {/* Mobile Overlay */}
             {isMobileOpen && (
-                <div className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in" onClick={() => setIsMobileOpen(false)} />
+                <div className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in print:hidden" onClick={() => setIsMobileOpen(false)} />
             )}
 
             <aside
-                className={`bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out relative z-50
+                className={`bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out relative z-50 print:hidden
                     ${isMobileOpen ? 'fixed inset-y-0 left-0 w-64 shadow-2xl' : 'hidden md:flex'}
                     ${!isMobileOpen && isCollapsed ? 'md:w-20' : 'md:w-64'}
                `}
@@ -260,9 +260,9 @@ export default function GeneralLayout({ children }: { children: React.ReactNode 
                 </div>
             </aside>
 
-            <main className="flex-1 overflow-y-auto relative bg-[#f8fafc]">
+            <main className="flex-1 overflow-y-auto relative bg-[#f8fafc] print:overflow-visible print:bg-white text-black">
                 {/* Mobile Header */}
-                <div className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+                <div className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between sticky top-0 z-30 shadow-sm print:hidden">
                     <div className="flex items-center gap-3">
                         <Logo size={32} />
                         <span className="font-bold text-[#1a2e3b]">ProfeIC Aula</span>
