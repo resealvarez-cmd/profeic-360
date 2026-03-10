@@ -17,6 +17,7 @@ import { NewsWall } from "@/components/NewsWall";
 import { MissionsCarousel } from "@/components/dashboard/MissionsCarousel";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { TrackerCobertura } from "@/components/dashboard/TrackerCobertura";
+import { OnboardingTour } from "@/components/dashboard/OnboardingTour";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -107,17 +108,30 @@ export default function Dashboard() {
     const [events, setEvents] = useState<any[]>([]);
 
     const [loading, setLoading] = useState(true);
+    const [showTour, setShowTour] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
+                setUserId(session.user.id);
                 // User & Role
                 const metadataName = session.user.user_metadata?.full_name;
                 if (metadataName) setUserName(metadataName.split(" ")[0]);
 
                 if (session.user.email === 're.se.alvarez@gmail.com') {
                     setIsSuperAdmin(true);
+                }
+
+                // Check tour completion
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('has_completed_tour')
+                    .eq('id', session.user.id)
+                    .single();
+                if (profile && !profile.has_completed_tour) {
+                    setTimeout(() => setShowTour(true), 1500);
                 }
 
                 // Check Admin via DB
@@ -155,6 +169,13 @@ export default function Dashboard() {
     }, []);
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
+    const completeTour = async () => {
+        setShowTour(false);
+        if (userId) {
+            await supabase.from("profiles").update({ has_completed_tour: true }).eq("id", userId);
+        }
+    };
 
     const handleGenerateTrajectory = async () => {
         setLoadingTrajectory(true);
@@ -362,18 +383,20 @@ export default function Dashboard() {
                             <FeedbackWidget feedbacks={feedbacks} loading={loading} />
 
                             {/* 2. TRACKER COBERTURA CURRICULAR */}
-                            <div className="w-full">
+                            <div id="tour-tracker" className="w-full">
                                 <TrackerCobertura />
                             </div>
 
                             {/* 3. TOOLS CAROUSEL */}
-                            <MissionsCarousel />
+                            <div id="tour-biblioteca">
+                                <MissionsCarousel />
+                            </div>
                         </div>
 
                         {/* COLUMNA DERECHA (Sidebar - Ocupa 1 de 3) */}
                         <div className="lg:col-span-1 space-y-8 h-full">
                             {/* 4. INSIGHTS WIDGET — Mentor IA Pedagógico */}
-                            <div className="sticky top-24">
+                            <div id="tour-insights" className="sticky top-24">
                                 <InsightsWidget />
                             </div>
                         </div>
@@ -440,6 +463,8 @@ export default function Dashboard() {
                     </div>
                 )}
             </main>
+            {/* ONBOARDING TOUR */}
+            {showTour && <OnboardingTour onComplete={completeTour} />}
         </div>
     );
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { ChevronDown, Sparkles, CheckCircle2, Bookmark, Target, Loader2, ArrowRight } from "lucide-react";
+import { ChevronDown, Sparkles, CheckCircle2, Bookmark, Target, Loader2, ArrowRight, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogroBanner, TipoLogro } from "@/components/dashboard/LogroBanner";
 
 interface CoberturaRecord {
     id: string;
@@ -39,6 +40,10 @@ export function TrackerCobertura() {
     // Tabs "pendientes" | "logrados"
     const [activeTab, setActiveTab] = useState<"pendientes" | "logrados">("pendientes");
 
+    // Sistema de Logros
+    const [logroActivo, setLogroActivo] = useState<{ tipo: TipoLogro; asignatura: string; nivel: string } | null>(null);
+    const [logrosObtenidos, setLogrosObtenidos] = useState<Set<string>>(new Set());
+
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://profeic-backend-484019506864.us-central1.run.app";
 
     useEffect(() => {
@@ -70,6 +75,15 @@ export function TrackerCobertura() {
                 setCourses(coursesArray);
             }
             setLoadingRecords(false);
+
+            // Cargar logros existentes
+            const { data: logros } = await supabase
+                .from("logros_usuario")
+                .select("tipo_logro, asignatura, nivel")
+                .eq("user_id", session.user.id);
+            if (logros) {
+                setLogrosObtenidos(new Set(logros.map((l: any) => `${l.tipo_logro}|${l.asignatura}|${l.nivel}`)));
+            }
         };
         fetchCoverage();
     }, []);
@@ -166,127 +180,184 @@ export function TrackerCobertura() {
 
     if (percentage === 100) chartData[1].value = 0; // Prevent recharts error with 0
 
+    // --- LÓGICA DE LOGROS ---
+    const checkAndAwardLogro = useCallback(async (tipo: TipoLogro) => {
+        const key = `${tipo}|${currentCourse.asignatura}|${currentCourse.nivel}`;
+        if (logrosObtenidos.has(key) || logroActivo) return;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const { error } = await supabase.from("logros_usuario").insert({
+            user_id: session.user.id,
+            tipo_logro: tipo,
+            asignatura: currentCourse.asignatura,
+            nivel: currentCourse.nivel,
+        });
+
+        if (!error) {
+            setLogrosObtenidos(prev => new Set([...prev, key]));
+            setLogroActivo({ tipo, asignatura: currentCourse.asignatura, nivel: currentCourse.nivel });
+        }
+    }, [currentCourse, logrosObtenidos, logroActivo]);
+
+    useEffect(() => {
+        if (percentage >= 100) checkAndAwardLogro("COBERTURA_100");
+        else if (percentage >= 50) checkAndAwardLogro("COBERTURA_50");
+        else if (percentage >= 20) checkAndAwardLogro("COBERTURA_20");
+    }, [percentage]);
+
+    const medalDefs: { tipo: TipoLogro; emoji: string; label: string; threshold: number }[] = [
+        { tipo: "COBERTURA_20", emoji: "🥉", label: "20%", threshold: 20 },
+        { tipo: "COBERTURA_50", emoji: "🥈", label: "50%", threshold: 50 },
+        { tipo: "COBERTURA_100", emoji: "🥇", label: "100%", threshold: 100 },
+    ];
+
     return (
-        <div className="w-full bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full ring-1 ring-black/5">
-            {/* Header Seleccionable */}
-            <div className="bg-slate-50 p-4 border-b border-slate-100 flex items-center justify-between relative">
-                <div className="flex items-center gap-2 text-[#2b546e] font-bold">
-                    <Target className="w-5 h-5 text-[#f2ae60]" />
-                    <span>Mi Cobertura</span>
-                </div>
-
-                {/* Dropdown de cursos */}
-                <div className="relative">
-                    <button
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                        className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:border-slate-300 transition-colors shadow-sm"
-                    >
-                        <span className="truncate max-w-[150px]">{currentCourse.asignatura} - {currentCourse.nivel}</span>
-                        <ChevronDown size={14} className={cn("text-slate-400 transition-transform", dropdownOpen && "rotate-180")} />
-                    </button>
-                    {dropdownOpen && (
-                        <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-slate-100 rounded-xl shadow-xl z-50 p-1 animate-in fade-in zoom-in-95">
-                            {courses.map((c, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => { setSelectedCourseIdx(idx); setDropdownOpen(false); }}
-                                    className={cn("w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-between", idx === selectedCourseIdx ? "bg-[#f2ae60]/10 text-[#2b546e] font-bold" : "text-slate-600 hover:bg-slate-50")}
-                                >
-                                    <span className="truncate">{c.asignatura}</span>
-                                    <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 ml-2 shrink-0">{c.nivel}</span>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="p-6 flex-1 flex grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
-
-                {/* Parte Lado Izquierdo: Gráfico Mágico */}
-                <div className="flex flex-col items-center justify-center relative">
-                    <div className="w-32 h-32 relative group">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={chartData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={45}
-                                    outerRadius={60}
-                                    startAngle={90}
-                                    endAngle={-270}
-                                    dataKey="value"
-                                    stroke="none"
-                                >
-                                    {chartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-2xl font-black text-[#1a2e3b] leading-none">{percentage}%</span>
-                        </div>
+        <>
+            {logroActivo !== null && (
+                <LogroBanner
+                    tipo={logroActivo.tipo}
+                    asignatura={logroActivo.asignatura}
+                    nivel={logroActivo.nivel}
+                    onClose={() => setLogroActivo(null)}
+                />
+            )}
+            <div className="w-full bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full ring-1 ring-black/5">
+                {/* Header Seleccionable */}
+                <div className="bg-slate-50 p-4 border-b border-slate-100 flex items-center justify-between relative">
+                    <div className="flex items-center gap-2 text-[#2b546e] font-bold">
+                        <Target className="w-5 h-5 text-[#f2ae60]" />
+                        <span>Mi Cobertura</span>
                     </div>
-                    <div className="text-center mt-2">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Avance Curricular</p>
-                        <p className="text-sm font-bold text-[#2b546e] mt-0.5">{coveredCount} / {total} OAs</p>
-                    </div>
-                </div>
 
-                {/* Parte Lado Derecho: Pestañas de Detalle */}
-                <div className="flex flex-col border-l-0 md:border-l md:border-slate-100 md:pl-6 min-h-[220px]">
-                    <div className="flex bg-slate-100 p-1 rounded-lg mb-4 w-fit">
+                    {/* Dropdown de cursos */}
+                    <div className="relative">
                         <button
-                            onClick={() => setActiveTab("pendientes")}
-                            className={cn("px-4 py-1.5 text-xs font-bold rounded-md transition-all", activeTab === "pendientes" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:border-slate-300 transition-colors shadow-sm"
                         >
-                            Pendientes ({pendingOas.length})
+                            <span className="truncate max-w-[150px]">{currentCourse.asignatura} - {currentCourse.nivel}</span>
+                            <ChevronDown size={14} className={cn("text-slate-400 transition-transform", dropdownOpen && "rotate-180")} />
                         </button>
-                        <button
-                            onClick={() => setActiveTab("logrados")}
-                            className={cn("px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5", activeTab === "logrados" ? "bg-white text-green-600 shadow-sm" : "text-slate-500 hover:text-slate-700")}
-                        >
-                            <CheckCircle2 size={12} /> Logrados ({coveredOas.length})
-                        </button>
-                    </div>
-
-                    <div className="flex-1 relative overflow-y-auto max-h-[160px] pr-2 custom-scrollbar">
-                        {loadingOas ? (
-                            <div className="absolute inset-0 flex items-center justify-center text-slate-400"><Loader2 className="w-5 h-5 animate-spin" /></div>
-                        ) : displayList.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-center py-6">
-                                <Bookmark className="w-8 h-8 text-slate-200 mb-2" />
-                                <p className="text-sm font-bold text-slate-400">
-                                    {activeTab === "pendientes" ? "¡Increíble! Has cubierto todos los OAs." : "Aún no hay OAs abordados en este curso."}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="space-y-2 pb-2">
-                                {displayList.map((oa, idx) => (
-                                    <div key={idx} className="bg-slate-50 p-3 rounded-xl border border-slate-100/50 flex items-start gap-3 hover:bg-slate-100 transition-colors group">
-                                        <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0", activeTab === "pendientes" ? "bg-orange-400" : "bg-green-500")} />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[10px] font-bold text-[#2b546e] uppercase mb-0.5">{oa.oa_codigo}</p>
-                                            <p className="text-xs text-slate-600 leading-snug line-clamp-2" title={oa.descripcion}>{oa.descripcion}</p>
-                                        </div>
-                                        {activeTab === "pendientes" && (
-                                            <a
-                                                href={`/planificador?nivel=${encodeURIComponent(currentCourse.nivel)}&asignatura=${encodeURIComponent(currentCourse.asignatura)}`}
-                                                className="shrink-0 bg-white p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-[#f2ae60] hover:border-[#f2ae60] transition-colors shadow-sm ml-2 group-hover:scale-110"
-                                                title="Planificar clase"
-                                            >
-                                                <Sparkles size={14} />
-                                            </a>
-                                        )}
-                                    </div>
+                        {dropdownOpen && (
+                            <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-slate-100 rounded-xl shadow-xl z-50 p-1 animate-in fade-in zoom-in-95">
+                                {courses.map((c, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => { setSelectedCourseIdx(idx); setDropdownOpen(false); }}
+                                        className={cn("w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-between", idx === selectedCourseIdx ? "bg-[#f2ae60]/10 text-[#2b546e] font-bold" : "text-slate-600 hover:bg-slate-50")}
+                                    >
+                                        <span className="truncate">{c.asignatura}</span>
+                                        <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 ml-2 shrink-0">{c.nivel}</span>
+                                    </button>
                                 ))}
                             </div>
                         )}
                     </div>
                 </div>
+
+                <div className="p-6 flex-1 flex grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+
+                    {/* Parte Lado Izquierdo: Gráfico Mágico */}
+                    <div className="flex flex-col items-center justify-center relative">
+                        <div className="w-32 h-32 relative group">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={chartData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={45}
+                                        outerRadius={60}
+                                        startAngle={90}
+                                        endAngle={-270}
+                                        dataKey="value"
+                                        stroke="none"
+                                    >
+                                        {chartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-2xl font-black text-[#1a2e3b] leading-none">{percentage}%</span>
+                            </div>
+                        </div>
+                        <div className="text-center mt-2">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Avance Curricular</p>
+                            <p className="text-sm font-bold text-[#2b546e] mt-0.5">{coveredCount} / {total} OAs</p>
+                        </div>
+                    </div>
+
+                    {/* Parte Lado Derecho: Pestañas de Detalle */}
+                    <div className="flex flex-col border-l-0 md:border-l md:border-slate-100 md:pl-6 min-h-[220px]">
+                        <div className="flex bg-slate-100 p-1 rounded-lg mb-4 w-fit">
+                            <button
+                                onClick={() => setActiveTab("pendientes")}
+                                className={cn("px-4 py-1.5 text-xs font-bold rounded-md transition-all", activeTab === "pendientes" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                            >
+                                Pendientes ({pendingOas.length})
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("logrados")}
+                                className={cn("px-4 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5", activeTab === "logrados" ? "bg-white text-green-600 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                            >
+                                <CheckCircle2 size={12} /> Logrados ({coveredOas.length})
+                            </button>
+                        </div>
+
+                        <div className="flex-1 relative overflow-y-auto max-h-[160px] pr-2 custom-scrollbar">
+                            {loadingOas ? (
+                                <div className="absolute inset-0 flex items-center justify-center text-slate-400"><Loader2 className="w-5 h-5 animate-spin" /></div>
+                            ) : displayList.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-center py-6">
+                                    <Bookmark className="w-8 h-8 text-slate-200 mb-2" />
+                                    <p className="text-sm font-bold text-slate-400">
+                                        {activeTab === "pendientes" ? "¡Increíble! Has cubierto todos los OAs." : "Aún no hay OAs abordados en este curso."}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2 pb-2">
+                                    {displayList.map((oa, idx) => (
+                                        <div key={idx} className="bg-slate-50 p-3 rounded-xl border border-slate-100/50 flex items-start gap-3 hover:bg-slate-100 transition-colors group">
+                                            <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0", activeTab === "pendientes" ? "bg-orange-400" : "bg-green-500")} />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[10px] font-bold text-[#2b546e] uppercase mb-0.5">{oa.oa_codigo}</p>
+                                                <p className="text-xs text-slate-600 leading-snug line-clamp-2" title={oa.descripcion}>{oa.descripcion}</p>
+                                            </div>
+                                            {activeTab === "pendientes" && (
+                                                <a
+                                                    href={`/planificador?nivel=${encodeURIComponent(currentCourse.nivel)}&asignatura=${encodeURIComponent(currentCourse.asignatura)}`}
+                                                    className="shrink-0 bg-white p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-[#f2ae60] hover:border-[#f2ae60] transition-colors shadow-sm ml-2 group-hover:scale-110"
+                                                    title="Planificar clase"
+                                                >
+                                                    <Sparkles size={14} />
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                {/* Medal row */}
+                <div className="px-5 py-2 border-t border-slate-100 flex items-center gap-1 bg-slate-50/60">
+                    <Trophy size={12} className="text-[#f2ae60] mr-1" />
+                    {medalDefs.map(m => {
+                        const earned = logrosObtenidos.has(`${m.tipo}|${currentCourse.asignatura}|${currentCourse.nivel}`) || percentage >= m.threshold;
+                        return (
+                            <span key={m.tipo} title={`${m.emoji} ${m.label} de cobertura`}
+                                className={cn("text-base transition-all duration-300", earned ? "opacity-100" : "opacity-20 grayscale")}>
+                                {m.emoji}
+                            </span>
+                        );
+                    })}
+                    <span className="ml-auto text-[10px] text-slate-400 font-medium">Logros de cobertura</span>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
