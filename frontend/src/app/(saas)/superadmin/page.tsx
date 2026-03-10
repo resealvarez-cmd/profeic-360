@@ -436,7 +436,7 @@ export default function SuperAdminDashboard() {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('id, email, full_name, role')
+                .select('id, email, full_name')
                 .is('school_id', null)
                 .order('email', { ascending: true });
 
