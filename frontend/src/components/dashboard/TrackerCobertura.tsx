@@ -162,17 +162,23 @@ export function TrackerCobertura() {
     };
 
     const coveredOas = officialOas.filter(isCovered);
-    const total = officialOas.length || courseRecords.length;
-    const coveredCount = officialOas.length > 0 ? coveredOas.length : courseRecords.length;
+    // Solo calculamos porcentaje real cuando tengamos los OAs oficiales cargados.
+    // Si officialOas aún está vacío (loadingOas), mostramos 0% para no disparar
+    // falsas medallas con la lógica de fallback (courseRecords.length / courseRecords.length = 100%).
+    const oasLoaded = officialOas.length > 0;
+    const total = oasLoaded ? officialOas.length : 0;
+    const coveredCount = oasLoaded ? coveredOas.length : 0;
     const percentage = total === 0 ? 0 : Math.round((coveredCount / total) * 100);
 
-    // useEffect para logros — también ANTES de los returns condicionales
+    // useEffect para logros — también ANTES de los returns condicionales.
+    // Solo se ejecuta cuando tenemos OAs oficiales cargados (oasLoaded) para evitar
+    // falsos positivos durante la carga inicial.
     useEffect(() => {
-        if (!currentCourse || percentage === 0) return;
+        if (!currentCourse || !oasLoaded || percentage === 0) return;
         if (percentage >= 100) checkAndAwardLogro("COBERTURA_100", currentCourse);
         else if (percentage >= 50) checkAndAwardLogro("COBERTURA_50", currentCourse);
         else if (percentage >= 20) checkAndAwardLogro("COBERTURA_20", currentCourse);
-    }, [percentage, currentCourse?.asignatura, currentCourse?.nivel]);
+    }, [percentage, oasLoaded, currentCourse?.asignatura, currentCourse?.nivel]);
 
     const medalDefs: { tipo: TipoLogro; emoji: string; label: string; threshold: number }[] = [
         { tipo: "COBERTURA_20", emoji: "🥉", label: "20%", threshold: 20 },
