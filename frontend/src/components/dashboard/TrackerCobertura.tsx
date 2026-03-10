@@ -121,6 +121,65 @@ export function TrackerCobertura() {
         }
     };
 
+    // --- LÓGICA DE LOGROS (hooks ANTES de cualquier return condicional) ---
+    const checkAndAwardLogro = useCallback(async (tipo: TipoLogro, course: { nivel: string; asignatura: string }) => {
+        const key = `${tipo}|${course.asignatura}|${course.nivel}`;
+        if (logrosObtenidos.has(key)) return;
+
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) return;
+
+            const { error } = await supabase.from("logros_usuario").insert({
+                user_id: session.user.id,
+                tipo_logro: tipo,
+                asignatura: course.asignatura,
+                nivel: course.nivel,
+            });
+
+            if (!error) {
+                setLogrosObtenidos(prev => new Set([...prev, key]));
+                setLogroActivo({ tipo, asignatura: course.asignatura, nivel: course.nivel });
+            }
+        } catch (_) {
+            // La tabla logros_usuario aún no existe — continuar sin guardar
+        }
+    }, [logrosObtenidos]);
+
+    const currentCourse = courses[selectedCourseIdx];
+
+    const courseRecords = currentCourse
+        ? records.filter(r => r.nivel === currentCourse.nivel && r.asignatura === currentCourse.asignatura)
+        : [];
+
+    const isCovered = (oa: OA) => {
+        const oaDesc = oa.descripcion.toLowerCase();
+        const oaCod = oa.oa_codigo.toLowerCase();
+        return courseRecords.some(r => {
+            const recId = r.oa_id.toLowerCase();
+            return recId === String(oa.id) || oaDesc.includes(recId) || recId.includes(oaCod);
+        });
+    };
+
+    const coveredOas = officialOas.filter(isCovered);
+    const total = officialOas.length || courseRecords.length;
+    const coveredCount = officialOas.length > 0 ? coveredOas.length : courseRecords.length;
+    const percentage = total === 0 ? 0 : Math.round((coveredCount / total) * 100);
+
+    // useEffect para logros — también ANTES de los returns condicionales
+    useEffect(() => {
+        if (!currentCourse || percentage === 0) return;
+        if (percentage >= 100) checkAndAwardLogro("COBERTURA_100", currentCourse);
+        else if (percentage >= 50) checkAndAwardLogro("COBERTURA_50", currentCourse);
+        else if (percentage >= 20) checkAndAwardLogro("COBERTURA_20", currentCourse);
+    }, [percentage, currentCourse?.asignatura, currentCourse?.nivel]);
+
+    const medalDefs: { tipo: TipoLogro; emoji: string; label: string; threshold: number }[] = [
+        { tipo: "COBERTURA_20", emoji: "🥉", label: "20%", threshold: 20 },
+        { tipo: "COBERTURA_50", emoji: "🥈", label: "50%", threshold: 50 },
+        { tipo: "COBERTURA_100", emoji: "🥇", label: "100%", threshold: 100 },
+    ];
+
     if (loadingRecords) {
         return (
             <div className="w-full bg-white border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[300px] animate-pulse">
@@ -131,7 +190,7 @@ export function TrackerCobertura() {
         );
     }
 
-    if (courses.length === 0) {
+    if (courses.length === 0 || !currentCourse) {
         return (
             <div className="w-full bg-gradient-to-br from-white to-slate-50 border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[300px] text-center">
                 <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-sm">
@@ -143,79 +202,16 @@ export function TrackerCobertura() {
         );
     }
 
-    const currentCourse = courses[selectedCourseIdx];
-
-    // Lógica de Cruce CRÍTICA
-    // Un OA oficial se considera abordado si algún récord en `records` (filtrado por este curso) 
-    // contiene parte de la descripción o código.
-    const courseRecords = records.filter(r => r.nivel === currentCourse.nivel && r.asignatura === currentCourse.asignatura);
-
-    const isCovered = (oa: OA) => {
-        // Normalizamos strings para comparación robusta
-        const oaDesc = oa.descripcion.toLowerCase();
-        const oaCod = oa.oa_codigo.toLowerCase();
-
-        return courseRecords.some(r => {
-            const recId = r.oa_id.toLowerCase();
-            return (
-                recId === String(oa.id) || // ID exacto
-                oaDesc.includes(recId) ||  // El record es un prefijo truncado de la desc
-                recId.includes(oaCod)      // El record contiene el código "OA 1"
-            );
-        });
-    };
-
-    const coveredOas = officialOas.filter(isCovered);
     const pendingOas = officialOas.filter(oa => !isCovered(oa));
-
-    // Si la BD no nos devuelve OAs para esa asignatura, usamos la lista cruda como fallback (100% progreso simulado)
     const displayList = officialOas.length > 0
         ? (activeTab === "pendientes" ? pendingOas : coveredOas)
         : [];
 
-    const total = officialOas.length || courseRecords.length;
-    const coveredCount = officialOas.length > 0 ? coveredOas.length : courseRecords.length;
-    const percentage = total === 0 ? 0 : Math.round((coveredCount / total) * 100);
-
     const chartData = [
         { name: "Logrados", value: coveredCount, color: "#f2ae60" },
-        { name: "Pendientes", value: total - coveredCount, color: "#f1f5f9" } // slate-100
+        { name: "Pendientes", value: total - coveredCount, color: "#f1f5f9" }
     ];
-
-    if (percentage === 100) chartData[1].value = 0; // Prevent recharts error with 0
-
-    // --- LÓGICA DE LOGROS ---
-    const checkAndAwardLogro = useCallback(async (tipo: TipoLogro) => {
-        const key = `${tipo}|${currentCourse.asignatura}|${currentCourse.nivel}`;
-        if (logrosObtenidos.has(key) || logroActivo) return;
-
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) return;
-
-        const { error } = await supabase.from("logros_usuario").insert({
-            user_id: session.user.id,
-            tipo_logro: tipo,
-            asignatura: currentCourse.asignatura,
-            nivel: currentCourse.nivel,
-        });
-
-        if (!error) {
-            setLogrosObtenidos(prev => new Set([...prev, key]));
-            setLogroActivo({ tipo, asignatura: currentCourse.asignatura, nivel: currentCourse.nivel });
-        }
-    }, [currentCourse, logrosObtenidos, logroActivo]);
-
-    useEffect(() => {
-        if (percentage >= 100) checkAndAwardLogro("COBERTURA_100");
-        else if (percentage >= 50) checkAndAwardLogro("COBERTURA_50");
-        else if (percentage >= 20) checkAndAwardLogro("COBERTURA_20");
-    }, [percentage]);
-
-    const medalDefs: { tipo: TipoLogro; emoji: string; label: string; threshold: number }[] = [
-        { tipo: "COBERTURA_20", emoji: "🥉", label: "20%", threshold: 20 },
-        { tipo: "COBERTURA_50", emoji: "🥈", label: "50%", threshold: 50 },
-        { tipo: "COBERTURA_100", emoji: "🥇", label: "100%", threshold: 100 },
-    ];
+    if (percentage === 100) chartData[1].value = 0;
 
     return (
         <>
