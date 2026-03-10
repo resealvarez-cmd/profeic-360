@@ -481,7 +481,7 @@ export default function PlanificadorWizard() {
                                     titulo={resultado.titulo_unidad_creativo}
                                     asignatura={asignaturaActiva}
                                     nivel={nivel}
-                                    contenido={{ ...resultado, nivel, asignaturaActiva }}
+                                    contenido={{ ...resultado, nivel, asignaturaActiva, mochila }}
                                 />
                                 <Button onClick={handleDownloadDocx} disabled={downloading} className="bg-[#2b546e] text-white hover:bg-[#1a2e3b]">
                                     {downloading ? "Generando..." : <><Download className="w-4 h-4 mr-2" /> Descargar Word</>}
