@@ -11,9 +11,7 @@ from supabase import create_client, Client
 import google.generativeai as genai
 import os
 import json
-from dotenv import load_dotenv
 
-load_dotenv()
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -104,7 +102,7 @@ async def get_dashboard_insights(authorization: str = Header(...)):
                     dias = (ahora - fecha).days
                     if dias <= 30:
                         asig_reciente.add(r.get("asignatura", ""))
-                except:
+                except Exception:
                     pass
 
         asig_sin_actividad = [a for a in asig_counter.keys() if a and a not in asig_reciente]
@@ -121,7 +119,7 @@ async def get_dashboard_insights(authorization: str = Header(...)):
                 dok_total["dok1"] += cfg.get("dokDistribution", {}).get("dok1", 0)
                 dok_total["dok2"] += cfg.get("dokDistribution", {}).get("dok2", 0)
                 dok_total["dok3"] += cfg.get("dokDistribution", {}).get("dok3", 0)
-            except:
+            except Exception:
                 pass
 
         # 4. Construir contexto para Gemini

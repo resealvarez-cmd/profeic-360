@@ -6,9 +6,7 @@ import json
 import re
 import os
 import httpx
-from dotenv import load_dotenv
 
-load_dotenv()
 router = APIRouter()
 
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -50,9 +48,8 @@ class AssessmentConfig(BaseModel):
     context_text: Optional[str] = None # <--- RAG CTX
     dokDistribution: DokDistribution
     quantities: Quantities
-    quantities: Quantities
-    points: PointsPerType 
-    num_alternatives: Optional[int] = 4 # Default 4  
+    points: PointsPerType
+    num_alternatives: Optional[int] = 4  # Default 4
 
 # --- LIMPIEZA JSON ---
 def limpiar_json(texto):
@@ -60,13 +57,13 @@ def limpiar_json(texto):
     texto = re.sub(r'```\s*', '', texto)
     try:
         return json.loads(texto)
-    except:
+    except Exception:
         inicio = texto.find("{")
         fin = texto.rfind("}")
         if inicio != -1 and fin != -1:
             try:
                 return json.loads(texto[inicio:fin+1])
-            except:
+            except Exception:
                 pass
         return None
 

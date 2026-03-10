@@ -9,9 +9,7 @@ from pydantic import BaseModel
 from typing import Optional
 from supabase import create_client, Client
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")

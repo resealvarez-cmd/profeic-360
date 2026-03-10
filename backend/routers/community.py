@@ -3,9 +3,7 @@ from typing import List, Optional, Union
 from pydantic import BaseModel
 from supabase import create_client, Client, ClientOptions
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 
 router = APIRouter()
 

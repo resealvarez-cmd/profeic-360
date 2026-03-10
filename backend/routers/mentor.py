@@ -5,19 +5,17 @@ import google.generativeai as genai
 import os
 from datetime import datetime
 import locale
-from dotenv import load_dotenv
 from supabase import create_client, Client
 
 # Configurar idioma para la fecha (intento robusto)
 try:
     locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
-except:
+except Exception:
     try:
         locale.setlocale(locale.LC_TIME, 'es_ES')
-    except:
-        pass 
+    except Exception:
+        pass  # El servidor seguirá funcionando con el locale por defecto
 
-load_dotenv()
 router = APIRouter()
 
 # --- CONFIGURACIÓN DE APIS ---

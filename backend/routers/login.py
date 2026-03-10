@@ -1,10 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os
-from dotenv import load_dotenv
 from supabase import create_client, Client
 
-load_dotenv()
 router = APIRouter()
 
 # --- CONEXIÓN SUPABASE ---

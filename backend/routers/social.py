@@ -2,10 +2,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
 import os
-from dotenv import load_dotenv
 from supabase import create_client, Client
 
-load_dotenv()
 
 router = APIRouter(prefix="/social", tags=["Social Engine"])
 

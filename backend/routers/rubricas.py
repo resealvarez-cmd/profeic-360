@@ -5,10 +5,7 @@ import json
 import re
 import os
 import httpx
-from dotenv import load_dotenv
 
-# Configuración
-load_dotenv()
 router = APIRouter()
 
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -27,7 +24,7 @@ class RubricRequest(BaseModel):
     actividad: str 
 
 # Forzamos reconstrucción por seguridad
-RubricRequest.model_rebuild()
+# (no necesario en Pydantic v2 moderno — puede removerse en el futuro)
 
 def limpiar_rubrica_json(texto):
     # Limpieza básica
@@ -35,11 +32,11 @@ def limpiar_rubrica_json(texto):
     texto = re.sub(r'```\s*', '', texto)
     try:
         return json.loads(texto)
-    except:
+    except Exception:
         # Intento de recuperación si falta una llave
         try:
             return json.loads(texto + "}")
-        except:
+        except Exception:
             return {"titulo": "Error de Generación", "descripcion": "Intente nuevamente.", "tabla": []}
 
 @router.post("/generate-rubric")

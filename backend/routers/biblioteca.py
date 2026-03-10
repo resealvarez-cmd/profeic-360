@@ -1,14 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 import os
-from dotenv import load_dotenv
 from supabase import create_client, Client
 from fastapi import UploadFile, File, Form
 from app.services.storage import storage
 from app.services.file_engine import extract_text_from_pdf
 from routers.deps import get_current_user_id
 
-load_dotenv()
 
 router = APIRouter(
     prefix="/biblioteca",
@@ -57,6 +55,7 @@ async def obtener_recursos(user_id: str = Depends(get_current_user_id)):
 @router.post("/upload")
 async def upload_resource(
     file: UploadFile = File(...),
+    authorization: str = Header(None),
 ):
     """
     Recibe un PDF, lo sube a Storage y extrae su texto.
@@ -70,17 +69,21 @@ async def upload_resource(
         if not content:
             raise HTTPException(status_code=400, detail="Archivo vacío")
 
-        # 2. Subir a Supabase Storage (usamos el servicio storage.py)
-        # file.read() mueve el puntero, storage.upload_file hace seek(0) antes de subir?
-        # storage.upload_file usa file.file.read(), así que mejor le pasamos el UploadFile reseteado.
-        await file.seek(0) 
+        # 2. Subir a Supabase Storage
+        await file.seek(0)
         
-        # Usamos un ID genérico temp o del usuario si tuviéramos auth. 
-        # Por ahora hardcodeamos 'general' o recibimos user_id.
-        # El requerimiento no especifica user_id en params, así que usaremos 'guest' o 'profesor'.
-        user_id = "profesor_invitado" 
+        # Extraer user_id del token si viene, si no usar 'anonymous' como carpeta
+        upload_user_id = "anonymous"
+        if authorization and supabase:
+            try:
+                token = authorization.replace("Bearer ", "").strip()
+                user_resp = supabase.auth.get_user(token)
+                if user_resp and user_resp.user:
+                    upload_user_id = user_resp.user.id
+            except Exception as auth_err:
+                print(f"⚠️ No se pudo validar token en upload: {auth_err}")
         
-        upload_result = storage.upload_file(file, user_id)
+        upload_result = storage.upload_file(file, upload_user_id)
         
         # 3. Extraer Texto
         # Necesitamos los bytes de nuevo. storage.upload_file hizo seek(0) al final?

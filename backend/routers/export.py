@@ -189,7 +189,7 @@ def style_header_cell(cell, text, bg_color="2B546E", text_color="FFFFFF"):
         run.font.bold = True
         try:
             run.font.color.rgb = RGBColor.from_string(text_color)
-        except:
+        except Exception:
             pass
         run.font.size = Pt(10)
     cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -210,7 +210,7 @@ def add_header_logo(doc, asignatura, nivel, titulo_extra=""):
     if os.path.exists(logo_path):
         try:
             run.add_picture(logo_path, width=Inches(1.0))
-        except:
+        except Exception:
             run.add_text("ProfeIC")
     else:
         run.add_text("ProfeIC")
@@ -1022,7 +1022,7 @@ def renderizar_reporte_ejecutivo(doc, data):
         # Sort data by date descending just in case
         try:
             sorted_matriz = sorted(data.matriz, key=lambda x: x.get('date', ''), reverse=True)
-        except:
+        except Exception:
             sorted_matriz = data.matriz
             
         for m in sorted_matriz:

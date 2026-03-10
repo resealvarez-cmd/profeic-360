@@ -5,9 +5,7 @@ import os
 import json
 import httpx
 import google.generativeai as genai
-from dotenv import load_dotenv
 
-load_dotenv()
 
 # --- CONFIGURACIÓN IA ---
 MODEL_NAME = "gemini-2.5-flash" 

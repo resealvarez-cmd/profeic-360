@@ -93,7 +93,7 @@ async def invite_user(req: InviteRequest, _ = Depends(verify_super_admin)):
                  "email": req.email,
                  "role": req.role
              }).execute()
-        except:
+        except Exception:
              pass # might already exist
 
         # 3. Associate with School and set Individual Plan

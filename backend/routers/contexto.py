@@ -10,11 +10,9 @@ from typing import Optional
 import google.generativeai as genai
 from supabase import create_client, Client
 import os
-from dotenv import load_dotenv
 from pypdf import PdfReader
 import io
 
-load_dotenv()
 router = APIRouter()
 
 # --- CONFIGURACIÓN ---

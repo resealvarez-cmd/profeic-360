@@ -3,9 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from supabase import create_client, Client
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 
 router = APIRouter(
     prefix="/telemetry",

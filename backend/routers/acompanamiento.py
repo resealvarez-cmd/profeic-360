@@ -4,9 +4,7 @@ from typing import List, Optional, Dict, Any
 import google.generativeai as genai
 import os
 from supabase import create_client, Client
-from dotenv import load_dotenv
 
-load_dotenv()
 router = APIRouter()
 
 # --- CONFIGURACIÓN ---
@@ -212,7 +210,7 @@ async def generate_trajectory_report(req: TrajectoryRequest):
         try:
              clean_text = response.text.replace("```json", "").replace("```", "").strip()
              return json.loads(clean_text)
-        except:
+        except Exception:
             return {
                 "summary": "Análisis preliminar indica datos variados. Se requiere revisión manual.",
                 "trend": "mixed",
@@ -380,7 +378,7 @@ async def generate_executive_report(req: ExecutiveRequest):
             for c in full_cycles_res.data:
                 if c.get('observer_id'): unique_observers.add(c['observer_id'])
                 if c.get('teacher_id'): unique_teachers.add(c['teacher_id'])
-        except:
+        except Exception:
              pass
              
         for c in filtered_cycles:

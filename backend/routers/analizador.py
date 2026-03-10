@@ -4,12 +4,10 @@ from typing import Optional
 import os
 import json
 import google.generativeai as genai
-from dotenv import load_dotenv
 from supabase import create_client, Client
 from collections import Counter
 from routers.deps import get_current_user_id
 
-load_dotenv()
 
 # --- CONFIGURACIÓN DB (SUPABASE) ---
 SUPABASE_URL = os.getenv("SUPABASE_URL")

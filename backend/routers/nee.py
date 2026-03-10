@@ -11,9 +11,7 @@ import httpx
 from docx import Document
 from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from dotenv import load_dotenv
 
-load_dotenv()
 router = APIRouter()
 
 # Configuración API

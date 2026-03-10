@@ -6,10 +6,8 @@ import json
 import re
 import os
 import httpx
-from dotenv import load_dotenv
 
 # Configuración Inicial
-load_dotenv()
 router = APIRouter()
 
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -62,7 +60,7 @@ def limpiar_y_reparar_json(texto_sucio):
     except json.JSONDecodeError:
         try:
             return json.loads(texto_limpio + "}") 
-        except:
+        except Exception:
             return None
 
 # --- ENDPOINT ---
