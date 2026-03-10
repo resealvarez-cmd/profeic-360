@@ -128,7 +128,64 @@ async def guardar_recurso(data: RecursoUniversal):
         res = supabase.table("biblioteca_recursos").insert(registro).execute()
         
         if res.data:
-            return {"status": "success", "id": res.data[0]['id']}
+            recurso_id = res.data[0]['id']
+            
+            # --- NUEVO: Registrar en cobertura_curricular ---
+            try:
+                oas_a_registrar = set()
+                contenido = data.contenido
+                
+                # 1. Extraer oas de oaId o oaDescripcion (Rúbricas, etc)
+                if "oaId" in contenido and contenido["oaId"] and str(contenido["oaId"]).lower() != "manual":
+                    oas_a_registrar.add(str(contenido["oaId"]))
+                elif "oaDescripcion" in contenido and contenido["oaDescripcion"]:
+                    oas_a_registrar.add(str(contenido["oaDescripcion"])[:255])
+                    
+                # 2. Extraer de oaTexts (usado en Evaluaciones)
+                if "oaTexts" in contenido and isinstance(contenido["oaTexts"], list):
+                    for oa in contenido["oaTexts"]:
+                        if oa: oas_a_registrar.add(str(oa)[:255])
+                        
+                # 3. Extraer de customOa
+                if "customOa" in contenido and contenido["customOa"]:
+                    oas_a_registrar.add(str(contenido["customOa"])[:255])
+
+                # 4. Planificador / Otros que envían su propio array
+                # Si en el futuro planificador envía `mochila` o la IA devuelve `oas_asociados`
+                if "oas_asociados" in contenido and isinstance(contenido["oas_asociados"], list):
+                    for oa in contenido["oas_asociados"]:
+                        if oa: oas_a_registrar.add(str(oa)[:255])
+                
+                # Para planificador, la lista de OAs seleccionados suele estar en 'mochila'
+                if "mochila" in contenido and isinstance(contenido["mochila"], list):
+                    for oa_item in contenido["mochila"]:
+                        if isinstance(oa_item, dict) and "descripcion" in oa_item:
+                            oas_a_registrar.add(str(oa_item["descripcion"])[:255])
+                
+                # Para evitar basura
+                if data.asignatura.lower() not in ["", "general", "manual"] and \
+                   data.nivel.lower() not in ["", "general", "manual"]:
+                    
+                    cobertura_records = []
+                    for oa in oas_a_registrar:
+                        cobertura_records.append({
+                            "user_id": data.user_id,
+                            "nivel": data.nivel,
+                            "asignatura": data.asignatura,
+                            "oa_id": str(oa),
+                            "recurso_id": recurso_id,
+                            "tipo_recurso": data.tipo
+                        })
+                    
+                    if cobertura_records:
+                        supabase.table("cobertura_curricular").insert(cobertura_records).execute()
+                        print(f"✅ Registrados {len(cobertura_records)} OAs en la cobertura curricular.")
+                        
+            except Exception as ex:
+                print(f"⚠️ Error al registrar cobertura curricular: {ex}")
+                # No bloqueamos el guardado del recurso principal si falla el registro de cobertura
+                
+            return {"status": "success", "id": recurso_id}
         else:
             raise Exception("No se recibió confirmación de Supabase")
         

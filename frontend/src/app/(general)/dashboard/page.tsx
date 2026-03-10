@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { NewsWall } from "@/components/NewsWall";
 import { MissionsCarousel } from "@/components/dashboard/MissionsCarousel";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { TrackerCobertura } from "@/components/dashboard/TrackerCobertura";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -358,10 +359,15 @@ export default function Dashboard() {
                         {/* 1. FEEDBACK WIDGET */}
                         <FeedbackWidget feedbacks={feedbacks} loading={loading} />
 
-                        {/* 2. INSIGHTS WIDGET — Mentor IA Pedagógico */}
+                        {/* 2. TRACKER COBERTURA CURRICULAR */}
+                        <div className="w-full max-w-5xl">
+                            <TrackerCobertura />
+                        </div>
+
+                        {/* 3. INSIGHTS WIDGET — Mentor IA Pedagógico */}
                         <InsightsWidget />
 
-                        {/* 3. TOOLS CAROUSEL */}
+                        {/* 4. TOOLS CAROUSEL */}
                         <MissionsCarousel />
                     </div>
                 ) : (

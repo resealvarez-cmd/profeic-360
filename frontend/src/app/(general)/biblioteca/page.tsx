@@ -408,7 +408,7 @@ const FILTER_TYPES = [
     { key: "RUBRICA", label: "Rúbricas" },
     { key: "ELEVADOR", label: "Elevador" },
     { key: "AUDITORIA", label: "Auditoría" },
-    { key: "NEE", label: "NEE" },
+    { key: "ESTRATEGIA", label: "NEE" },
     { key: "LECTURA", label: "Lecturas" },
 ];
 
@@ -470,7 +470,7 @@ export default function BibliotecaPage() {
             const token = session.data.session?.access_token;
 
             if (!token) {
-                alert("Error de sesión. Por favor recarga la página.");
+                toast.error("Error de sesión. Por favor recarga la página.");
                 return;
             }
 
@@ -585,7 +585,7 @@ export default function BibliotecaPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                         <Input
                             placeholder="Buscar por título, asignatura o tipo..."
-                            className="pl-10 bg-white border-slate-200 focus:ring-[#f2ae60] text-slate-800 placeholder:text-slate-400"
+                            className="pl-10 bg-white border-slate-200 focus:ring-[#f2ae60] text-slate-900 dark:text-slate-900 font-medium placeholder:text-slate-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -602,8 +602,8 @@ export default function BibliotecaPage() {
                                 key={key}
                                 onClick={() => setActiveFilter(key)}
                                 className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeFilter === key
-                                        ? "bg-[#1a2e3b] text-white border-[#1a2e3b] shadow-sm"
-                                        : "bg-white text-slate-500 border-slate-200 hover:border-[#f2ae60] hover:text-[#1a2e3b]"
+                                    ? "bg-[#1a2e3b] text-white border-[#1a2e3b] shadow-sm"
+                                    : "bg-white text-slate-500 border-slate-200 hover:border-[#f2ae60] hover:text-[#1a2e3b]"
                                     }`}
                             >
                                 {label} <span className={`ml-1 ${activeFilter === key ? "opacity-70" : "opacity-50"}`}>({count})</span>
@@ -721,7 +721,7 @@ export default function BibliotecaPage() {
                                         if (url) {
                                             window.location.href = `${url}?loadId=${selectedResource.id}`;
                                         } else {
-                                            alert("Editor no disponible para este tipo de recurso.");
+                                            toast.error("Editor no disponible para este tipo de recurso.");
                                         }
                                     }}
                                     className="border-[#2b546e] text-[#2b546e] hover:bg-slate-50 font-bold w-full sm:w-auto"
