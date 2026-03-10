@@ -463,16 +463,31 @@ export default function SuperAdminDashboard() {
 
         setAssigningMap(prev => ({ ...prev, [userId]: true }));
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({ school_id: selectedSchoolId })
-                .eq('id', userId);
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("No hay sesión activa");
 
-            if (error) throw error;
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const response = await fetch(`${BE_URL}/admin/profile-plan`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    profile_id: userId,
+                    school_id: selectedSchoolId,
+                    individual_plan_active: false
+                })
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || "Error en el servidor");
+            }
 
             const school = schools.find(s => s.id === selectedSchoolId);
             toast.success(`Usuario asignado a ${school?.name || 'colegio'} ✓`);
-            // Remove from list
+            // Remove from list optimistically
             setUnassignedUsers(prev => prev.filter(u => u.id !== userId));
         } catch (err: any) {
             toast.error("Error al asignar: " + err.message);
