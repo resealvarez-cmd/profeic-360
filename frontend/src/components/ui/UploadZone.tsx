@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UploadCloud, FileText, CheckCircle, XCircle, Loader2, File } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -54,14 +55,14 @@ export const UploadZone = ({ onContextLoaded }: UploadZoneProps) => {
         formData.append("file", file);
 
         try {
-            const res = await fetch(`${API_URL}/biblioteca/upload`, {
+            const res = await fetch(`${API_URL} /biblioteca/upload`, {
                 method: "POST",
                 body: formData,
             });
 
             if (!res.ok) {
                 const errorText = await res.text();
-                throw new Error(`Error ${res.status}: ${res.statusText} \nDetalles: ${errorText}`);
+                throw new Error(`Error ${res.status}: ${res.statusText} \nDetalles: ${errorText} `);
             }
 
             const data = await res.json();
@@ -77,8 +78,8 @@ export const UploadZone = ({ onContextLoaded }: UploadZoneProps) => {
             onContextLoaded(data.full_text || data.extracted_text_preview, data.filename); // Usamos full_text si existe
 
         } catch (e: any) {
-            console.error(e);
-            alert(`Error en la subida: ${e.message || e}`);
+            console.error("Upload error details:", e);
+            toast.error(`Error en la subida: ${e.message || e} `);
             setStatus("error");
             setErrorMessage("Hubo un error procesando el archivo. Intenta nuevamente.");
         }

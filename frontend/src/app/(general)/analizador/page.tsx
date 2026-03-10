@@ -5,9 +5,10 @@ import { createPortal } from "react-dom";
 import {
     BrainCircuit, Search, FileText, CheckCircle2, Sparkles, Copy,
     Microscope, ChevronRight, ChevronLeft, AlertOctagon, Info,
-    ListChecks, AlertTriangle, Lightbulb, Check, Activity,
+    ListChecks, Lightbulb, Check, Activity,
     PanelLeftClose, PanelLeftOpen, PieChart as PieIcon,
-    ArrowRight, TrendingUp, ThumbsUp, MessageCircleQuestion
+    ArrowRight, TrendingUp, ThumbsUp, MessageCircleQuestion,
+    ShieldAlert, BookOpen, AlertCircle, Wand2, Target, FileSearch, HelpCircle, FileDown, CheckCircle, ChevronDown, AlignLeft, RefreshCw, BarChart, AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,12 +17,13 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
 import { cn } from "@/lib/utils";
+import html2pdf from "html2pdf.js";
+import { toast } from "sonner";
 import { trackEvent } from "@/lib/telemetry";
 
 // --- IMPORTACIÓN ÚNICA DEL BOTÓN ---
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { supabase } from "@/lib/supabaseClient";
-import { toast } from "sonner";
 // --- COLORES ---
 const COLORS = ["#94a3b8", "#60a5fa", "#2b546e", "#f2ae60"];
 
@@ -116,12 +118,12 @@ export default function AnalizadorPage() {
                     signal: controller.signal
                 });
                 clearTimeout(timeout);
-            } catch (networkError: any) {
+            } catch (err: any) {                    // 2. Fallbacks de timeout / errores de red (después de 90s)
                 clearTimeout(timeout);
-                if (networkError.name === 'AbortError') {
-                    alert(`⏱️ Tiempo agotado: El análisis tardó más de 90 segundos. Intenta con un instrumento más corto o vuelve a intentarlo.`);
+                if (err.name === 'AbortError') {
+                    toast.error(`⏱️ Tiempo agotado: El análisis tardó más de 90 segundos. Intenta con un instrumento más corto o vuelve a intentarlo.`);
                 } else {
-                    alert(`⚠️ Error de conexión: No se pudo contactar al servidor (${API_URL}).\n\nVerifica que el backend de Cloud Run esté activo.`);
+                    toast.error(`⚠️ Error de conexión: No se pudo contactar al servidor (${API_URL}).\n\nVerifica que el backend de Cloud Run esté activo.`);
                 }
                 return;
             }
@@ -129,7 +131,7 @@ export default function AnalizadorPage() {
             if (!response.ok) {
                 const errorBody = await response.json().catch(() => ({ detail: `HTTP ${response.status}` }));
                 const detail = errorBody?.detail || `Error HTTP ${response.status}`;
-                alert(`❌ Error del servidor: ${detail}`);
+                toast.error(`❌ Error del servidor: ${detail}`);
                 return;
             }
 
@@ -148,7 +150,7 @@ export default function AnalizadorPage() {
             });
         } catch (error: any) {
             console.error("Error inesperado:", error);
-            alert(`Error inesperado: ${error.message}`);
+            toast.error(`Error inesperado: ${error.message}`);
         } finally {
             setIsAnalyzing(false);
         }

@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip } from 'recharts';
+import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, LineChart, Line, AreaChart, Area } from "recharts";
 import { toast } from "sonner";
 import ProductAnalytics from "@/components/ProductAnalytics";
 
@@ -76,11 +76,11 @@ export default function Dashboard360() {
                 // Update latest insight immediately to show the new result in the blue card too
                 setLatestInsight({ ...data, heatmap: data.metrics });
             } else {
-                alert("Error generando reporte ejecutivo.");
+                toast.error("Error generando reporte ejecutivo.");
             }
         } catch (error) {
             console.error("Error executive:", error);
-            alert("Error de conexión IA.");
+            toast.error("Error de conexión IA.");
         } finally {
             setLoadingExecutive(false);
         }

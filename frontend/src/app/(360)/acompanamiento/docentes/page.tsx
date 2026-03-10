@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react"; // Added Suspense
-import { useRouter, useSearchParams } from "next/navigation"; // Added useSearchParams
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Calendar, Mail, FileText, MoreVertical, Plus } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
@@ -105,11 +105,11 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
 
     const handleObserve = async (teacher: any) => {
         if (!teacher.id) {
-            alert("Este docente no ha activado su cuenta (Falta UUID). No se puede observar aún.");
+            toast.error("Este docente no ha activado su cuenta (Falta UUID). No se puede observar aún.");
             return;
         }
         if (!currentUserId) {
-            alert("Debes iniciar sesión para observar.");
+            toast.error("Debes iniciar sesión para observar.");
             return;
         }
 
@@ -129,7 +129,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             router.push(`/acompanamiento/observacion/${data.id}`);
 
         } catch (err: any) {
-            alert("Error iniciando observación: " + err.message);
+            toast.error("Error iniciando observación: " + err.message);
         }
     };
 
@@ -150,7 +150,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             // Some clients have limits on BCC length, but this is best effort
             openMailtoLink("", "Comunicado Docente", emails.join(','));
         } else {
-            alert("No hay correos disponibles.");
+            toast.error("No hay correos disponibles.");
         }
     };
 
@@ -162,7 +162,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
         if (teacher.email) {
             openMailtoLink(teacher.email, "Agendar Reunión");
         } else {
-            alert("Este docente no tiene correo registrado.");
+            toast.error("Este docente no tiene correo registrado.");
         }
     };
 

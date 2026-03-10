@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { configSchema, ConfigFormValues, PlanificacionClase, EstrategiaPropuesta } from '@/types/planificador';
+import { toast } from "sonner";
 
 export const usePlanificador = () => {
     const [step, setStep] = useState(1);
@@ -46,7 +47,7 @@ export const usePlanificador = () => {
             }
         } catch (error) {
             console.error("Error conectando con el Director:", error);
-            alert("Error al conectar con el servidor. Revisa que el backend esté corriendo.");
+            toast.error("Error al conectar con el servidor. Revisa que el backend esté corriendo.");
         } finally {
             setLoading(false);
         }

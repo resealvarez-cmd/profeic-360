@@ -159,7 +159,7 @@ export default function LecturaInteligente() {
     // Action: Avanzar a Panel 2
     const handleGenerarPreguntas = async () => {
         if (!config.grade || !config.subject || !config.oaText) {
-            alert("Por favor completa Nivel, Asignatura y un OA.");
+            toast.error("Por favor completa Nivel, Asignatura y un OA.");
             return;
         }
 
@@ -229,7 +229,7 @@ export default function LecturaInteligente() {
 
         } catch (error: any) {
             console.error("Error al generar:", error.message);
-            alert(`Error: ${error.message}. Por favor intenta nuevamente.`);
+            toast.error(`Error: ${error.message}. Por favor intenta nuevamente.`);
         } finally {
             setLoading(false);
             setMensajeCarga("");
@@ -328,7 +328,7 @@ export default function LecturaInteligente() {
                 throw new Error("Error al descargar el documento");
             }
         } catch (e: any) {
-            alert(e.message);
+            toast.error(e.message);
         } finally {
             setLoading(false);
         }

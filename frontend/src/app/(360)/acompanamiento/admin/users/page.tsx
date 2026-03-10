@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
 
         } catch (error: any) {
             console.error("Error fetching users:", error);
-            alert("Error cargando usuarios: " + error.message);
+            toast.error("Error cargando usuarios: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -153,7 +153,9 @@ export default function AdminUsersPage() {
                         .eq('id', editingUser.id);
                 }
 
-                alert("Usuario actualizado correctamente.");
+                toast.success("Usuario actualizado correctamente.");
+                setEditingUser(null);
+                fetchUsers();
             } else {
                 // CREATE LOGIC
                 // Check if user exists
@@ -164,7 +166,7 @@ export default function AdminUsersPage() {
                     .single();
 
                 if (existing) {
-                    alert("Este correo ya está registrado en el sistema.");
+                    toast.error("Este correo ya está registrado en el sistema.");
                     setActionLoading(false);
                     return;
                 }
@@ -195,7 +197,7 @@ export default function AdminUsersPage() {
                         throw new Error(errData.detail || "Error al crear usuario directamente");
                     }
 
-                    alert(`Usuario ${newUser.full_name} creado con contraseña exitosamente.`);
+                    toast.success(`Usuario ${newUser.full_name} creado con contraseña exitosamente.`);
                 } else {
                     // Pre-authorize without sending invite
                     const { error } = await supabase
@@ -208,7 +210,7 @@ export default function AdminUsersPage() {
                         }]);
 
                     if (error) throw error;
-                    alert(`Usuario ${newUser.full_name} pre-autorizado.`);
+                    toast.success(`Usuario ${newUser.full_name} pre-autorizado.`);
                 }
             }
 
@@ -219,7 +221,7 @@ export default function AdminUsersPage() {
 
         } catch (error: any) {
             console.error("Error saving user:", error);
-            alert("Error: " + error.message);
+            toast.error("Error: " + error.message);
         } finally {
             setActionLoading(false);
         }
@@ -248,9 +250,10 @@ export default function AdminUsersPage() {
             }
 
             setUsers(users.filter(u => u.email !== email));
-            alert("Usuario eliminado correctamente.");
+            toast.success("Usuario eliminado correctamente.");
+            fetchUsers();
         } catch (error: any) {
-            alert("Error al eliminar: " + error.message);
+            toast.error("Error al eliminar: " + error.message);
         }
     };
 
