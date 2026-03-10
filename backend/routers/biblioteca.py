@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
@@ -6,6 +6,7 @@ from supabase import create_client, Client
 from fastapi import UploadFile, File, Form
 from app.services.storage import storage
 from app.services.file_engine import extract_text_from_pdf
+from routers.deps import get_current_user_id
 
 load_dotenv()
 
@@ -26,24 +27,24 @@ else:
     print("⚠️ ADVERTENCIA: Supabase no configurado en biblioteca.py")
 
 # --- MODELO UNIVERSAL ---
+# NOTA: user_id ya NO va en el body — se extrae del JWT en el servidor
 class RecursoUniversal(BaseModel):
-    user_id: str
-    tipo: str        
-    titulo: str      
+    tipo: str
+    titulo: str
     asignatura: str = "General"
     nivel: str = "General"
-    contenido: dict  
+    contenido: dict
 
-# --- 1. LEER TODOS (GET) ---
+# --- 1. LEER TODOS (GET) — requiere auth, filtra por el usuario autenticado ---
 @router.get("/all")
-async def obtener_recursos():
+async def obtener_recursos(user_id: str = Depends(get_current_user_id)):
     if not supabase:
         raise HTTPException(status_code=500, detail="Base de datos no conectada")
     
     try:
-        # CORREGIDO: Volvemos a tu tabla real 'biblioteca_recursos'
         response = supabase.table("biblioteca_recursos")\
             .select("*")\
+            .eq("user_id", user_id)\
             .order("created_at", desc=True)\
             .execute()
             
@@ -106,17 +107,20 @@ async def upload_resource(
         print(f"❌ Error en upload: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# --- 2. GUARDAR (POST) ---
+# --- 2. GUARDAR (POST) — user_id desde JWT, nunca del body ---
 @router.post("/save") 
-async def guardar_recurso(data: RecursoUniversal):
+async def guardar_recurso(
+    data: RecursoUniversal,
+    user_id: str = Depends(get_current_user_id)  # ← JWT verificado server-side
+):
     if not supabase:
         raise HTTPException(status_code=500, detail="DB no conectada")
     
     try:
-        print(f"💾 Guardando {data.tipo} para usuario {data.user_id}")
+        print(f"💾 Guardando {data.tipo} para usuario {user_id}")
         
         registro = {
-            "user_id": data.user_id,
+            "user_id": user_id,   # ← viene del JWT verificado, no del body
             "tipo": data.tipo,
             "titulo": data.titulo,
             "asignatura": data.asignatura,
@@ -124,7 +128,6 @@ async def guardar_recurso(data: RecursoUniversal):
             "contenido": data.contenido
         }
         
-        # CORREGIDO: Volvemos a tu tabla real 'biblioteca_recursos'
         res = supabase.table("biblioteca_recursos").insert(registro).execute()
         
         if res.data:
@@ -169,7 +172,7 @@ async def guardar_recurso(data: RecursoUniversal):
                     cobertura_records = []
                     for oa in oas_a_registrar:
                         cobertura_records.append({
-                            "user_id": data.user_id,
+                            "user_id": user_id,   # ← JWT verificado
                             "nivel": data.nivel,
                             "asignatura": data.asignatura,
                             "oa_id": str(oa),

@@ -48,7 +48,13 @@ app = FastAPI(title="API ProfeIC", version="4.0.0")
 # 2. SEGURIDAD (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=[
+        "https://profeic.cl",
+        "https://www.profeic.cl",
+        "https://profeic-360.vercel.app",  # Preview deployments
+        "http://localhost:3000",            # Dev local frontend
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

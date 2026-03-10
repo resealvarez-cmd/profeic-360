@@ -44,19 +44,13 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
 
     const handleSave = async () => {
         setLoading(true);
-        console.log("💾 Intentando guardar...");
 
         try {
-            // CAMBIO CLAVE: Usamos getSession en lugar de getUser
             const { data: { session }, error } = await supabase.auth.getSession();
 
             if (error || !session?.user) {
-                console.error("❌ Error de sesión:", error);
-                throw new Error("No se detectó la sesión. Por favor, recarga la página (F5) e inicia sesión.");
+                throw new Error("No se detectó la sesión. Por favor, recarga la página e inicia sesión.");
             }
-
-            const userId = session.user.id;
-            console.log("✅ Usuario detectado:", userId);
 
             const contenidoFinal = {
                 ...contenido,
@@ -65,8 +59,8 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
                 nivel: formNivel
             };
 
+            // user_id ya NO va en el body — el backend lo extrae del JWT
             const payload = {
-                user_id: userId,
                 tipo: tipo,
                 titulo: formTitulo,
                 asignatura: formAsignatura,
@@ -75,10 +69,7 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
             };
 
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-            if (!apiUrl) {
-                console.error("❌ La variable de entorno NEXT_PUBLIC_API_URL no está configurada.");
-                throw new Error("La configuración del servidor es incorrecta. Contacte a soporte.");
-            }
+            if (!apiUrl) throw new Error("La configuración del servidor es incorrecta.");
 
             const response = await fetch(`${apiUrl}/biblioteca/save`, {
                 method: "POST",
@@ -92,7 +83,6 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
             if (!response.ok) {
                 const errorBody = await response.json().catch(() => ({ detail: `Error HTTP ${response.status}` }));
                 const detail = errorBody?.detail || errorBody?.message || `Error HTTP ${response.status}`;
-                console.error("❌ Respuesta del servidor:", errorBody);
                 throw new Error(`Error del servidor: ${detail}`);
             }
 
@@ -100,7 +90,6 @@ export function BotonGuardar({ tipo, titulo = "", asignatura = "", nivel = "", c
             setTimeout(() => setOpen(false), 1500);
 
         } catch (error: any) {
-            console.error("Error detallado al guardar:", error);
             toast.error(error.message || "Error al guardar el recurso.");
         } finally {
             setLoading(false);

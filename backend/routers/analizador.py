@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, HTTPException, Header, Depends
 from pydantic import BaseModel
 from typing import Optional
 import os
@@ -7,6 +7,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from collections import Counter
+from routers.deps import get_current_user_id
 
 load_dotenv()
 
@@ -33,8 +34,8 @@ class AnalisisRequest(BaseModel):
     objetivo_aprendizaje: str
     texto_evaluacion: str
 
+# user_id ya NO va en el body — se extrae del JWT en el servidor
 class GuardarAnalisisRequest(BaseModel):
-    user_id: str = "33964953-b929-4d89-913a-592f026903d6"
     objetivo_aprendizaje: str
     texto_evaluacion: str = ""
     resultado_analisis: dict
@@ -165,25 +166,21 @@ async def auditar_instrumento(request: AnalisisRequest):
 
 
 @router.post("/save")
-async def guardar_analisis(request: GuardarAnalisisRequest, authorization: Optional[str] = Header(None)):
+async def guardar_analisis(
+    request: GuardarAnalisisRequest,
+    user_id: str = Depends(get_current_user_id)   # ← JWT verificado server-side
+):
     if not supabase:
         raise HTTPException(status_code=503, detail="Base de datos no disponible")
 
     try:
-        user_id = request.user_id
         author_name = "Profe IC"
-
-        if authorization:
-            token = authorization.replace("Bearer ", "")
-            user_response = supabase.auth.get_user(token)
-            if user_response and user_response.user:
-                user_id = user_response.user.id
-                try:
-                    profile = supabase.table("profiles").select("full_name").eq("id", user_id).single().execute()
-                    if profile.data and profile.data.get("full_name"):
-                        author_name = profile.data["full_name"]
-                except Exception as e:
-                    print(f"⚠️ Error fetching profile: {e}")
+        try:
+            profile = supabase.table("profiles").select("full_name").eq("id", user_id).single().execute()
+            if profile.data and profile.data.get("full_name"):
+                author_name = profile.data["full_name"]
+        except Exception as e:
+            print(f"⚠️ Error fetching profile: {e}")
 
         data = {
             "user_id": user_id,
@@ -203,6 +200,8 @@ async def guardar_analisis(request: GuardarAnalisisRequest, authorization: Optio
         else:
             raise HTTPException(status_code=500, detail="Error al guardar en Supabase")
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error saving: {e}")
         raise HTTPException(status_code=500, detail=str(e))
