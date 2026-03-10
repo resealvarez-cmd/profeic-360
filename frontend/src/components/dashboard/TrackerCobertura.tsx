@@ -76,13 +76,17 @@ export function TrackerCobertura() {
             }
             setLoadingRecords(false);
 
-            // Cargar logros existentes
-            const { data: logros } = await supabase
-                .from("logros_usuario")
-                .select("tipo_logro, asignatura, nivel")
-                .eq("user_id", session.user.id);
-            if (logros) {
-                setLogrosObtenidos(new Set(logros.map((l: any) => `${l.tipo_logro}|${l.asignatura}|${l.nivel}`)));
+            // Cargar logros existentes (tabla puede no existir aún en producción)
+            try {
+                const { data: logros, error: logrosError } = await supabase
+                    .from("logros_usuario")
+                    .select("tipo_logro, asignatura, nivel")
+                    .eq("user_id", session.user.id);
+                if (logros && !logrosError) {
+                    setLogrosObtenidos(new Set(logros.map((l: any) => `${l.tipo_logro}|${l.asignatura}|${l.nivel}`)));
+                }
+            } catch (_) {
+                // La tabla logros_usuario aún no existe en este entorno — continúa sin logros
             }
         };
         fetchCoverage();

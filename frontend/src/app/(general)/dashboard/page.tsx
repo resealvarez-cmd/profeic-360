@@ -124,14 +124,18 @@ export default function Dashboard() {
                     setIsSuperAdmin(true);
                 }
 
-                // Check tour completion
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('has_completed_tour')
-                    .eq('id', session.user.id)
-                    .single();
-                if (profile && !profile.has_completed_tour) {
-                    setTimeout(() => setShowTour(true), 1500);
+                // Check tour completion (columna puede no existir aún en producción)
+                try {
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('has_completed_tour')
+                        .eq('id', session.user.id)
+                        .single();
+                    if (profile && !profileError && !profile.has_completed_tour) {
+                        setTimeout(() => setShowTour(true), 1500);
+                    }
+                } catch (_) {
+                    // La columna has_completed_tour aún no existe — no mostrar tour
                 }
 
                 // Check Admin via DB
