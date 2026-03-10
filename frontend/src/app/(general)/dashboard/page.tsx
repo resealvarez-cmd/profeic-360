@@ -355,20 +355,28 @@ export default function Dashboard() {
 
                 {/* CONDITIONAL CONTENT */}
                 {activeTab === 'tools' ? (
-                    <div className="space-y-8">
-                        {/* 1. FEEDBACK WIDGET */}
-                        <FeedbackWidget feedbacks={feedbacks} loading={loading} />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* COLUMNA IZQUIERDA (Principal - Ocupa 2 de 3) */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* 1. FEEDBACK WIDGET */}
+                            <FeedbackWidget feedbacks={feedbacks} loading={loading} />
 
-                        {/* 2. TRACKER COBERTURA CURRICULAR */}
-                        <div className="w-full max-w-5xl">
-                            <TrackerCobertura />
+                            {/* 2. TRACKER COBERTURA CURRICULAR */}
+                            <div className="w-full">
+                                <TrackerCobertura />
+                            </div>
+
+                            {/* 3. TOOLS CAROUSEL */}
+                            <MissionsCarousel />
                         </div>
 
-                        {/* 3. INSIGHTS WIDGET — Mentor IA Pedagógico */}
-                        <InsightsWidget />
-
-                        {/* 4. TOOLS CAROUSEL */}
-                        <MissionsCarousel />
+                        {/* COLUMNA DERECHA (Sidebar - Ocupa 1 de 3) */}
+                        <div className="lg:col-span-1 space-y-8 h-full">
+                            {/* 4. INSIGHTS WIDGET — Mentor IA Pedagógico */}
+                            <div className="sticky top-24">
+                                <InsightsWidget />
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     /* SOCIAL / WIDGETS GRID */
