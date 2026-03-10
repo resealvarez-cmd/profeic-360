@@ -106,7 +106,7 @@ export function OnboardingTour({ onComplete }: Props) {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0 }}
                         style={{
-                            top: highlight.top - 6 + window.scrollY,
+                            top: highlight.top - 6 + (typeof window !== "undefined" ? window.scrollY : 0),
                             left: highlight.left - 6,
                             width: highlight.width + 12,
                             height: highlight.height + 12,
