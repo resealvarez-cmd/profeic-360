@@ -138,7 +138,7 @@ async def get_product_analytics(email: str = Query(...)):
             [{"email": k, "count": v} for k, v in user_activity.items()],
             key=lambda x: x["count"],
             reverse=True
-        )[:5]
+        )[:10]
 
         # 9. Format Module Usage
         module_stats = sorted(

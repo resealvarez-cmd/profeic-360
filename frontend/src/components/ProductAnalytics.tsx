@@ -106,16 +106,18 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                             <UserCheck size={12} /> Power Users
                         </h3>
-                        <div className="space-y-2">
-                            {data.power_users.slice(0, 3).map((user: any, i: number) => (
-                                <div key={i} className="flex justify-between items-center p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">
+                        <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                            {data.power_users.map((user: any, i: number) => (
+                                <div key={i} className={`flex justify-between items-center p-2 rounded-xl border transition-colors ${i === 0 ? 'bg-indigo-50 border-indigo-100' : 'bg-slate-50 border-slate-100'}`}>
+                                    <div className="flex items-center gap-2 overflow-hidden">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i === 0 ? 'bg-indigo-500 text-white shadow-sm' : 'bg-slate-200 text-slate-700'}`}>
                                             {i + 1}
                                         </div>
                                         <span className="text-[11px] text-slate-600 truncate max-w-[120px] font-medium">{user.email}</span>
                                     </div>
-                                    <span className="text-[10px] font-bold text-slate-900 bg-white px-2 py-0.5 rounded-lg border border-slate-200">{user.count} ops</span>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${i === 0 ? 'bg-white text-indigo-600 border-indigo-200' : 'bg-white text-slate-900 border-slate-200'}`}>
+                                        {user.count} ops
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -183,21 +185,20 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                     </div>
                 </div>
 
-                {/* Power Users */}
-                <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl">
+                <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <UserCheck size={16} /> Power Users (Top Actividad)
+                        <Trophy size={16} className="text-indigo-400" /> Power Users (Top 10 Actividad)
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-3 max-h-[260px] overflow-y-auto pr-2 custom-scrollbar">
                         {data.power_users.map((user: any, i: number) => (
-                            <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/5">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-[#4a6b8c] text-white flex items-center justify-center text-xs font-bold">
+                            <div key={i} className={`flex justify-between items-center p-3 rounded-xl transition-all border ${i === 0 ? 'bg-indigo-500/10 border-indigo-500/30 shadow-lg shadow-indigo-500/5' : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/5'}`}>
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? 'bg-indigo-500 text-white' : 'bg-[#4a6b8c] text-white'}`}>
                                         {i + 1}
                                     </div>
                                     <span className="text-sm text-slate-200 truncate max-w-[200px]">{user.email}</span>
                                 </div>
-                                <span className="text-xs font-bold text-blue-300">{user.count} ops</span>
+                                <span className={`text-xs font-bold ${i === 0 ? 'text-indigo-300' : 'text-blue-300'}`}>{user.count} ops</span>
                             </div>
                         ))}
                     </div>
@@ -239,12 +240,12 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
 function Card({ title, value, icon, desc, isCompact = false }: any) {
     return (
         <div className={`
-            bg-white rounded-3xl border border-slate-200 shadow-sm transition-all relative group
-            ${isCompact ? 'p-3 rounded-2xl' : 'p-5'}
+            rounded-3xl border transition-all relative group
+            ${isCompact ? 'p-3 rounded-2xl bg-white border-slate-200 shadow-sm' : 'p-5 bg-white border-slate-200 shadow-sm'}
             hover:border-indigo-400 hover:shadow-md
         `}>
             {/* Tooltip visible on hover */}
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[9px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center shadow-xl">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[9px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center shadow-xl border border-white/10">
                 {desc}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
             </div>
