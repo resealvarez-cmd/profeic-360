@@ -668,23 +668,42 @@ export default function SuperAdminDashboard() {
 
                 <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                        <BookOpen size={80} />
+                        <UserCheck size={80} />
                     </div>
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Recursos en Biblioteca</p>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Impacto Real</p>
                     <h3 className="text-3xl font-black text-white">{stats?.summary?.total_resources || 0}</h3>
-                    <p className="text-slate-500 text-[10px] mt-2 font-bold uppercase tracking-widest">Contenido generado</p>
+                    <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-500 font-bold">
+                        <BookOpen size={12} /> Recursos generados y guardados
+                    </div>
                 </div>
 
-                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl flex flex-col justify-center">
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">Power User de la Semana</p>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-black text-lg">
-                            {stats?.power_users?.[0]?.name?.[0] || "D"}
+                <div className="lg:col-span-1 bg-slate-800 border border-slate-700 p-6 rounded-3xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-indigo-500/20 text-indigo-500 rounded-xl">
+                            <Trophy size={20} />
                         </div>
-                        <div>
-                            <p className="text-white font-bold text-sm truncate max-w-[120px]">{stats?.power_users?.[0]?.name || "Docente Pro"}</p>
-                            <p className="text-indigo-400 text-[10px] font-bold">{stats?.power_users?.[0]?.count || 0} acciones logradas</p>
-                        </div>
+                        <h2 className="text-lg font-bold text-white">Top Actividad (10)</h2>
+                    </div>
+                    <div className="space-y-3 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
+                        {stats?.power_users?.map((user: any, i: number) => (
+                            <div key={i} className={`flex items-center justify-between p-3 rounded-2xl transition-all border ${i === 0 ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-slate-900/50 border-slate-700/50 hover:bg-slate-900'}`}>
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${i === 0 ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-800 text-slate-400'}`}>
+                                        {i + 1}
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                        <p className="text-[11px] font-bold text-slate-200 truncate">{user.name}</p>
+                                        <p className="text-[9px] text-slate-500 truncate">{user.email}</p>
+                                    </div>
+                                </div>
+                                <span className="text-[10px] font-black text-indigo-400 whitespace-nowrap ml-2">
+                                    {user.count} <span className="opacity-50 font-medium">ops</span>
+                                </span>
+                            </div>
+                        ))}
+                        {(!stats?.power_users || stats.power_users.length === 0) && (
+                            <p className="text-center text-slate-600 py-8 text-xs italic">Cargando actividad...</p>
+                        )}
                     </div>
                 </div>
             </div>

@@ -310,7 +310,7 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
              for k, v in user_activity.items()],
             key=lambda x: x["count"],
             reverse=True
-        )[:5]
+        )[:10]
 
         sorted_modules = sorted(
             [{"name": k.capitalize(), "val": v} for k, v in module_usage.items()],
