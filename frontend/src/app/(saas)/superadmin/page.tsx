@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle } from "lucide-react";
+import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle, TrendingUp, Clock, UserCheck, BarChart3, Zap } from "lucide-react";
 
 // ─── Modal de edición del perfil institucional ───────────────────────────────
 interface School {
@@ -406,10 +406,37 @@ export default function SuperAdminDashboard() {
     const [assigningMap, setAssigningMap] = useState<Record<string, boolean>>({});
     const [schoolSelectionMap, setSchoolSelectionMap] = useState<Record<string, string>>({});
 
+    // Stats state
+    const [stats, setStats] = useState<any>(null);
+    const [loadingStats, setLoadingStats] = useState(true);
+
     useEffect(() => {
         fetchSchools();
         fetchUnassignedUsers();
+        fetchStats();
     }, []);
+
+    const fetchStats = async () => {
+        setLoadingStats(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const response = await fetch(`${BE_URL}/admin/stats`, {
+                headers: { "Authorization": `Bearer ${session.access_token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setStats(data);
+            }
+        } catch (err) {
+            console.error("Error fetching stats", err);
+        } finally {
+            setLoadingStats(false);
+        }
+    };
 
     const fetchSchools = async () => {
         try {
@@ -602,19 +629,132 @@ export default function SuperAdminDashboard() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8">
-            <header>
-                <h1 className="text-3xl font-extrabold text-white">SaaS Backoffice</h1>
-                <p className="text-slate-400 mt-2">Gestiona múltiples colegios (tenants) y envía invitaciones mágicas.</p>
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-white">SaaS Backoffice</h1>
+                    <p className="text-slate-400 mt-2">Gestiona múltiples colegios (tenants) y conoce el impacto de la plataforma.</p>
+                </div>
+                <button
+                    onClick={fetchStats}
+                    className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl transition-all border border-slate-700"
+                >
+                    <Zap size={14} className="text-amber-400" /> Refrescar Estadísticas
+                </button>
             </header>
 
+            {/* --- STATS SECTION --- */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                        <TrendingUp size={80} />
+                    </div>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Adopción ProfeIC</p>
+                    <h3 className="text-3xl font-black text-white">{stats?.summary?.adoption_percent || 0}%</h3>
+                    <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-500 font-bold">
+                        <Users size={12} /> {stats?.summary?.active_users || 0} de {stats?.summary?.total_authorized || 0} usuarios activos
+                    </div>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                        <Clock size={80} />
+                    </div>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Horas Ahorradas</p>
+                    <h3 className="text-3xl font-black text-white">{stats?.summary?.saved_hours || 0}h</h3>
+                    <p className="text-slate-500 text-[10px] mt-2 font-bold flex items-center gap-1">
+                        <Sparkles size={12} className="text-amber-400" /> Basado en productividad real
+                    </p>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                        <BookOpen size={80} />
+                    </div>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Recursos en Biblioteca</p>
+                    <h3 className="text-3xl font-black text-white">{stats?.summary?.total_resources || 0}</h3>
+                    <p className="text-slate-500 text-[10px] mt-2 font-bold uppercase tracking-widest">Contenido generado</p>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl flex flex-col justify-center">
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">Power User de la Semana</p>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-black text-lg">
+                            {stats?.power_users?.[0]?.name?.[0] || "D"}
+                        </div>
+                        <div>
+                            <p className="text-white font-bold text-sm truncate max-w-[120px]">{stats?.power_users?.[0]?.name || "Docente Pro"}</p>
+                            <p className="text-indigo-400 text-[10px] font-bold">{stats?.power_users?.[0]?.count || 0} acciones logradas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- TOP MODULES & RECENT EVENTS --- */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 bg-slate-800 border border-slate-700 p-6 rounded-3xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-amber-500/20 text-amber-500 rounded-xl">
+                            <BarChart3 size={20} />
+                        </div>
+                        <h2 className="text-lg font-bold text-white">Módulos más Populares</h2>
+                    </div>
+                    <div className="space-y-4">
+                        {stats?.top_modules?.map((mod: any, i: number) => (
+                            <div key={i} className="group">
+                                <div className="flex items-center justify-between mb-1.5 px-1">
+                                    <span className="text-xs font-bold text-slate-300">{mod.name}</span>
+                                    <span className="text-xs font-black text-white">{mod.val}</span>
+                                </div>
+                                <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-1000"
+                                        style={{ width: `${Math.min((mod.val / (stats?.summary?.total_resources || 1)) * 100, 100)}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="lg:col-span-2 bg-slate-800 border border-slate-700 p-6 rounded-3xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-teal-500/20 text-teal-500 rounded-xl">
+                            <Zap size={20} />
+                        </div>
+                        <h2 className="text-lg font-bold text-white">Eventos Real-Time (Engagement)</h2>
+                    </div>
+                    <div className="space-y-3">
+                        {stats?.recent_events?.map((ev: any, i: number) => (
+                            <div key={i} className="flex items-center justify-between p-3 bg-slate-900/50 border border-slate-700/50 rounded-2xl hover:bg-slate-900 transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-teal-400 animate-pulse' : 'bg-slate-600'}`}></div>
+                                    <div className="flex flex-col">
+                                        <p className="text-xs font-bold text-slate-200">
+                                            {ev.event_name.replace(/_/g, ' ')}
+                                            <span className="text-slate-500 font-normal ml-2">en {ev.module?.split('/').pop() || 'general'}</span>
+                                        </p>
+                                        <p className="text-[10px] text-slate-500">{ev.email}</p>
+                                    </div>
+                                </div>
+                                <span className="text-[9px] font-mono text-slate-600">
+                                    {new Date(ev.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
             {/* Edit Modal */}
-            {editingSchool && (
-                <SchoolEditModal
-                    school={editingSchool}
-                    onClose={() => setEditingSchool(null)}
-                    onSaved={fetchSchools}
-                />
-            )}
+            {
+                editingSchool && (
+                    <SchoolEditModal
+                        school={editingSchool}
+                        onClose={() => setEditingSchool(null)}
+                        onSaved={fetchSchools}
+                    />
+                )
+            }
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 

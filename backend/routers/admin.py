@@ -216,3 +216,121 @@ async def update_profile_plan(req: UpdateProfilePlanRequest, _ = Depends(verify_
         return {"message": "Perfil individual actualizado correctamente."}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error al actualizar perfil: {str(e)}")
+
+# === DASHBOARD DE ESTADÍSTICAS (SAAS ENGAGEMENT) ===
+# Pesos para cálculo de horas ahorradas (minutos)
+SAVED_MINUTES_MAP = {
+    "planificador": 85,
+    "lectura-inteligente": 55,
+    "rubricas": 40,
+    "analizador": 35,
+    "evaluaciones": 60,
+    "nee": 50,
+    "mentor": 15
+}
+
+@router.get("/stats")
+async def get_admin_stats(_ = Depends(verify_super_admin)):
+    """
+    Agrega métricas de uso global para el SuperAdmin:
+    - Adopción, Horas Ahorradas, Usuarios Activos, Top Módulos.
+    """
+    if not supabase_admin:
+        raise HTTPException(status_code=500, detail="Falta Service Role Key")
+
+    try:
+        # 1. Usuarios autorizados vs perfiles activos
+        res_auth = supabase_admin.table('authorized_users').select('email', count='exact').execute()
+        total_authorized = res_auth.count or 1
+
+        # 2. Telemetría y Biblioteca
+        res_events = supabase_admin.table('telemetry_events').select('*').order('created_at', desc=True).limit(1000).execute()
+        events = res_events.data or []
+
+        res_lib = supabase_admin.table('biblioteca_recursos').select('tipo, user_id, created_at').execute()
+        lib_items = res_lib.data or []
+
+        # 3. Mapeo de UUIDs a emails para legibilidad
+        res_profiles = supabase_admin.table('profiles').select('id, email, full_name').execute()
+        profile_map = {p['id']: {"email": p.get('email', 'anon'), "name": p.get('full_name', 'Docente')} for p in (res_profiles.data or [])}
+
+        # 4. Procesamiento
+        total_saved_minutes = 0
+        module_usage = {}
+        user_activity = {}
+        unique_active_users = set()
+
+        LIB_TYPE_TO_MODULE = {
+            "PLANIFICACION": "planificador",
+            "RUBRICA": "rubricas",
+            "EVALUACION": "evaluaciones",
+            "AUDITORIA": "analizador",
+            "LECTURA": "lectura-inteligente",
+            "ESTRATEGIA": "nee",
+            "ELEVADOR": "mentor"
+        }
+
+        # Procesar items de biblioteca (histórico de éxito)
+        for item in lib_items:
+            tipo = str(item.get('tipo', '')).upper()
+            uid = item.get('user_id')
+            user_info = profile_map.get(uid, {"email": "anonymous", "name": "Anónimo"})
+            email = user_info["email"]
+            
+            if email != "anonymous":
+                unique_active_users.add(email)
+                user_activity[email] = user_activity.get(email, 0) + 1
+            
+            mod_key = LIB_TYPE_TO_MODULE.get(tipo, "unknown")
+            if mod_key != "unknown":
+                total_saved_minutes += SAVED_MINUTES_MAP.get(mod_key, 0)
+                module_usage[mod_key] = module_usage.get(mod_key, 0) + 1
+
+        # Procesar telemetría (interacciones en tiempo real)
+        for ev in events:
+            mod = ev.get('module', 'unknown')
+            mod_clean = mod.split('/')[-1] if '/' in mod else mod
+            email = ev.get('email', 'anonymous')
+            
+            if email != "anonymous":
+                unique_active_users.add(email)
+                user_activity[email] = user_activity.get(email, 0) + 1
+
+            if mod_clean in SAVED_MINUTES_MAP and 'success' in ev.get('event_name', '').lower():
+                # Evitar doble conteo si ya se contó en biblioteca? 
+                # La telemetría cuenta 'intentos' y 'éxitos' visuales, la biblioteca cuenta 'guardados'.
+                # Para simplificar, si es éxito en telemetría pero no se guardó, igual ahorró algo de tiempo.
+                pass 
+
+        # 5. Formatear resultados
+        adoption_pct = round((len(unique_active_users) / total_authorized) * 100, 1) if total_authorized > 0 else 0
+        
+        top_users = sorted(
+            [{"email": k, "count": v, "name": next((v['name'] for uid, v in profile_map.items() if v['email'] == k), k)} 
+             for k, v in user_activity.items()],
+            key=lambda x: x["count"],
+            reverse=True
+        )[:5]
+
+        sorted_modules = sorted(
+            [{"name": k.capitalize(), "val": v} for k, v in module_usage.items()],
+            key=lambda x: x["val"],
+            reverse=True
+        )
+
+        return {
+            "summary": {
+                "total_authorized": total_authorized,
+                "active_users": len(unique_active_users),
+                "adoption_percent": adoption_pct,
+                "saved_hours": round(total_saved_minutes / 60, 1),
+                "total_resources": len(lib_items)
+            },
+            "top_modules": sorted_modules,
+            "power_users": top_users,
+            "recent_events": events[:10]
+        }
+
+    except Exception as e:
+        print(f"❌ Error en stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
