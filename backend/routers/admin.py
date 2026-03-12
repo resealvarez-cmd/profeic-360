@@ -9,7 +9,7 @@ router = APIRouter(prefix="/admin", tags=["SuperAdmin"])
 # ATENCIÓN: Esta clave es 'admin' y se usa para crear usuarios o sobreescribir RLS.
 # NO EXPORTAR NUNCA AL CLIENTE FRONTEND.
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
     print("WARNING: SUPABASE_SERVICE_ROLE_KEY is missing. Admin endpoints will fail.")
@@ -252,7 +252,12 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
 
         # 3. Mapeo de UUIDs a emails para legibilidad
         res_profiles = supabase_admin.table('profiles').select('id, email, full_name').execute()
-        profile_map = {p['id']: {"email": p.get('email', 'anon'), "name": p.get('full_name', 'Docente')} for p in (res_profiles.data or [])}
+        profiles_data = res_profiles.data or []
+        profile_map = {p['id']: {"email": p.get('email', 'anon'), "name": p.get('full_name', 'Docente')} for p in profiles_data}
+        # Mapa optimizado para búsqueda por email
+        email_to_name = {p.get('email'): p.get('full_name', 'Docente') for p in profiles_data if p.get('email')}
+
+        print(f"📊 Stats Admin: Fetched {len(profiles_data)} profiles, {len(events)} events, {len(lib_items)} icons.")
 
         # 4. Procesamiento
         total_saved_minutes = 0
@@ -305,12 +310,13 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
         # 5. Formatear resultados
         adoption_pct = round((len(unique_active_users) / total_authorized) * 100, 1) if total_authorized > 0 else 0
         
-        top_users = sorted(
-            [{"email": k, "count": v, "name": next((v['name'] for uid, v in profile_map.items() if v['email'] == k), k)} 
-             for k, v in user_activity.items()],
-            key=lambda x: x["count"],
-            reverse=True
-        )[:10]
+        # Búsqueda optimizada de nombres
+        top_users = []
+        user_activity_items = sorted(user_activity.items(), key=lambda x: x[1], reverse=True)[:10]
+        for email, count in user_activity_items:
+            # Primero buscamos en el mapa de emails (perfiles)
+            name = email_to_name.get(email, email)
+            top_users.append({"email": email, "count": count, "name": name})
 
         sorted_modules = sorted(
             [{"name": k.capitalize(), "val": v} for k, v in module_usage.items()],
