@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import {
     Clock, Users, Zap, AlertTriangle,
-    BarChart3, UserCheck, Activity, Globe, Trophy
+    BarChart3, UserCheck, Activity, Globe, Trophy, Info
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -49,24 +49,28 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                         title="Horas"
                         value={`${data.summary.saved_hours}h`}
                         icon={<Clock size={14} className="text-[#A1C969]" />}
+                        desc="Horas estimadas de ahorro administrativo"
                         isCompact
                     />
                     <Card
                         title="Adopción"
                         value={`${data.summary.adoption_percent}%`}
                         icon={<Users size={14} className="text-blue-500" />}
+                        desc="Usuarios activos vs autorizados"
                         isCompact
                     />
                     <Card
                         title="Fricción"
                         value={data.summary.friction_count}
                         icon={<AlertTriangle size={14} className="text-orange-500" />}
+                        desc="Regeneraciones IA por insatisfacción del usuario"
                         isCompact
                     />
                     <Card
                         title="Eventos"
                         value={data.summary.total_events}
                         icon={<Zap size={14} className="text-[#f2ae60]" />}
+                        desc="Total de interacciones capturadas"
                         isCompact
                     />
                 </div>
@@ -129,25 +133,25 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                     title="Horas Ahorradas"
                     value={`${data.summary.saved_hours}h`}
                     icon={<Clock className="text-[#A1C969]" />}
-                    desc="Tiempo lectivo recuperado"
+                    desc="Horas de trabajo administrativo ahorradas mediante automatización IA."
                 />
                 <Card
                     title="Adopción"
                     value={`${data.summary.adoption_percent}%`}
                     icon={<Users className="text-blue-600" />}
-                    desc={`${data.summary.active_users_count} de ${data.summary.total_authorized} activados`}
+                    desc={`${data.summary.active_users_count} de ${data.summary.total_authorized} docentes activos en el periodo.`}
                 />
                 <Card
                     title="Fricción (IA)"
                     value={data.summary.friction_count}
                     icon={<AlertTriangle className="text-orange-500" />}
-                    desc="Regeneraciones de ítems"
+                    desc="Cantidad de veces que un usuario regeneró contenido IA por no estar satisfecho con el resultado inicial."
                 />
                 <Card
                     title="Total Eventos"
                     value={data.summary.total_events}
                     icon={<Zap className="text-[#f2ae60]" />}
-                    desc="Interacciones capturadas"
+                    desc="Volumen total de interacciones y ejecuciones exitosas en la plataforma."
                 />
             </div>
 
@@ -233,32 +237,36 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
 }
 
 function Card({ title, value, icon, desc, isCompact = false }: any) {
-    if (isCompact) {
-        return (
-            <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm group hover:border-[#1e293b] transition-all flex items-center justify-between">
+    return (
+        <div className={`
+            bg-white rounded-3xl border border-slate-200 shadow-sm transition-all relative group
+            ${isCompact ? 'p-3 rounded-2xl' : 'p-5'}
+            hover:border-indigo-400 hover:shadow-md
+        `}>
+            {/* Tooltip visible on hover */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[9px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center shadow-xl">
+                {desc}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
+            </div>
+
+            <div className={`flex items-center gap-3 ${isCompact ? 'mb-1 justify-between' : 'mb-3'}`}>
                 <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-100">
+                    <div className={`${isCompact ? 'p-1.5' : 'p-2'} bg-slate-50 rounded-xl border border-slate-100`}>
                         {icon}
                     </div>
-                    <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{title}</h4>
+                    <h4 className={`${isCompact ? 'text-[9px]' : 'text-[10px]'} font-black text-slate-400 uppercase tracking-widest`}>
+                        {title}
+                    </h4>
                 </div>
-                <span className="text-xl font-black text-slate-900">{value}</span>
+                <Info size={isCompact ? 10 : 12} className="text-slate-300 group-hover:text-indigo-400 transition-colors" />
             </div>
-        );
-    }
 
-    return (
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm group hover:border-[#1e293b] transition-all">
-            <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
-                    {icon}
-                </div>
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{title}</h4>
-            </div>
             <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-slate-900">{value}</span>
+                <span className={`${isCompact ? 'text-xl' : 'text-3xl'} font-black text-slate-900`}>{value}</span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1 font-medium">{desc}</p>
+            {!isCompact && (
+                <p className="text-[10px] text-slate-500 mt-1 font-medium line-clamp-1">{desc}</p>
+            )}
         </div>
     );
 }
