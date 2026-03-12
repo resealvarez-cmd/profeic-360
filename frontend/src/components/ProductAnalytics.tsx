@@ -19,7 +19,11 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                 const res = await fetch(`${API_URL}/telemetry/analytics?email=${encodeURIComponent(userEmail)}`);
                 if (res.ok) {
                     const json = await res.json();
+                    console.log("📊 Analytics Data:", json);
                     setData(json);
+                } else {
+                    const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
+                    console.error("📊 Analytics Error:", res.status, err);
                 }
             } catch (e) {
                 console.error("Error loading analytics", e);

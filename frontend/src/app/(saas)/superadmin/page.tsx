@@ -430,9 +430,14 @@ export default function SuperAdminDashboard() {
             if (response.ok) {
                 const data = await response.json();
                 setStats(data);
+            } else {
+                const errData = await response.json().catch(() => ({ detail: "Error desconocido" }));
+                console.error("Stats error response:", response.status, errData);
+                toast.error(`Error ${response.status}: ${errData.detail || 'Fallo al cargar stats'}`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error fetching stats", err);
+            toast.error("Error de conexión: " + err.message);
         } finally {
             setLoadingStats(false);
         }

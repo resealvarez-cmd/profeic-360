@@ -62,9 +62,11 @@ async def verify_super_admin(authorization: str = Header(...)):
             raise HTTPException(status_code=401, detail="Token inválido")
             
         email = user_response.user.email
+        print(f"👮 verify_super_admin: user={email}")
         
         # Hardcoded SuperAdmin Check or use authorized_users table
         if email != "re.se.alvarez@gmail.com":
+            print(f"🚫 verify_super_admin: Access Denied for {email}")
             raise HTTPException(status_code=403, detail="Acceso denegado. No eres Super Administrador.")
             
         return user_response.user
@@ -238,10 +240,12 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
     if not supabase_admin:
         raise HTTPException(status_code=500, detail="Falta Service Role Key")
 
+    print("📈 Admin Stats: Start...")
     try:
         # 1. Usuarios autorizados vs perfiles activos
         res_auth = supabase_admin.table('authorized_users').select('email', count='exact').execute()
         total_authorized = res_auth.count or 1
+        print(f"📈 Admin Stats: total_authorized={total_authorized}")
 
         # 2. Telemetría y Biblioteca
         res_events = supabase_admin.table('telemetry_events').select('*').order('created_at', desc=True).limit(1000).execute()
@@ -342,6 +346,7 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
         )
 
         return {
+            "version": "v1.1.0-Debug",
             "summary": {
                 "total_authorized": total_authorized,
                 "active_users": len(unique_active_users),

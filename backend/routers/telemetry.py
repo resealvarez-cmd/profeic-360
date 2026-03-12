@@ -53,7 +53,10 @@ async def track_event(req: TelemetryTrackRequest):
 async def get_product_analytics(email: str = Query(...)):
     # SECURITY: Only re.se.alvarez@gmail.com can call this
     if email != "re.se.alvarez@gmail.com":
+        print(f"🚫 Telemetry: Denied access to {email}")
         raise HTTPException(status_code=403, detail="Access denied. Super Admin only.")
+    
+    print(f"📊 Telemetry: Building analytics for {email}")
 
     try:
         # 1. Fetch total authorized users (for Adoption denominator)
@@ -165,6 +168,7 @@ async def get_product_analytics(email: str = Query(...)):
         )
 
         return {
+            "version": "v1.1.0-Debug",
             "summary": {
                 "total_events": total_events,
                 "saved_hours": round(total_saved_minutes / 60, 1),
