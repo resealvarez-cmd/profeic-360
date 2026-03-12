@@ -423,7 +423,9 @@ export default function SuperAdminDashboard() {
             if (!session) return;
 
             const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-            const response = await fetch(`${BE_URL}/admin/stats`, {
+            const statsUrl = `${BE_URL}/admin/stats`;
+            console.log("🔍 Fetching stats from:", statsUrl);
+            const response = await fetch(statsUrl, {
                 headers: { "Authorization": `Bearer ${session.access_token}` }
             });
 
