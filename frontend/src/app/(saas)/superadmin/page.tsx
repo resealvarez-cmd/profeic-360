@@ -697,12 +697,43 @@ export default function SuperAdminDashboard() {
                                     </div>
                                 </div>
                                 <span className="text-[10px] font-black text-indigo-400 whitespace-nowrap ml-2">
-                                    {user.count} <span className="opacity-50 font-medium">ops</span>
+                                    {user.count} <span className="opacity-50 font-medium">acciones</span>
                                 </span>
                             </div>
                         ))}
                         {(!stats?.power_users || stats.power_users.length === 0) && (
                             <p className="text-center text-slate-600 py-8 text-xs italic">Cargando actividad...</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* School Distribution */}
+                <div className="lg:col-span-1 bg-slate-800 border border-slate-700 p-6 rounded-3xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-teal-500/20 text-teal-400 rounded-xl">
+                            <Building size={20} />
+                        </div>
+                        <h2 className="text-lg font-bold text-white">Distribución por Colegio</h2>
+                    </div>
+                    <div className="space-y-3 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
+                        {stats?.school_stats?.map((school: any, i: number) => (
+                            <div key={i} className="flex flex-col gap-1.5 p-3 rounded-2xl bg-slate-900/40 border border-slate-700/30">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[11px] font-bold text-slate-200 truncate pr-2">{school.name}</span>
+                                    <span className="text-[10px] font-black text-white px-2 py-0.5 bg-slate-800 rounded-lg border border-slate-700">
+                                        {school.count} <span className="text-slate-500 font-medium">users</span>
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.3)] transition-all duration-1000"
+                                        style={{ width: `${(school.count / (stats?.summary?.active_users || 1)) * 100}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                        {(!stats?.school_stats || stats.school_stats.length === 0) && (
+                            <p className="text-center text-slate-600 py-8 text-xs italic">Cargando distribución...</p>
                         )}
                     </div>
                 </div>

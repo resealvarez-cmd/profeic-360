@@ -318,6 +318,23 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
             reverse=True
         )
 
+        # 6. Usuarios por Colegio
+        res_profiles_school = supabase_admin.table('profiles').select('school_id').execute()
+        school_counts = {}
+        for p in (res_profiles_school.data or []):
+            sid = p.get('school_id') or "individual"
+            school_counts[sid] = school_counts.get(sid, 0) + 1
+
+        res_schools = supabase_admin.table('schools').select('id, name').execute()
+        schools_map = {s['id']: s['name'] for s in (res_schools.data or [])}
+        schools_map["individual"] = "Profesores Independientes"
+
+        school_stats = sorted(
+            [{"name": schools_map.get(sid, sid), "count": count} for sid, count in school_counts.items()],
+            key=lambda x: x["count"],
+            reverse=True
+        )
+
         return {
             "summary": {
                 "total_authorized": total_authorized,
@@ -328,6 +345,7 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
             },
             "top_modules": sorted_modules,
             "power_users": top_users,
+            "school_stats": school_stats,
             "recent_events": events[:10]
         }
 

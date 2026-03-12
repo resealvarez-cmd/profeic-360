@@ -147,6 +147,23 @@ async def get_product_analytics(email: str = Query(...)):
             reverse=True
         )
 
+        # 10. School Totals
+        res_schools = supabase.table('schools').select('id, name').execute()
+        schools_map = {s['id']: s['name'] for s in (res_schools.data or [])}
+        schools_map["individual"] = "Profesores Independientes"
+
+        user_profiles_school = supabase.table('profiles').select('school_id').execute()
+        school_counts = {}
+        for p in (user_profiles_school.data or []):
+            sid = p.get('school_id') or "individual"
+            school_counts[sid] = school_counts.get(sid, 0) + 1
+        
+        school_stats = sorted(
+            [{"name": schools_map.get(sid, sid), "count": count} for sid, count in school_counts.items()],
+            key=lambda x: x["count"],
+            reverse=True
+        )
+
         return {
             "summary": {
                 "total_events": total_events,
@@ -158,6 +175,7 @@ async def get_product_analytics(email: str = Query(...)):
             },
             "top_modules": module_stats,
             "power_users": top_users,
+            "school_stats": school_stats,
             "recent_events": events[-10:]
         }
 

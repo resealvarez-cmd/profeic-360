@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import {
     Clock, Users, Zap, AlertTriangle,
-    BarChart3, UserCheck, Activity, Globe, Trophy, Info
+    BarChart3, UserCheck, Activity, Globe, Trophy, Info, Building
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -116,13 +116,30 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                                         <span className="text-[11px] text-slate-600 truncate max-w-[120px] font-medium">{user.email}</span>
                                     </div>
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${i === 0 ? 'bg-white text-indigo-600 border-indigo-200' : 'bg-white text-slate-900 border-slate-200'}`}>
-                                        {user.count} ops
+                                        {user.count} acciones
                                     </span>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
+
+                {/* School Totals (Only in Compact for SuperAdmin view) */}
+                {data.school_stats && (
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <Building size={12} /> Usuarios por Colegio
+                        </h3>
+                        <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1 custom-scrollbar">
+                            {data.school_stats.map((school: any, i: number) => (
+                                <div key={i} className="flex justify-between items-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                                    <span className="text-[10px] text-slate-600 truncate font-bold">{school.name}</span>
+                                    <span className="text-[10px] font-black text-slate-900">{school.count}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -198,7 +215,30 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                                     </div>
                                     <span className="text-sm text-slate-200 truncate max-w-[200px]">{user.email}</span>
                                 </div>
-                                <span className={`text-xs font-bold ${i === 0 ? 'text-indigo-300' : 'text-blue-300'}`}>{user.count} ops</span>
+                                <span className={`text-xs font-bold ${i === 0 ? 'text-indigo-300' : 'text-blue-300'}`}>{user.count} acciones</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* School Breakdown */}
+                <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <Building size={16} className="text-teal-400" /> Distribución por Colegio
+                    </h3>
+                    <div className="space-y-3 max-h-[260px] overflow-y-auto pr-2 custom-scrollbar">
+                        {data.school_stats?.map((school: any, i: number) => (
+                            <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-transparent">
+                                <span className="text-sm text-slate-200 truncate font-bold">{school.name}</span>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-24 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-teal-500"
+                                            style={{ width: `${(school.count / data.summary.active_users_count) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                    <span className="text-xs font-black text-white w-6 text-right">{school.count}</span>
+                                </div>
                             </div>
                         ))}
                     </div>
