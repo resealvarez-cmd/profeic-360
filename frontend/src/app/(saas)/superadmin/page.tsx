@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle, TrendingUp, Clock, UserCheck, BarChart3, Zap } from "lucide-react";
+import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle, TrendingUp, Clock, UserCheck, BarChart3, Zap, Trophy } from "lucide-react";
 
 // ─── Modal de edición del perfil institucional ───────────────────────────────
 interface School {
