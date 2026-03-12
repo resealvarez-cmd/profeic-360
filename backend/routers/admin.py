@@ -1,7 +1,7 @@
-import os
 from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from supabase import create_client, Client
+from .analytics_service import calculate_global_stats
 
 router = APIRouter(prefix="/admin", tags=["SuperAdmin"])
 
@@ -240,125 +240,15 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
     if not supabase_admin:
         raise HTTPException(status_code=500, detail="Falta Service Role Key")
 
-    print("📈 Admin Stats: Start...")
+    print("📈 Admin Stats: Start (Centralized)...")
     try:
-        # 1. Usuarios autorizados vs perfiles activos
-        res_auth = supabase_admin.table('authorized_users').select('email', count='exact').execute()
-        total_authorized = res_auth.count or 1
-        print(f"📈 Admin Stats: total_authorized={total_authorized}")
+        stats = calculate_global_stats(supabase_admin)
+        stats["version"] = "v1.2.0-Sync" # Unificado
+        return stats
 
-        # 2. Telemetría y Biblioteca
-        res_events = supabase_admin.table('telemetry_events').select('*').order('created_at', desc=True).limit(1000).execute()
-        events = res_events.data or []
-
-        res_lib = supabase_admin.table('biblioteca_recursos').select('tipo, user_id, created_at').execute()
-        lib_items = res_lib.data or []
-
-        # 3. Mapeo de UUIDs a emails para legibilidad
-        res_profiles = supabase_admin.table('profiles').select('id, email, full_name').execute()
-        profiles_data = res_profiles.data or []
-        profile_map = {p['id']: {"email": p.get('email', 'anon'), "name": p.get('full_name', 'Docente')} for p in profiles_data}
-        # Mapa optimizado para búsqueda por email
-        email_to_name = {p.get('email'): p.get('full_name', 'Docente') for p in profiles_data if p.get('email')}
-
-        print(f"📊 Stats Admin: Fetched {len(profiles_data)} profiles, {len(events)} events, {len(lib_items)} icons.")
-
-        # 4. Procesamiento
-        total_saved_minutes = 0
-        module_usage = {}
-        user_activity = {}
-        unique_active_users = set()
-
-        LIB_TYPE_TO_MODULE = {
-            "PLANIFICACION": "planificador",
-            "RUBRICA": "rubricas",
-            "EVALUACION": "evaluaciones",
-            "AUDITORIA": "analizador",
-            "LECTURA": "lectura-inteligente",
-            "ESTRATEGIA": "nee",
-            "ELEVADOR": "mentor"
-        }
-
-        # Procesar items de biblioteca (histórico de éxito)
-        for item in lib_items:
-            tipo = str(item.get('tipo', '')).upper()
-            uid = item.get('user_id')
-            user_info = profile_map.get(uid, {"email": "anonymous", "name": "Anónimo"})
-            email = user_info["email"]
-            
-            if email != "anonymous":
-                unique_active_users.add(email)
-                user_activity[email] = user_activity.get(email, 0) + 1
-            
-            mod_key = LIB_TYPE_TO_MODULE.get(tipo, "unknown")
-            if mod_key != "unknown":
-                total_saved_minutes += SAVED_MINUTES_MAP.get(mod_key, 0)
-                module_usage[mod_key] = module_usage.get(mod_key, 0) + 1
-
-        # Procesar telemetría (interacciones en tiempo real)
-        for ev in events:
-            mod = ev.get('module', 'unknown')
-            mod_clean = mod.split('/')[-1] if '/' in mod else mod
-            email = ev.get('email', 'anonymous')
-            
-            if email != "anonymous":
-                unique_active_users.add(email)
-                user_activity[email] = user_activity.get(email, 0) + 1
-
-            if mod_clean in SAVED_MINUTES_MAP and 'success' in ev.get('event_name', '').lower():
-                # Evitar doble conteo si ya se contó en biblioteca? 
-                # La telemetría cuenta 'intentos' y 'éxitos' visuales, la biblioteca cuenta 'guardados'.
-                # Para simplificar, si es éxito en telemetría pero no se guardó, igual ahorró algo de tiempo.
-                pass 
-
-        # 5. Formatear resultados
-        adoption_pct = round((len(unique_active_users) / total_authorized) * 100, 1) if total_authorized > 0 else 0
-        
-        # Búsqueda optimizada de nombres
-        top_users = []
-        user_activity_items = sorted(user_activity.items(), key=lambda x: x[1], reverse=True)[:10]
-        for email, count in user_activity_items:
-            # Primero buscamos en el mapa de emails (perfiles)
-            name = email_to_name.get(email, email)
-            top_users.append({"email": email, "count": count, "name": name})
-
-        sorted_modules = sorted(
-            [{"name": k.capitalize(), "val": v} for k, v in module_usage.items()],
-            key=lambda x: x["val"],
-            reverse=True
-        )
-
-        # 6. Usuarios por Colegio
-        res_profiles_school = supabase_admin.table('profiles').select('school_id').execute()
-        school_counts = {}
-        for p in (res_profiles_school.data or []):
-            sid = p.get('school_id') or "individual"
-            school_counts[sid] = school_counts.get(sid, 0) + 1
-
-        res_schools = supabase_admin.table('schools').select('id, name').execute()
-        schools_map = {s['id']: s['name'] for s in (res_schools.data or [])}
-        schools_map["individual"] = "Profesores Independientes"
-
-        school_stats = sorted(
-            [{"name": schools_map.get(sid, sid), "count": count} for sid, count in school_counts.items()],
-            key=lambda x: x["count"],
-            reverse=True
-        )
-
-        return {
-            "version": "v1.1.0-Debug",
-            "summary": {
-                "total_authorized": total_authorized,
-                "active_users": len(unique_active_users),
-                "adoption_percent": adoption_pct,
-                "saved_hours": round(total_saved_minutes / 60, 1),
-                "total_resources": len(lib_items)
-            },
-            "top_modules": sorted_modules,
-            "power_users": top_users,
-            "school_stats": school_stats,
-            "recent_events": events[:10]
-        }
+    except Exception as e:
+        print(f"❌ Error en stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
     except Exception as e:
         print(f"❌ Error en stats: {e}")
