@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle, TrendingUp, Clock, UserCheck, BarChart3, Zap, Trophy } from "lucide-react";
+import { Plus, Users, Building, Mail, Loader2, ArrowRight, Pencil, X, Save, MapPin, BookOpen, Sparkles, Upload, FileText, Trash2, File as FileIcon, UserX, CheckCircle, TrendingUp, Clock, UserCheck, BarChart3, Zap, Trophy, AlertTriangle, Activity } from "lucide-react";
 
 // ─── Modal de edición del perfil institucional ───────────────────────────────
 interface School {
@@ -653,17 +653,6 @@ export default function SuperAdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                        <TrendingUp size={80} />
-                    </div>
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Adopción ProfeIC</p>
-                    <h3 className="text-3xl font-black text-white">{stats?.summary?.adoption_percent || 0}%</h3>
-                    <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-500 font-bold">
-                        <Users size={12} /> {stats?.summary?.active_users || 0} de {stats?.summary?.total_authorized || 0} usuarios activos
-                    </div>
-                </div>
-
-                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
                         <Clock size={80} />
                     </div>
                     <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Horas Ahorradas</p>
@@ -675,16 +664,41 @@ export default function SuperAdminDashboard() {
 
                 <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                        <UserCheck size={80} />
+                        <Users size={80} />
                     </div>
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Impacto Real</p>
-                    <h3 className="text-3xl font-black text-white">{stats?.summary?.total_resources || 0}</h3>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Adopción ProfeIC</p>
+                    <h3 className="text-3xl font-black text-white">{stats?.summary?.adoption_percent || 0}%</h3>
                     <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-500 font-bold">
-                        <BookOpen size={12} /> Recursos generados y guardados
+                        <UserCheck size={12} /> {stats?.summary?.active_users || 0} usuarios activos
                     </div>
                 </div>
 
-                <div className="lg:col-span-1 bg-slate-800 border border-slate-700 p-6 rounded-3xl">
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                        <AlertTriangle size={80} />
+                    </div>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Fricción IA</p>
+                    <h3 className="text-3xl font-black text-white">{stats?.summary?.friction_count || 0}</h3>
+                    <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-500 font-bold">
+                        <Zap size={12} className="text-orange-500" /> Regeneraciones por insatisfacción
+                    </div>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                        <TrendingUp size={80} />
+                    </div>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Eventos Totales</p>
+                    <h3 className="text-3xl font-black text-white">{stats?.summary?.total_events || 0}</h3>
+                    <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-500 font-bold">
+                        <Activity size={12} /> Interacciones capturadas
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Top Activity */}
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-3xl">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2 bg-indigo-500/20 text-indigo-500 rounded-xl">
                             <Trophy size={20} />
@@ -695,7 +709,7 @@ export default function SuperAdminDashboard() {
                         {stats?.power_users?.map((user: any, i: number) => (
                             <div key={i} className={`flex items-center justify-between p-3 rounded-2xl transition-all border ${i === 0 ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-slate-900/50 border-slate-700/50 hover:bg-slate-900'}`}>
                                 <div className="flex items-center gap-3 overflow-hidden">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${i === 0 ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-800 text-slate-400'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${i === 0 ? 'bg-indigo-50 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-800 text-slate-400'}`}>
                                         {i + 1}
                                     </div>
                                     <div className="flex flex-col min-w-0">
@@ -744,10 +758,10 @@ export default function SuperAdminDashboard() {
                         )}
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* --- TOP MODULES & RECENT EVENTS --- */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            < div className="grid grid-cols-1 lg:grid-cols-3 gap-8" >
                 <div className="lg:col-span-1 bg-slate-800 border border-slate-700 p-6 rounded-3xl">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2 bg-amber-500/20 text-amber-500 rounded-xl">
@@ -800,7 +814,7 @@ export default function SuperAdminDashboard() {
                         ))}
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Edit Modal */}
             {
@@ -1084,6 +1098,6 @@ export default function SuperAdminDashboard() {
                 )}
             </div>
 
-        </div>
+        </div >
     );
 }

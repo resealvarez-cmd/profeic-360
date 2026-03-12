@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from supabase import create_client, Client
@@ -243,12 +244,8 @@ async def get_admin_stats(_ = Depends(verify_super_admin)):
     print("📈 Admin Stats: Start (Centralized)...")
     try:
         stats = calculate_global_stats(supabase_admin)
-        stats["version"] = "v1.2.0-Sync" # Unificado
+        stats["version"] = "v1.2.1-FinalSync" 
         return stats
-
-    except Exception as e:
-        print(f"❌ Error en stats: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
     except Exception as e:
         print(f"❌ Error en stats: {e}")

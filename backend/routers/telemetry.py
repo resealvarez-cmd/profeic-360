@@ -60,7 +60,7 @@ async def get_product_analytics(email: str = Query(...)):
     print(f"📊 Telemetry: Building analytics for {email} (Centralized)")
     try:
         stats = calculate_global_stats(supabase)
-        stats["version"] = "v1.2.0-Sync" # Unificado
+        stats["version"] = "v1.2.1-FinalSync" 
         return stats
 
     except Exception as e:
