@@ -69,7 +69,8 @@ def calculate_global_stats(supabase: Client):
     # 2.2 Process Telemetry Events (Interaction/Drift)
     for ev in events:
         mod = ev.get('module', 'unknown')
-        mod_clean = mod.split('/')[-1] if '/' in mod else mod
+        # Normalize: Remove paths and convert underscores to dashes
+        mod_clean = (mod.split('/')[-1] if '/' in mod else mod).replace('_', '-')
         email = ev.get('email', 'anonymous')
         
         if email != "anonymous":

@@ -88,7 +88,7 @@ def read_root():
 
 @app.get("/version")
 def read_version():
-    return {"version": "v1.0.3-MultiTenantFix-SuperAdmin", "message": "🚀 SISTEMA PROFEIC OPERATIVO"}
+    return {"version": "v1.2.2-AnalyticsSync", "message": "🚀 SISTEMA PROFEIC OPERATIVO - ANALITICAS SINCRONIZADAS"}
 
 # Esto permite correrlo directamente con Python si quisieras
 if __name__ == "__main__":
