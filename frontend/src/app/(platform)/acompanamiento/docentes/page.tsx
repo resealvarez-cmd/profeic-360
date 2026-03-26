@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, Calendar, Mail, FileText, MoreVertical, Plus, BrainCircuit, ChevronRight, ChevronDown } from "lucide-react";
+import { Search, Calendar, Mail, FileText, MoreVertical, Plus, BrainCircuit, ChevronRight, ChevronDown, Users } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { TeacherProfiler } from "@/components/shared/TeacherProfiler";
@@ -58,12 +58,10 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                 }
             }
 
-            // 2. Fetch Teachers (Authorized) AND their Profile IDs
-            // ONLY if not a teacher
+            // 2. Fetch All staff roles (not restricted to teacher)
             const { data: authorized, error: authError } = await supabase
                 .from('authorized_users')
                 .select('*')
-                .eq('role', 'teacher')
                 .order('full_name', { ascending: true });
 
             if (authError) {
@@ -250,8 +248,8 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                             <button onClick={handleContactAll} className="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-50 font-medium">
                                 <Mail size={18} /> Contactar Todos
                             </button>
-                            <button onClick={handleAddTeacher} className="bg-[#1a2e3b] text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-[#2b546e] shadow-lg shadow-blue-900/20 font-bold">
-                                <Plus size={18} /> Agregar Docente
+                            <button onClick={handleAddTeacher} className="bg-[#1a2e3b] text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-[#2b546e] shadow-lg shadow-blue-900/20 font-bold whitespace-nowrap">
+                                <Users size={18} /> Gestionar Personal / Perfiles
                             </button>
                         </>
                     )}
@@ -330,6 +328,13 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                                         <div className="flex flex-wrap gap-2 mt-4">
                                             <span className="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-black uppercase tracking-wider border border-blue-100">{teacher.subject || 'General'}</span>
                                             <span className="text-[10px] bg-slate-50 text-slate-500 px-2.5 py-1 rounded-lg font-black uppercase tracking-wider border border-slate-100">{teacher.grade || 'Media'}</span>
+                                            <span className={`text-[10px] px-2.5 py-1 rounded-lg font-black uppercase tracking-wider border ${
+                                                teacher.role === 'admin' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                teacher.role === 'director' || teacher.role === 'utp' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                                'bg-indigo-50 text-indigo-600 border-indigo-100'
+                                            }`}>
+                                                {teacher.role === 'teacher' ? 'Docente' : teacher.role === 'utp' ? 'Coordinador/UTP' : teacher.role === 'director' ? 'Director' : teacher.role}
+                                            </span>
                                         </div>
                                     </div>
 
