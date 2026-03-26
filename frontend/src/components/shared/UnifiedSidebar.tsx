@@ -232,7 +232,7 @@ export default function UnifiedSidebar() {
             <NavItem href="/mensajeria" icon={MessageSquare} label="Mensajería" isActive={isActive("/mensajeria")} show={show} onClick={closeMobile} />
           </CollapsibleSection>
 
-          {isDirectivo && !individualPlan && ["pro", "enterprise"].includes(schoolPlan) && (
+          {(isDirectivo || isSuperAdmin) && !individualPlan && (isSuperAdmin || ["pro", "enterprise"].includes(schoolPlan)) && (
             <CollapsibleSection label="Gestión Escolar" icon={LayoutDashboard} show={show}>
               <NavItem href="/acompanamiento/dashboard" icon={LayoutDashboard} label="Dashboard 360°" isActive={isActive("/acompanamiento/dashboard")} show={show} onClick={closeMobile} />
               <NavItem href="/acompanamiento/docentes" icon={Users} label="Mis Docentes" isActive={isActive("/acompanamiento/docentes")} show={show} onClick={closeMobile} />

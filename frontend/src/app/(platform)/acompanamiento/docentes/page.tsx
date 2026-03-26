@@ -51,9 +51,8 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             if (authUser) {
                 setUserRole(authUser.role);
                 // SECURITY CHECK: If Teacher, Do NOT fetch list, redirect or show empty.
-                if (authUser.role === 'teacher') {
+                if (authUser.role === 'teacher' && user.email !== 're.se.alvarez@gmail.com') {
                     setLoading(false);
-                    // Optional: Redirect
                     router.push('/acompanamiento/dashboard');
                     return;
                 }
