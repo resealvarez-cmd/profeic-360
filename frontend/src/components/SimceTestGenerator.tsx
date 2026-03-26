@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // SIMCE JSON keys must match tablas_especificaciones_simce.json exactly
 const NIVELES = ["4° Básico", "6° Básico", "8° Básico", "II Medio"];
