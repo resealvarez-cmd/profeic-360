@@ -37,9 +37,11 @@ async def get_current_user_id(authorization: str = Header(...)) -> str:
 
         return user_response.user.id
 
-    except HTTPException:
+    except HTTPException as e:
+        print(f"Auth DEBUG: HTTPException {e.status_code} - {e.detail}")
         raise
     except Exception as e:
+        print(f"Auth DEBUG: Error validando token: {str(e)}")
         raise HTTPException(status_code=401, detail=f"Error validando token: {str(e)}")
 
 

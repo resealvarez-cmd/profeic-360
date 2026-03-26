@@ -7,16 +7,16 @@ import uvicorn
 import os
 
 # --- PREVENCIÓN DE CRASHES EN CLOUD RUN ---
-# Si Cloud Run arranca pero faltan variables (ej. error de tipeo en la consola),
-# esto evita que la aplicación entera colapse al importar Supabase en los routers.
+# Solo seteamos fallbacks si la variable NO EXISTE en absoluto.
 if not os.getenv("SUPABASE_URL"):
     os.environ["SUPABASE_URL"] = "https://falsesupabase.supabase.co"
 if not os.getenv("SUPABASE_KEY"):
-    os.environ["SUPABASE_KEY"] = "false_anon_key"
+    os.environ["SUPABASE_KEY"] = "missing_key"
 if not os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
-    os.environ["SUPABASE_SERVICE_ROLE_KEY"] = "false_role_key"
+    # Intentamos reusar la KEY si existe antes de poner un placeholder roto
+    os.environ["SUPABASE_SERVICE_ROLE_KEY"] = os.getenv("SUPABASE_KEY") or "missing_role_key"
 if not os.getenv("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "false_gemini_key"
+    os.environ["GOOGLE_API_KEY"] = "missing_gemini_key"
 
 # 1. IMPORTAMOS TUS ROUTERS
 # (Basado en el árbol de archivos que me mostraste, TIENES TODOS ESTOS)
@@ -40,8 +40,15 @@ from routers import (
     telemetry,
     admin,
     profile,
-    insights
+    insights,
+    simce,
+    simce_generator,         # ← Generador SIMCE con IA (blueprint + RAG + LLM)
+    omr_vision,
+    enrollment,
+    teachers,
+    mejora_continua
 )
+from simce_router import router as simce_router
 
 app = FastAPI(title="API ProfeIC", version="4.0.0")
 
@@ -81,6 +88,14 @@ app.include_router(telemetry.router)
 app.include_router(admin.router)
 app.include_router(profile.router)
 app.include_router(insights.router)
+# app.include_router(simce.router)
+# app.include_router(simce_generator.router)  # POST /api/v1/simce/generate
+app.include_router(omr_vision.router)
+app.include_router(enrollment.router)
+app.include_router(teachers.router)
+app.include_router(mejora_continua.router)
+app.include_router(simce_router) # Nuevo router híbrido
+
 
 @app.get("/")
 def read_root():

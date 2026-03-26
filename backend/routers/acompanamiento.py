@@ -1,9 +1,17 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import google.generativeai as genai
 import os
+import io
+from fastapi import APIRouter, HTTPException, UploadFile, File
+from pydantic import BaseModel
 from supabase import create_client, Client
+from docx import Document
+from docx.shared import Pt, Inches, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+import io
+import time
+import json
+from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
@@ -117,112 +125,268 @@ async def generate_flash_feedback(req: FlashFeedbackRequest):
         print(f"Error Flash Feedback: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# --- ENDPOINT: TRANSCRIPCIÓN DE VOZ (MULTIMODAL) ---
+@router.post("/acompanamiento/transcribe")
+async def transcribe_observation(file: UploadFile = File(...)):
+    try:
+        # 1. Leer contenido del audio
+        audio_content = await file.read()
+        
+        # 2. Configurar el modelo (usando gemini-2.5-flash)
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        
+        # 3. Prompt de transcripción pedagógica
+        prompt = """
+        TRANSCRIPCIÓN PEDAGÓGICA:
+        Escucha este audio de una observación de aula. 
+        Transcribe lo que dice el observador de forma limpia y profesional.
+        - Elimina muletillas y sonidos ambiente.
+        - Corrige errores menores de dicción.
+        - Devuelve ÚNICAMENTE el texto transcrito, sin comentarios adicionales.
+        """
+        
+        # 4. Llamada multimodal
+        response = model.generate_content([
+            prompt,
+            {
+                "mime_type": file.content_type or "audio/webm",
+                "data": audio_content
+            }
+        ], request_options={"timeout": 120})
+        
+        return {"text": response.text.strip()}
+
+    except Exception as e:
+        print(f"Error Transcripción: {e}")
+        # Fallback simple en caso de error de AI
+        raise HTTPException(status_code=500, detail=f"No se pudo procesar el audio: {str(e)}")
+
 # --- ENDPOINT: TRAJECTORY REPORT (NIVEL 2) ---
 class TrajectoryRequest(BaseModel):
     teacher_id: str
 
+async def _get_teacher_trajectory_data(teacher_id: str):
+    start_time = time.time()
+    
+    # 1. Fetch Teacher Profile
+    teacher_res = supabase.table('profiles').select('*').eq('id', teacher_id).execute()
+    teacher = teacher_res.data[0] if teacher_res.data else None
+    if not teacher:
+        teacher = {"full_name": "Docente (Perfil Pendiente de Activación)"}
+
+    # 2. Fetch ALL Completed Cycles
+    all_cycles_res = supabase.table('observation_cycles')\
+        .select('id, created_at, observer:observer_id(full_name)')\
+        .eq('teacher_id', teacher_id)\
+        .eq('status', 'completed')\
+        .order('created_at', desc=True)\
+        .execute()
+    
+    all_cycles = all_cycles_res.data or []
+    total_cycles = len(all_cycles)
+    observers = list(set([c.get('observer', {}).get('full_name') for c in all_cycles if c.get('observer')]))
+    cycles = all_cycles[:3]
+
+    # 3. Calculate KPIs
+    total_started_res = supabase.table('observation_cycles')\
+        .select('id')\
+        .eq('teacher_id', teacher_id)\
+        .execute()
+    total_started = len(total_started_res.data) if total_started_res.data else 0
+    closure_rate = round((total_cycles / total_started * 100)) if total_started > 0 else 0
+
+    all_cycle_ids = [c['id'] for c in all_cycles]
+    execution_data_res = supabase.table('observation_data')\
+        .select('content')\
+        .in_('cycle_id', all_cycle_ids)\
+        .eq('stage', 'execution')\
+        .execute()
+    
+    scores_list = []
+    if execution_data_res.data:
+        for item in execution_data_res.data:
+            scores = item.get('content', {}).get('scores', {})
+            if isinstance(scores, dict):
+                valid_scores = [v for v in scores.values() if isinstance(v, (int, float))]
+                scores_list.extend(valid_scores)
+    
+    depth_index = round((sum(scores_list) / (len(scores_list) * 4) * 100)) if scores_list else 0
+
+    # 4. Fetch Details for Analysis
+    cycle_ids = [c['id'] for c in cycles]
+    if not cycle_ids:
+        return {
+            "teacher": teacher,
+            "total_cycles": 0,
+            "observers": [],
+            "closure_rate": 0,
+            "depth_index": 0,
+            "analysis": None
+        }
+
+    all_obs_res = supabase.table('observation_data').select('cycle_id, content').in_('cycle_id', cycle_ids).eq('stage', 'execution').execute()
+    obs_map = {item['cycle_id']: item['content'] for item in all_obs_res.data} if all_obs_res.data else {}
+
+    all_comm_res = supabase.table('commitments').select('cycle_id, description, status').in_('cycle_id', cycle_ids).execute()
+    comm_map = {item['cycle_id']: item['description'] for item in all_comm_res.data} if all_comm_res.data else {}
+    
+    all_refl_res = supabase.table('observation_data').select('cycle_id, content').in_('cycle_id', cycle_ids).eq('stage', 'reflection').execute()
+    refl_map = {item['cycle_id']: item['content'] for item in all_refl_res.data} if all_refl_res.data else {}
+    
+    history_text = ""
+    for i, cycle in enumerate(reversed(cycles)):
+        content = obs_map.get(cycle['id'], {})
+        scores = content.get('scores', {})
+        tags = content.get('tags_selected', [])
+        obs_notes = content.get('observations', {})
+        cycle_date = cycle['created_at'].split('T')[0]
+        observer = (cycle.get('observer') or {}).get('full_name', 'Desconocido')
+        comm = comm_map.get(cycle['id'], "Sin compromiso")
+        refl = refl_map.get(cycle['id'], {}).get('reflection', "Sin reflexión")
+        
+        history_text += f"\n--- OBS #{i+1} ({cycle_date}) ---\nObservador: {observer}\nPuntajes: {scores}\nTags: {tags}\nNotas: {obs_notes}\nReflexión: {refl}\nCompromiso: {comm}\n"
+
+    # AI Prompt
+    prompt = f"ROL: Analista Pedagógico Senior.\nTAREA: Perfilador para {teacher['full_name']}.\nCONTEXTO: 8 Dimensiones de Evaluación ProfeIC.\nHISTORIAL:\n{history_text}\n\nFORMATO JSON (NO USAR COMILLAS TRIPLES): \n{{\n  \"teacher_view\": \"Párrafo positivo para el docente...\",\n  \"utp_view\": \"Análisis técnico...\",\n  \"director_view\": \"Visión estratégica...\",\n  \"trend\": \"ascending\" | \"stable\" | \"descending\",\n  \"summary\": \"{teacher['full_name']} se caracteriza, según sus observadores, como un docente que... Además su autopercepción indica que...\",\n  \"strengths\": [],\n  \"gaps\": [],\n  \"suggested_training\": []\n}}"
+    
+    model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
+    response = model.generate_content(prompt, request_options={"timeout": 120})
+    
+    try:
+        clean_text = response.text.replace("```json", "").replace("```", "").strip()
+        analysis = json.loads(clean_text)
+    except:
+        analysis = {"summary": f"{teacher['full_name']} se encuentra en monitoreo activo por el equipo técnico pedagógico.", "strengths":[], "gaps":[], "teacher_view":"", "utp_view":"", "director_view":"", "suggested_training":[]}
+
+    return {
+        "teacher": teacher,
+        "total_cycles": total_cycles,
+        "observers": observers,
+        "closure_rate": closure_rate,
+        "depth_index": depth_index,
+        "analysis": analysis,
+        "raw_history": cycles 
+    }
+
 @router.post("/acompanamiento/trajectory-report")
 async def generate_trajectory_report(req: TrajectoryRequest):
     try:
-        # 1. Fetch Teacher Profile
-        teacher_res = supabase.table('profiles').select('*').eq('id', req.teacher_id).single().execute()
-        teacher = teacher_res.data
-        if not teacher:
-            raise HTTPException(status_code=404, detail="Docente no encontrado")
-
-        # 2. Fetch Last 3 Completed Cycles (History)
-        cycles_res = supabase.table('observation_cycles')\
-            .select('id, created_at, observer:observer_id(full_name)')\
-            .eq('teacher_id', req.teacher_id)\
-            .eq('status', 'completed')\
-            .order('created_at', { 'ascending': False })\
-            .limit(3)\
-            .execute()
-        
-        cycles = cycles_res.data or []
-        
-        # 3. Fetch Observation Data & Commitments for these cycles
-        history_text = ""
-        for i, cycle in enumerate(reversed(cycles)): # Chronological order
-            # Get Scores/Obs
-            obs_data = supabase.table('observation_data')\
-                .select('content')\
-                .eq('cycle_id', cycle['id'])\
-                .eq('stage', 'execution')\
-                .single().execute()
-            
-            # Get Commitment made IN this cycle (for next time)
-            comm_data = supabase.table('commitments')\
-                .select('description, status')\
-                .eq('cycle_id', cycle['id'])\
-                .single().execute()
-
-            content = obs_data.data['content'] if obs_data.data else {}
-            scores = content.get('scores', {})
-            
-            # Formatting for AI
-            cycle_date = cycle['created_at'].split('T')[0]
-            observer = cycle['observer']['full_name']
-            commitment = comm_data.data['description'] if comm_data.data else "Sin compromiso registrado"
-            
-            history_text += f"""
-            --- OBSERVACIÓN #{i+1} ({cycle_date}) ---
-            Observador: {observer}
-            Puntajes (1-4): {scores}
-            Compromiso derivado: "{commitment}"
-            ------------------------------------------
-            """
-
-        if not history_text:
+        data = await _get_teacher_trajectory_data(req.teacher_id)
+        if data["total_cycles"] == 0:
             return {
-                "summary": "No hay suficiente historial para generar un reporte de trayectoria.",
-                "trend": "neutral",
-                "focus_alert": None
-            }
-
-        # 4. Prompt Engineering (Master Plan Level 2)
-        prompt = f"""
-        ROL: Eres un "Analista de Datos Educativos" senior.
-        TAREA: Generar un Reporte de Trayectoria para el docente {teacher['full_name']}.
-        
-        HISTORIAL DE OBSERVACIONES (Cronológico):
-        {history_text}
-
-        OBJETIVO:
-        1. Analizar la TENDENCIA: ¿El docente mejora, se estanca o retrocede?
-        2. Verificar CUMPLIMIENTO: ¿Los compromisos de una obs se reflejan en la siguiente?
-        3. Identificar FOCO CRÍTICO: ¿Qué ámbito tiene puntajes bajos persistentes?
-
-        FORMATO DE RESPUESTA (JSON estricto):
-        {{
-            "summary": "Párrafo narrativo de 3-4 líneas describiendo la evolución del docente. Sé directo y profesional.",
-            "trend": "ascending" | "stable" | "descending" | "mixed",
-            "focus_alert": "Nombre del foco con más dificultades (o null si todo va bien).",
-            "recommendation": "Una sugerencia estratégica para el equipo directivo."
-        }}
-        """
-
-        # 5. Call Gemini
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        response = model.generate_content(prompt)
-        
-        import json
-        try:
-             clean_text = response.text.replace("```json", "").replace("```", "").strip()
-             return json.loads(clean_text)
-        except Exception:
-            return {
-                "summary": "Análisis preliminar indica datos variados. Se requiere revisión manual.",
-                "trend": "mixed",
+                "teacher_view": "Aún no hay suficientes observaciones registradas.",
+                "utp_view": "Datos insuficientes.",
+                "director_view": "Datos insuficientes.",
+                "trend": "stable",
                 "focus_alert": None,
-                "recommendation": "Revisar bitácora manualmente."
+                "strengths": [],
+                "gaps": [],
+                "suggested_training": []
             }
-
+        
+        return {
+            "teacher_name": data["teacher"]["full_name"],
+            "total_cycles": data["total_cycles"],
+            "observers": data["observers"],
+            "closure_rate": data["closure_rate"],
+            "depth_index": data["depth_index"],
+            "trajectory_analysis": data["analysis"]
+        }
     except Exception as e:
-        print(f"Error Trajectory Report: {e}")
+        print(f"Error Trajectory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# --- ENDPOINT: EXECUTIVE REPORT (NIVEL 3 - STRATEGIC BRAIN) ---
+@router.post("/acompanamiento/export-trajectory")
+async def export_teacher_trajectory(req: TrajectoryRequest):
+    try:
+        data = await _get_teacher_trajectory_data(req.teacher_id)
+        teacher = data["teacher"]
+        analysis = data["analysis"]
+        
+        if not analysis:
+            raise HTTPException(status_code=400, detail="No hay datos suficientes para exportar el informe.")
+
+        doc = Document()
+        
+        # Branding Header
+        header = doc.add_heading(f"PERFILADOR DOCENTE 360° - {teacher['full_name']}", 0)
+        header.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        doc.add_paragraph(f"Fecha de Reporte: {time.strftime('%d/%m/%Y')}")
+        doc.add_paragraph().add_run("Generado con Inteligencia Aumentada por ProfeIC").italic = True
+        
+        # Section 1: Metadata
+        doc.add_heading("I. ESTADO GENERAL DE ACOMPAÑAMIENTO", level=1)
+        table = doc.add_table(rows=2, cols=2)
+        table.style = 'Table Grid'
+        table.cell(0,0).text = "Ciclos Finalizados"; table.cell(0,1).text = "Tasa de Cierre"
+        table.cell(1,0).text = str(data["total_cycles"]); table.cell(1,1).text = f"{data['closure_rate']}%"
+        
+        doc.add_paragraph(f"\nObservadores principales: {', '.join(data['observers']) if data['observers'] else 'N/A'}")
+        p_kpi = doc.add_paragraph()
+        p_kpi.add_run(f"Índice de Profundidad Didáctica (KPI): {data['depth_index']}%").bold = True
+        
+        # Section 2: AI Summary
+        doc.add_heading("II. RESUMEN EJECUTIVO (IA)", level=1)
+        p = doc.add_paragraph(analysis.get('summary', ''))
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        
+        # Section 3: Views
+        doc.add_heading("III. ANÁLISIS SEGMENTADO", level=1)
+        doc.add_heading("Perspectiva Docente", level=2)
+        doc.add_paragraph(analysis.get('teacher_view', ''))
+        
+        doc.add_heading("Análisis Técnico (UTP)", level=2)
+        doc.add_paragraph(analysis.get('utp_view', ''))
+        
+        doc.add_heading("Visión Estratégica (Director)", level=2)
+        doc.add_paragraph(analysis.get('director_view', ''))
+        
+        # Section 4: Strengths & Gaps
+        doc.add_page_break()
+        doc.add_heading("IV. MAPA DE COMPETENCIAS", level=1)
+        
+        strengths = analysis.get('strengths', [])
+        gaps = analysis.get('gaps', [])
+
+        table_comp = doc.add_table(rows=1, cols=2)
+        col1, col2 = table_comp.rows[0].cells
+        
+        p1 = col1.add_paragraph("FORTALEZAS DESTACADAS")
+        p1.runs[0].bold = True
+        for s in strengths:
+            col1.add_paragraph(f"✓ {s}", style='List Bullet')
+            
+        p2 = col2.add_paragraph("OPORTUNIDADES DE MEJORA")
+        p2.runs[0].bold = True
+        for g in gaps:
+            col2.add_paragraph(f"→ {g}", style='List Bullet')
+            
+        # Section 5: Training
+        doc.add_heading("V. PLAN DE FORMACIÓN SUGERIDO", level=1)
+        training = analysis.get('suggested_training', [])
+        for t in training:
+            p = doc.add_paragraph(style='List Bullet')
+            p.add_run(t).bold = True
+
+        # Footer
+        doc.add_paragraph("\n\nConfidencial - Propiedad de la Institución Educativa y ProfeIC.")
+        
+        file_stream = io.BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+        
+        filename = f"Perfil_{teacher['full_name'].replace(' ', '_')}.docx"
+        return StreamingResponse(
+            file_stream,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except Exception as e:
+        import traceback
+        print(f"Error Export: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 class ExecutiveRequest(BaseModel):
     start_date: Optional[str] = None
     end_date: Optional[str] = None
@@ -485,7 +649,7 @@ async def generate_executive_report(req: ExecutiveRequest):
         # 6. Call Gemini
         # We enforce JSON output to prevent parsing errors due to markdown or unescaped characters
         model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
-        response = model.generate_content(prompt)
+        response = model.generate_content(prompt, request_options={"timeout": 120})
         
         import json
         try:
@@ -571,8 +735,9 @@ async def get_executive_metrics(req: MetricsRequest):
 
         # 1. Safe Intersection of Roles and Tenant Profiles
         # Step A: Get all valid teacher/utp emails globally
-        auth_res = supabase.table('authorized_users').select('email').in_('role', ['teacher', 'utp']).execute()
-        valid_teacher_emails = set(item['email'] for item in (auth_res.data or []))
+        auth_res = supabase.table('authorized_users').select('email, full_name, role').execute()
+        all_auth_users = {item['email']: item for item in (auth_res.data or [])}
+        valid_teacher_emails = set(r['email'] for r in (auth_res.data or []) if r.get('role') in ['teacher', 'utp'])
         
         # Step B: Get profiles bound securely to the Tenant
         if author_school_id:
@@ -586,6 +751,14 @@ async def get_executive_metrics(req: MetricsRequest):
                 .execute()
         
         raw_profiles = prof_res.data or []
+        
+        profile_names_map = {}
+        for p in raw_profiles:
+            name = p.get('full_name')
+            email = p.get('email')
+            if not name and email in all_auth_users:
+                name = all_auth_users[email].get('full_name')
+            profile_names_map[p['id']] = name or 'Usuario Sin Nombre'
         
         # Step C: Intersect those who belong to the school AND have the correct role
         all_teachers = [p for p in raw_profiles if p.get('email') in valid_teacher_emails]
@@ -661,14 +834,17 @@ async def get_executive_metrics(req: MetricsRequest):
         teacher_scores = {}
         
         for c in all_cycles:
-            obs_id = c['observer_id']
-            obs_name = c.get('observer', {}).get('full_name', 'Desconocido')
-            teach_name = c.get('teacher', {}).get('full_name', 'Desconocido')
+            obs_id = c.get('observer_id')
+            obs_name = profile_names_map.get(obs_id) if obs_id in profile_names_map else 'Desconocido'
+            
+            teach_id = c.get('teacher_id')
+            teach_name = profile_names_map.get(teach_id) if teach_id in profile_names_map else 'Docente N/A'
             
             # Populate Matriz
             matriz.append({
                 "observer_name": obs_name,
                 "teacher_name": teach_name,
+                "teacher_id": c.get('teacher_id'),
                 "status": c['status'],
                 "date": c['created_at']
             })

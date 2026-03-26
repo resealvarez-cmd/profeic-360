@@ -1,0 +1,491 @@
+[
+  {
+    "asignatura": "Lenguaje y Comunicación - Lectura",
+    "niveles": [
+      {
+        "nivel": "4° Básico",
+        "ejes_habilidades": [
+          {
+            "habilidad": "Localizar",
+            "descripcion": "Tareas de lectura donde el lector recupera información explícita en el texto.",
+            "porcentaje": 30
+          },
+          {
+            "habilidad": "Interpretar y relacionar",
+            "descripcion": "Tareas donde el lector integra y relaciona elementos del texto para construir significados no explícitos.",
+            "porcentaje": 65
+          },
+          {
+            "habilidad": "Reflexionar",
+            "descripcion": "Tareas donde el lector relaciona información del texto con elementos externos (conocimientos previos, experiencias, valores, actitudes).",
+            "porcentaje": 5
+          }
+        ],
+        "ejes_tematicos": [],
+        "notas": "Las pruebas contienen igual cantidad de textos literarios y no literarios."
+      },
+      {
+        "nivel": "6° Básico",
+        "ejes_habilidades": [
+          {
+            "habilidad": "Localizar",
+            "descripcion": "Tareas de lectura para operar con elementos explícitos de los textos: identificar, discriminar y extraer información explícita.",
+            "porcentaje": 28
+          },
+          {
+            "habilidad": "Interpretar y relacionar",
+            "descripcion": "Tareas de lectura relativas a construir significados implícitos estableciendo conexiones entre elementos explícitos: inferir información, interpretar lenguaje figurado, reconocer relaciones causales.",
+            "porcentaje": 54
+          },
+          {
+            "habilidad": "Reflexionar",
+            "descripcion": "Tareas de lectura relativas a confrontar distintos aspectos del texto con conocimientos previos, experiencia personal y evaluaciones críticas.",
+            "porcentaje": 18
+          }
+        ],
+        "ejes_tematicos": []
+      },
+      {
+        "nivel": "8° Básico",
+        "ejes_habilidades": [
+          {
+            "habilidad": "Localizar",
+            "descripcion": "Tareas de lectura donde el lector recupera información explícita en el texto.",
+            "porcentaje": 10
+          },
+          {
+            "habilidad": "Interpretar y relacionar",
+            "descripcion": "Tareas donde el lector integra y relaciona elementos del texto para construir significados no explícitos.",
+            "porcentaje": 63
+          },
+          {
+            "habilidad": "Reflexionar",
+            "descripcion": "Tareas donde el lector relaciona información del texto con elementos externos.",
+            "porcentaje": 27
+          }
+        ],
+        "ejes_tematicos": []
+      },
+      {
+        "nivel": "II Medio",
+        "ejes_habilidades": [
+          {
+            "habilidad": "Localizar",
+            "descripcion": "Tareas de lectura donde el lector recupera información explícita en el texto.",
+            "porcentaje": 8
+          },
+          {
+            "habilidad": "Interpretar y relacionar",
+            "descripcion": "Tareas donde el lector integra y relaciona elementos del texto para construir significados no explícitos.",
+            "porcentaje": 76
+          },
+          {
+            "habilidad": "Reflexionar",
+            "descripcion": "Tareas donde el lector relaciona información del texto con elementos externos.",
+            "porcentaje": 16
+          }
+        ],
+        "ejes_tematicos": []
+      }
+    ]
+  },
+  {
+    "asignatura": "Matemática",
+    "niveles": [
+      {
+        "nivel": "4° Básico",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Conocimiento factual de conceptos, propiedades y procedimientos matemáticos: recordar definiciones, fórmulas, teoremas, métodos de cálculo; reconocer propiedades; localizar datos; clasificar elementos según propiedades.",
+            "porcentaje": 35
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Selección de estrategias adecuadas para resolver problemas y aplicación de operaciones y procedimientos. Generación de representaciones equivalentes para comunicar cantidades y relaciones.",
+            "porcentaje": 48
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Razonamiento intuitivo e inductivo para descubrir patrones y regularidades, realizar generalizaciones y buscar estrategias.",
+            "porcentaje": 17
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Números y operaciones",
+            "descripcion": "Sistema posicional, algoritmos de adición, sustracción, multiplicación y división de números naturales, fracciones, decimales y porcentajes.",
+            "porcentaje": 50
+          },
+          {
+            "eje": "Patrones y álgebra",
+            "descripcion": "Relaciones entre números, formas y objetos; ecuaciones; reglas de patrones.",
+            "porcentaje": 8
+          },
+          {
+            "eje": "Geometría",
+            "descripcion": "Reconocimiento y comparación de figuras de dos y tres dimensiones; reflexión, traslación y rotación.",
+            "porcentaje": 16
+          },
+          {
+            "eje": "Medición",
+            "descripcion": "Medición del tiempo, ancho, largo, alto, peso, perímetro, superficie, volumen, ángulos.",
+            "porcentaje": 15
+          },
+          {
+            "eje": "Datos y probabilidades",
+            "descripcion": "Tablas, gráficos, media aritmética, descripción de posibilidad de ocurrencia de eventos aleatorios.",
+            "porcentaje": 11
+          }
+        ]
+      },
+      {
+        "nivel": "6° Básico",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Conocimiento factual de conceptos, propiedades y procedimientos matemáticos.",
+            "porcentaje": 35
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Selección de estrategias adecuadas para resolver problemas y aplicación de operaciones y procedimientos.",
+            "porcentaje": 48
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Razonamiento intuitivo e inductivo para descubrir patrones y regularidades.",
+            "porcentaje": 17
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Números y operaciones",
+            "descripcion": "Sistema posicional, algoritmos de adición, sustracción, multiplicación y división de números naturales; propiedades de números racionales.",
+            "porcentaje": 47
+          },
+          {
+            "eje": "Patrones y álgebra",
+            "descripcion": "Relaciones entre números, formas, objetos y conceptos; cambio de cantidades; ecuaciones e inecuaciones.",
+            "porcentaje": 11
+          },
+          {
+            "eje": "Geometría",
+            "descripcion": "Reconocimiento, visualización y comparación de figuras de dos y tres dimensiones; reflexión, traslación y rotación.",
+            "porcentaje": 11
+          },
+          {
+            "eje": "Medición",
+            "descripcion": "Medición del tiempo; cuantificación de objetos (ancho, largo, alto, peso, perímetro, superficie, volumen, ángulos).",
+            "porcentaje": 19
+          },
+          {
+            "eje": "Datos y probabilidades",
+            "descripcion": "Registro, clasificación y lectura de información en tablas y gráficos; cálculo e interpretación de la media aritmética.",
+            "porcentaje": 11
+          }
+        ]
+      },
+      {
+        "nivel": "8° Básico",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Conocimiento factual de conceptos, propiedades y procedimientos matemáticos.",
+            "porcentaje": 35
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Selección de estrategias adecuadas para resolver problemas y aplicación de operaciones y procedimientos.",
+            "porcentaje": 48
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Razonamiento intuitivo e inductivo para descubrir patrones y regularidades.",
+            "porcentaje": 17
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Números",
+            "descripcion": "Operaciones con números enteros y racionales; raíces; potencias.",
+            "porcentaje": 30
+          },
+          {
+            "eje": "Álgebra y funciones",
+            "descripcion": "Lenguaje algebraico, expresiones algebraicas, ecuaciones, regularidades, funciones.",
+            "porcentaje": 25
+          },
+          {
+            "eje": "Geometría",
+            "descripcion": "Teorema de Pitágoras, área, volumen, transformación isométricas.",
+            "porcentaje": 20
+          },
+          {
+            "eje": "Probabilidad y estadística",
+            "descripcion": "Datos estadísticos, interpretación de gráficos, probabilidad.",
+            "porcentaje": 25
+          }
+        ]
+      },
+      {
+        "nivel": "II Medio",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Conocimiento factual de conceptos, propiedades y procedimientos matemáticos.",
+            "porcentaje": 34
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Selección de estrategias adecuadas para resolver problemas y aplicación de operaciones y procedimientos.",
+            "porcentaje": 62
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Razonamiento intuitivo e inductivo para descubrir patrones y regularidades.",
+            "porcentaje": 3
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Números",
+            "descripcion": "Operaciones con números, potencias, cambio porcentual constante, aproximación y estimación.",
+            "porcentaje": 29
+          },
+          {
+            "eje": "Álgebra y funciones",
+            "descripcion": "Lenguaje algebraico, expresiones algebraicas, ecuaciones, regularidades, funciones.",
+            "porcentaje": 26
+          },
+          {
+            "eje": "Geometría",
+            "descripcion": "Imaginación espacial, coordenadas y vectores, homotecia, cálculo de perímetros, áreas y volúmenes, trigonometría.",
+            "porcentaje": 26
+          },
+          {
+            "eje": "Probabilidad y estadística",
+            "descripcion": "Datos estadísticos, interpretación de gráficos, probabilidad de ocurrencia, medidas de dispersión.",
+            "porcentaje": 18
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "asignatura": "Ciencias Naturales",
+    "niveles": [
+      {
+        "nivel": "4° Básico",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "",
+            "porcentaje": 35
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "",
+            "porcentaje": 48
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "",
+            "porcentaje": 17
+          }
+        ],
+        "ejes_tematicos": []
+      },
+      {
+        "nivel": "6° Básico",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Comprensión de hechos, relaciones, conceptos y procesos propios de las Ciencias Naturales.",
+            "porcentaje": 51
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Aplicación del conocimiento científico en situaciones sencillas: comparar, contrastar, clasificar e interpretar información.",
+            "porcentaje": 30
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Uso del razonamiento científico para resolver problemas, extraer conclusiones, tomar decisiones fundamentadas.",
+            "porcentaje": 19
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Ciencias de la Vida",
+            "descripcion": "Organización celular; estructura y función de sistemas circulatorio, digestivo y respiratorio; mecanismos de transporte; microorganismos; pubertad; ecosistema.",
+            "porcentaje": 43
+          },
+          {
+            "eje": "Ciencias Físicas y Químicas",
+            "descripcion": "Manifestaciones de energía, transformaciones y transferencia de calor; energía eléctrica; circuito eléctrico; materia según modelo particulado.",
+            "porcentaje": 36
+          },
+          {
+            "eje": "Ciencias de la Tierra y el Universo",
+            "descripcion": "Características de capas de la Tierra, océanos y lagos; distribución de agua; formación del suelo; erosión.",
+            "porcentaje": 21
+          }
+        ]
+      },
+      {
+        "nivel": "8° Básico",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Comprensión de hechos, relaciones, conceptos y procesos propios de las Ciencias Naturales.",
+            "porcentaje": 40
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Aplicación del conocimiento científico en situaciones sencillas.",
+            "porcentaje": 35
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Uso del razonamiento científico para resolver problemas.",
+            "porcentaje": 25
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Biología",
+            "descripcion": "Célula; sistemas del cuerpo humano; nutrición; salud.",
+            "porcentaje": 35
+          },
+          {
+            "eje": "Química",
+            "descripcion": "Tabla periódica; átomo; reacciones químicas; compuestos.",
+            "porcentaje": 30
+          },
+          {
+            "eje": "Física",
+            "descripcion": "Fuerzas eléctricas; circuitos eléctricos; calor; energía.",
+            "porcentaje": 35
+          }
+        ]
+      },
+      {
+        "nivel": "II Medio",
+        "dominios_cognitivos": [
+          {
+            "dominio": "Conocimiento",
+            "descripcion": "Comprensión de hechos, relaciones, conceptos y procesos propios de las Ciencias Naturales.",
+            "porcentaje": 29
+          },
+          {
+            "dominio": "Aplicación",
+            "descripcion": "Aplicación del conocimiento científico en situaciones sencillas.",
+            "porcentaje": 41
+          },
+          {
+            "dominio": "Razonamiento",
+            "descripcion": "Uso del razonamiento científico para resolver problemas.",
+            "porcentaje": 30
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Biología",
+            "descripcion": "Diversidad biológica y evolución; evidencias de evolución y teoría de selección natural; ecosistemas; ciclos biogeoquímicos; sistema nervioso; herencia y principios de Mendel.",
+            "porcentaje": 42
+          },
+          {
+            "eje": "Química",
+            "descripcion": "Reacciones químicas cotidianas; factores que influyen en reacciones; conservación de masa; compuestos binarios y ternarios; nomenclatura; soluciones.",
+            "porcentaje": 28
+          },
+          {
+            "eje": "Física",
+            "descripcion": "Ondas y modelo ondulatorio; sonido y luz; modelo corpuscular y ondulatorio; aplicaciones tecnológicas; sismos; fenómenos astronómicos; movimiento; leyes de Newton.",
+            "porcentaje": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "niveles": [
+      {
+        "nivel": "8° Básico",
+        "ejes_habilidades": [
+          {
+            "habilidad": "Pensamiento temporal y espacial",
+            "descripcion": "Habilidades para establecer y representar secuencias cronológicas entre períodos históricos. Comparar procesos históricos identificando relaciones de causalidad, continuidades y cambios. Representar mediante herramientas geográficas la ubicación y características de los lugares.",
+            "porcentaje": 21
+          },
+          {
+            "habilidad": "Análisis y trabajo con fuentes de información",
+            "descripcion": "Uso de diversas fuentes de información para comprender fenómenos sociales. Capacidad de obtención y análisis de información. Establecer comparaciones.",
+            "porcentaje": 36
+          },
+          {
+            "habilidad": "Pensamiento crítico",
+            "descripcion": "Comprensión de diferentes puntos de vista en el análisis de hechos y procesos del mundo social. Capacidad de elaborar juicios propios. Analizar y reconocer la complejidad de los fenómenos humanos.",
+            "porcentaje": 43
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Historia",
+            "descripcion": "Desarrollo histórico de la humanidad: desde el proceso de hominización hasta los inicios de la Modernidad. Evolución de la especie humana. Transformaciones del Neolítico. Nacimiento de las primeras civilizaciones. Antigüedad clásica. Periodo medieval. Época Moderna. Proceso de expansión europea. Estructuración del orden colonial en Chile. Pensamiento ilustrado, Revolución francesa e independencias americanas.",
+            "porcentaje": 51
+          },
+          {
+            "eje": "Geografía",
+            "descripcion": "Economía mercantilista del siglo XVI. La región como perspectiva de análisis social y territorial (América y Chile). Uso de herramientas geográficas para ubicar e identificar distribuciones espaciales y patrones.",
+            "porcentaje": 29
+          },
+          {
+            "eje": "Formación Ciudadana",
+            "descripcion": "Participación activa y responsable en la sociedad democrática. Legado político del mundo antiguo y valoración de la democracia. Nueva concepción de los derechos individuales como fundamento de la política moderna. Derechos Humanos en el contexto de procesos históricos.",
+            "porcentaje": 20
+          }
+        ]
+      },
+      {
+        "nivel": "II Medio",
+        "ejes_habilidades": [
+          {
+            "habilidad": "Pensamiento temporal y espacial",
+            "descripcion": "Habilidades para establecer y representar secuencias cronológicas. Comparar procesos históricos.",
+            "porcentaje": 20
+          },
+          {
+            "habilidad": "Análisis y trabajo con fuentes de información",
+            "descripcion": "Uso de diversas fuentes de información para comprender fenómenos sociales.",
+            "porcentaje": 35
+          },
+          {
+            "habilidad": "Pensamiento crítico",
+            "descripcion": "Comprensión de diferentes puntos de vista. Capacidad de elaborar juicios propios.",
+            "porcentaje": 45
+          }
+        ],
+        "ejes_tematicos": [
+          {
+            "eje": "Historia de Chile",
+            "descripcion": "Historia de Chile: período colonial, independencia, siglo XIX, siglo XX, democracia y dictaduras.",
+            "porcentaje": 50
+          },
+          {
+            "eje": "Geografía de Chile",
+            "descripcion": "Geografía de Chile: regiones, relieve, clima, recursos naturales, población.",
+            "porcentaje": 25
+          },
+          {
+            "eje": "Formación Ciudadana",
+            "descripcion": "Democracia, derechos humanos, participación ciudadana, institucionalidad política.",
+            "porcentaje": 25
+          }
+        ]
+      }
+    ]
+  }
+]

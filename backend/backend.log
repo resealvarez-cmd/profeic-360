@@ -1,0 +1,1171 @@
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Will watch for changes in these directories: ['/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [96652] using StatReload
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [96732]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:61979 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61979 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62201 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62201 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [96732]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [97279]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:62271 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62336 - "OPTIONS /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62336 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [97279]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [97605]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/simce_generator.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [97605]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [97650]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [97650]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [97668]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:62530 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62530 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62539 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [97668]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [98485]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:62622 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for connections to close. (CTRL+C to force quit)
+INFO:     127.0.0.1:62622 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [98485]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [98542]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:62679 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62679 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "OPTIONS /profile/context HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62708 - "OPTIONS /profile/context HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "GET /profile/context HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62708 - "GET /profile/context HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+👮 verify_super_admin: user=re.se.alvarez@gmail.com
+📈 Admin Stats: Start (Centralized)...
+❌ Error en stats: {'message': 'JSON could not be generated', 'code': 401, 'hint': 'Refer to full message for details', 'details': 'b\'{"message":"Invalid API key","hint":"Double check your Supabase `anon` or `service_role` API key."}\''}
+INFO:     127.0.0.1:62708 - "GET /admin/stats HTTP/1.1" 500 Internal Server Error
+👮 verify_super_admin: user=re.se.alvarez@gmail.com
+📈 Admin Stats: Start (Centralized)...
+❌ Error en stats: {'message': 'JSON could not be generated', 'code': 401, 'hint': 'Refer to full message for details', 'details': 'b\'{"message":"Invalid API key","hint":"Double check your Supabase `anon` or `service_role` API key."}\''}
+INFO:     127.0.0.1:62707 - "GET /admin/stats HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:62772 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62772 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62772 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [98542]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [98857]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [98857]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [98875]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [98875]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [99165]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:62828 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62837 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62888 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [99165]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [99454]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [99454]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [99487]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [99487]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [99508]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [99508]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [99757]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [99757]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [99768]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/mentor.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [99768]
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [464]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:62944 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62944 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 422 Unprocessable Content
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [464]
+Python(877) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [877]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:63018 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63018 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63028 - "OPTIONS /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63028 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63190 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63193 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [877]
+Python(1701) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=5, pipe_handle=7)
+                                                  ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/spawn.py", line 131, in _main
+    prepare(preparation_data)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/spawn.py", line 297, in _fixup_main_from_path
+    main_content = runpy.run_path(main_path,
+                                  run_name="__mp_main__")
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/main.py", line 23, in <module>
+    from routers import (
+    ...<26 lines>...
+    )
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/mejora_continua.py", line 404
+    ```
+    ^
+SyntaxError: invalid syntax
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+Python(1712) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [1712]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:63246 - "OPTIONS /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63247 - "OPTIONS /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63246 - "POST /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63248 - "OPTIONS /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63247 - "POST /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63249 - "OPTIONS /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63246 - "POST /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63248 - "POST /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63248 - "OPTIONS /dashboard/insights HTTP/1.1" 200 OK
+❌ [INSIGHTS] Error: {'message': 'JSON could not be generated', 'code': 401, 'hint': 'Refer to full message for details', 'details': 'b\'{"message":"Invalid API key","hint":"Double check your Supabase `anon` or `service_role` API key."}\''}
+INFO:     127.0.0.1:63248 - "GET /dashboard/insights HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63255 - "OPTIONS /dashboard/insights HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63258 - "OPTIONS /curriculum/options HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63259 - "OPTIONS /curriculum/options HTTP/1.1" 200 OK
+❌ [INSIGHTS] Error: {'message': 'JSON could not be generated', 'code': 401, 'hint': 'Refer to full message for details', 'details': 'b\'{"message":"Invalid API key","hint":"Double check your Supabase `anon` or `service_role` API key."}\''}
+INFO:     127.0.0.1:63248 - "GET /dashboard/insights HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63255 - "POST /curriculum/options HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63258 - "POST /curriculum/options HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63287 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63287 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63287 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63287 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63396 - "OPTIONS /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63396 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63412 - "POST /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63413 - "POST /acompanamiento/executive-metrics HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1712]
+Python(2522) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [2522]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:63519 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63519 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63532 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2522]
+Python(2981) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [2981]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:63617 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63843 - "OPTIONS /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63843 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64209 - "OPTIONS /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64209 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64276 - "OPTIONS /api/v1/mejora-continua/copiloto HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64276 - "POST /api/v1/mejora-continua/copiloto HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2981]
+Python(6997) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [6997]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:50368 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50368 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50467 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50467 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [6997]
+Python(8114) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [8114]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8114]
+Python(8131) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [8131]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8131]
+Python(8158) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [8158]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8158]
+Python(8175) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [8175]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8175]
+Python(8184) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [8184]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:50660 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 441, in generar_simce
+    estimulo_oficial = _get_random_stimulus(req.asignatura, req.nivel)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 167, in _get_random_stimulus
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 404: No se encontraron estímulos en la base de datos para la asignatura 'Lenguaje y Comunicación - Lectura' y nivel 'II Medio'
+
+INFO:     127.0.0.1:50660 - "POST /api/v1/simce/generate HTTP/1.1" 500 Internal Server Error
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8184]
+Python(8659) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [8659]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 451, in generar_simce
+    estimulo_oficial = _get_random_stimulus(req.asignatura, req.nivel)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 177, in _get_random_stimulus
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 404: No se encontraron estímulos para 'Lenguaje y Comunicación - Lectura' (lengua y literatura) y nivel 'II Medio' (2° medio). Revisa el JSON oficial.
+
+INFO:     127.0.0.1:50764 - "POST /api/v1/simce/generate HTTP/1.1" 500 Internal Server Error
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 451, in generar_simce
+    estimulo_oficial = _get_random_stimulus(req.asignatura, req.nivel)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 177, in _get_random_stimulus
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 404: No se encontraron estímulos para 'Lenguaje y Comunicación - Lectura' (lengua y literatura) y nivel 'II Medio' (2° medio). Revisa el JSON oficial.
+
+INFO:     127.0.0.1:50775 - "POST /api/v1/simce/generate HTTP/1.1" 500 Internal Server Error
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8659]
+Python(9445) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [9445]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 468, in generar_simce
+    ensayo_final = await asyncio.gather(*tareas)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/simce_router.py", line 319, in generar_un_bloque
+    raise ValueError(f"Abordando: No se encontraron indicadores curriculares para {asignatura} en {nivel}. "
+                     f"No podemos generar preguntas disciplinarias de calidad sin esta información.")
+ValueError: Abordando: No se encontraron indicadores curriculares para Lenguaje y Comunicación - Lectura en II Medio. No podemos generar preguntas disciplinarias de calidad sin esta información.
+
+INFO:     127.0.0.1:50863 - "POST /api/v1/simce/generate HTTP/1.1" 500 Internal Server Error
+WARNING:  StatReload detected changes in 'simce_parser.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9445]
+Python(10232) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [10232]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10232]
+Python(10253) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [10253]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:50975 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50975 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51023 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51023 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app/services/prompts.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10253]
+Python(12253) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [12253]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/api/v1/router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12253]
+Python(12277) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [12277]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12277]
+Python(13409) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [13409]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:51605 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51605 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51660 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51660 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 422 Unprocessable Content
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13409]
+Python(14056) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [14056]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:51703 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:51703 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:51751 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51795 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 500 Internal Server Error
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [14056]
+Python(14414) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+Python(14425) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [14425]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:51959 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51959 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52063 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52063 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [14425]
+Python(16041) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [16041]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:52490 - "POST /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/uvicorn/protocols/http/h11_impl.py", line 410, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/fastapi/applications.py", line 1160, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/middleware/cors.py", line 87, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 130, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 116, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 670, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 324, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/mejora_continua.py", line 626, in exportar_gantt_pdf
+    main_table.setStyle(TableStyle(row_styles))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/reportlab/platypus/tables.py", line 1145, in setStyle
+    c, (sc,sr), (ec,er) = cmd[0:3]
+       ^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [16041]
+Python(17659) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [17659]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:52596 - "OPTIONS /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 200 OK
+❌ Error crítico en PDF Pro Export: not enough values to unpack (expected 2, got 1)
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/mejora_continua.py", line 627, in exportar_gantt_pdf
+    main_table.setStyle(TableStyle(row_styles))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/reportlab/platypus/tables.py", line 1145, in setStyle
+    c, (sc,sr), (ec,er) = cmd[0:3]
+       ^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+
+INFO:     127.0.0.1:52596 - "POST /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 500 Internal Server Error
+❌ Error crítico en PDF Pro Export: not enough values to unpack (expected 2, got 1)
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/mejora_continua.py", line 627, in exportar_gantt_pdf
+    main_table.setStyle(TableStyle(row_styles))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/reportlab/platypus/tables.py", line 1145, in setStyle
+    c, (sc,sr), (ec,er) = cmd[0:3]
+       ^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+
+INFO:     127.0.0.1:52715 - "POST /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 500 Internal Server Error
+❌ Error crítico en PDF Pro Export: not enough values to unpack (expected 2, got 1)
+Traceback (most recent call last):
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/mejora_continua.py", line 627, in exportar_gantt_pdf
+    main_table.setStyle(TableStyle(row_styles))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/venv/lib/python3.14/site-packages/reportlab/platypus/tables.py", line 1145, in setStyle
+    c, (sc,sr), (ec,er) = cmd[0:3]
+       ^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+
+INFO:     127.0.0.1:52717 - "POST /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 500 Internal Server Error
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [17659]
+Python(19034) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [19034]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:52847 - "OPTIONS /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52847 - "POST /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [19034]
+Python(21916) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [21916]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [21916]
+Python(22043) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [22043]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:53350 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53350 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/mejora_continua.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22043]
+Python(22536) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [22536]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:53467 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53467 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53574 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22536]
+Python(23477) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [23477]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:53714 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53714 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53734 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53734 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [23477]
+Python(24843) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [24843]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:53989 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+Auth DEBUG: Error validando token: The read operation timed out
+INFO:     127.0.0.1:53989 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54005 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54005 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54030 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'simce_router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [24843]
+Python(25885) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/routers/planificador.py:4: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+La librería 'pyzbar' no está instalada.
+INFO:     Started server process [25885]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔐 Usando Service Role Key para operaciones de comunidad (Bypass RLS)
+INFO:     127.0.0.1:54241 - "OPTIONS /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54241 - "POST /api/v1/mejora-continua/exportar-gantt-pdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54256 - "OPTIONS /api/v1/mejora-continua/copiloto HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54256 - "POST /api/v1/mejora-continua/copiloto HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54291 - "OPTIONS /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54291 - "POST /api/v1/mejora-continua/generar-informe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54299 - "OPTIONS /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54299 - "POST /api/v1/mejora-continua/descargar-word HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54434 - "OPTIONS /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54434 - "POST /api/v1/simce/generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54434 - "OPTIONS /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54434 - "POST /api/v1/simce/generate/download-cuadernillo HTTP/1.1" 200 OK

@@ -1,9 +1,11 @@
 import os
 import glob
+from pathlib import Path
 
 def generate_bible():
-    output_file = "/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/PROFEIC_LA_BIBLIA_EXTENDIDA.md"
-    project_root = "/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26"
+    PROJECT_ROOT = Path(__file__).resolve().parent
+    output_file = PROJECT_ROOT / "PROFEIC_LA_BIBLIA_EXTENDIDA.md"
+    project_root = PROJECT_ROOT
     
     with open(output_file, "w", encoding="utf-8") as out:
         out.write("# 📘 PROFEIC: LA BIBLIA DEL ECOSISTEMA (VERSIÓN EXTENDIDA)\n")

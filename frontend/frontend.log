@@ -1,0 +1,187 @@
+
+> profeic-frontend@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3000
+   - Environments: .env.local, .env
+   - Experiments (use at your own risk):
+     · cpus
+
+ ✓ Ready in 1511ms
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ○ Compiling / ...
+ ✓ Compiled / in 2.1s (688 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /login ...
+ ✓ Compiled /login in 936ms (1005 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 2.8s (2881 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 604ms (2846 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled /icon.svg in 481ms (1465 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /simce/escanear ...
+ ✓ Compiled /simce/escanear in 2s (2892 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /simce ...
+ ✓ Compiled /simce in 1541ms (2918 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 5.4s (2899 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 3.3s (2899 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 3.6s (2899 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /perfil ...
+ ✓ Compiled /perfil in 15.6s (2911 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 4.7s (2864 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 4.7s (2864 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 5.4s (2864 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling / ...
+ ✓ Compiled / in 1105ms (1472 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 10.8s (2864 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 41.5s (2864 modules)
+ ✓ Compiled in 19.4s (2864 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+ ⨯ unhandledRejection: Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+ ⨯ unhandledRejection: Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+ ⨯ unhandledRejection: Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+ ⨯ unhandledRejection: Error: ENOENT: no such file or directory, scandir '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+    at async Object.readdir (node:internal/fs/promises:958:18)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:39:29
+    at async Promise.all (index 0)
+    at async recursiveReadDir (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/lib/recursive-readdir.js:32:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:71:25
+    at async Promise.all (index 0)
+    at async BatchedFileReader.load (/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:67:25)
+    at async /Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/node_modules/next/dist/server/future/route-matcher-providers/dev/helpers/file-reader/batched-file-reader.js:41:26 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend/src/app'
+}
+ ⨯ Module not found: Error: Can't resolve 'next-flight-client-entry-loader' in '/Users/renealvarezpinones/Downloads/PROFEIC GITHUB 01-26/frontend'

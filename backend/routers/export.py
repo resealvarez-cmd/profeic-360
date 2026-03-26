@@ -204,12 +204,13 @@ def add_header_logo(doc, asignatura, nivel, titulo_extra=""):
     p = cell_logo.paragraphs[0]
     run = p.add_run()
     
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    logo_path = os.path.join(base_dir, 'assets', 'logo_profeic.svg.png')
+    from pathlib import Path
+    base_dir = Path(__file__).resolve().parent.parent
+    logo_path = base_dir / 'assets' / 'logo_profeic.svg.png'
     
-    if os.path.exists(logo_path):
+    if logo_path.exists():
         try:
-            run.add_picture(logo_path, width=Inches(1.0))
+            run.add_picture(str(logo_path), width=Inches(1.0))
         except Exception:
             run.add_text("ProfeIC")
     else:

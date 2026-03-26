@@ -170,7 +170,7 @@ async def chat_mentor(req: ChatRequest, authorization: Optional[str] = Header(No
                 {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
                 {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"},
             ]
-            model = genai.GenerativeModel('gemini-1.5-flash', safety_settings=safety_settings) 
+            model = genai.GenerativeModel('gemini-2.5-flash', safety_settings=safety_settings) 
             response = model.generate_content(full_prompt)
             
             if response.parts:

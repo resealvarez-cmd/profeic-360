@@ -8,7 +8,9 @@ from supabase import create_client, Client
 router = APIRouter()
 
 # --- CARGA DE VARIABLES ---
-dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv_path = BASE_DIR / '.env'
 load_dotenv(dotenv_path)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")

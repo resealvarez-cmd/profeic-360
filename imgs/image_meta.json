@@ -1,0 +1,860 @@
+[
+  {
+    "query": "Afiche educativo escolar chileno sobre reciclaje o medio ambiente, colors llamativos, texto en español",
+    "image_info": {
+      "url": "https://www.dsvalpo.cl/wp-content/uploads/2022/05/Semana-del-Reciclaje_17-20.05.2022_Mesa-de-trabajo-1-1024x1024.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 203973,
+      "width": 1024,
+      "height": 1024,
+      "total_pixels": 1048576,
+      "basic_score": 0.9362133675696657,
+      "file_name": "afiche-educativo-reciclaje-escolar-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is a perfect match for the search query and prompt. it is an authentic educational poster from a Chilean school (Deutsche Schule Valparaíso) regarding a recycling week. It features clear Spanish text, colorful illustrations of recycling bins, and the recycling symbol. There are no intrusive stock watermarks, only the relevant institutional logos.",
+      "file_name": "afiche-educativo-reciclaje-escolar-chile.jpg",
+      "caption": "An educational poster for 'Recycling Week' at the Deutsche Schule Valparaíso in Chile, showing families sorting waste into colored recycling bins with a large green recycling symbol and an eco-friendly lightbulb graphic.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Afiche educativo escolar chileno sobre reciclaje o medio ambiente, colors llamativos, texto en español",
+    "image_info": {
+      "url": "https://images.twinkl.co.uk/tw1n/image/private/t_630/image_repo/ff/ab/sa-df-1710894500-carteles-reduce-reutiliza-y-recicla_ver_1.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 131515,
+      "width": 630,
+      "height": 315,
+      "total_pixels": 198450,
+      "basic_score": 0.7509545153822563,
+      "file_name": "afiche-educativo-reciclaje-escolar-las-3r.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 70.0,
+      "overall_score": 88.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It provides a comprehensive educational poster in Spanish covering the '3 Rs' (Reduce, Reuse, Recycle) with clear, colorful illustrations suitable for a school environment. It includes the Twinkl logo and QR codes, which act as watermarks/branding, but they are standard for educational resources.",
+      "file_name": "afiche-educativo-reciclaje-escolar-las-3r.jpg",
+      "caption": "A set of three educational posters in Spanish illustrating the concepts of Reduce, Reuse, and Recycle, featuring colorful drawings of household items, energy-saving tips, and waste management for students.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Afiche educativo escolar chileno sobre reciclaje o medio ambiente, colors llamativos, texto en español",
+    "image_info": {
+      "url": "https://repositorioambiental.mma.gob.cl/wp-content/uploads/2019/09/157G3.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 66030,
+      "width": 794,
+      "height": 567,
+      "total_pixels": 450198,
+      "basic_score": 0.8378903099962742,
+      "file_name": "afiche-educativo-reciclaje-medio-ambiente-espanol.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 75.0,
+      "watermark_score": 100.0,
+      "overall_score": 85.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It is an educational poster in Spanish about environmental education and recycling, featuring bright colors and clear data points. While the resolution is adequate for web use, some of the smaller text is slightly soft.",
+      "file_name": "afiche-educativo-reciclaje-medio-ambiente-espanol.jpg",
+      "caption": "An educational infographic in Spanish titled 'Educación Ambiental' detailing the environmental benefits of recycling various materials like paper, glass, steel, and plastic to save resources and protect biodiversity.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Portada de cuento infantil chileno con ilustración colorida",
+    "image_info": {
+      "url": "https://editorialazafran.cl/wp-content/uploads/2024/12/Portada_Web-1.png",
+      "img_format": "PNG",
+      "mode": "RGB",
+      "file_size": 1022124,
+      "width": 1000,
+      "height": 1000,
+      "total_pixels": 1000000,
+      "basic_score": 0.9511076459932908,
+      "file_name": "portada-libro-infantil-chile-ilustrado.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 100.0,
+      "watermark_score": 100.0,
+      "overall_score": 100.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It is a high-quality, professional cover for a Chilean children's book titled 'CHILE de la A a la Z'. The illustration is vibrant, colorful, and features various iconic Chilean symbols like the Moai, local fauna, and traditional architecture.",
+      "file_name": "portada-libro-infantil-chile-ilustrado.jpg",
+      "caption": "The colorful cover of the Chilean children's book 'CHILE de la A a la Z' by Camila Herrera, featuring illustrations of a Moai, a penguin, a kingfisher, a fox, and other native Chilean elements by Pola Hoffmann.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Portada de cuento infantil chileno con ilustración colorida",
+    "image_info": {
+      "url": "https://editorialazafran.cl/wp-content/uploads/2024/08/Portada_Web-2.png",
+      "img_format": "PNG",
+      "mode": "RGB",
+      "file_size": 478734,
+      "width": 1000,
+      "height": 1000,
+      "total_pixels": 1000000,
+      "basic_score": 0.9460513610547792,
+      "file_name": "portada-libro-infantil-chileno-cuentos-de-mi-pueblo.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 98.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It is an authentic Chilean children's book cover ('Cuentos de mi pueblo II' by Ximena Odet, published by Azafrán Editorial). The illustration is colorful and culturally relevant, depicting rural Chilean life with characters in traditional attire, animals, and a classic 'asado' (roast). The image quality is excellent and free of watermarks.",
+      "file_name": "portada-libro-infantil-chileno-cuentos-de-mi-pueblo.jpg",
+      "caption": "The front cover of a Chilean children's book titled 'Cuentos de mi pueblo II' by Ximena Odet, featuring a hand-drawn illustration of a community gathering in a rural setting with traditional ponchos, dogs, a horse, and a roast over a fire.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Portada de cuento infantil chileno con ilustración colorida",
+    "image_info": {
+      "url": "https://covers.odilo.io/publicms/Historia_de_un_oso__/9789561229822.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 863917,
+      "width": 1400,
+      "height": 1173,
+      "total_pixels": 1642200,
+      "basic_score": 0.8652109456229513,
+      "file_name": "historia-de-un-oso-portada-libro-infantil-chileno.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 95.0,
+      "overall_score": 97.0,
+      "explanation": "The image is the official cover of 'Historia de un Oso' (Bear Story), a famous Chilean children's book based on the Oscar-winning short film. It perfectly matches the search query and prompt. The clarity is excellent, and the only 'watermark' is the official Oscar winner seal, which is part of the book's professional cover design.",
+      "file_name": "historia-de-un-oso-portada-libro-infantil-chileno.jpg",
+      "caption": "The colorful cover illustration of the Chilean children's book 'Historia de un Oso' by Antonia Herrera and Gabriel Osorio, depicting a family of three mechanical bears standing in a whimsical landscape with stylized trees and a sun.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Portada de cuento infantil chileno con ilustración colorida",
+    "image_info": {
+      "url": "https://cocorocoq.com/wp-content/uploads/2022/08/10-1.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 62471,
+      "width": 1000,
+      "height": 1000,
+      "total_pixels": 1000000,
+      "basic_score": 0.9232388042527404,
+      "file_name": "portada-libro-infantil-chileno-ayelen-karina-cocq.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 90.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It features the cover of 'Ayelén y los frutos mágicos' by the renowned Chilean illustrator Karina Cocq. The illustration is colorful, artistic, and specifically represents Chilean children's literature. The image quality is high with no watermarks.",
+      "file_name": "portada-libro-infantil-chileno-ayelen-karina-cocq.jpg",
+      "caption": "The front cover of the Chilean children's book 'Ayelén y los frutos mágicos', featuring a whimsical and colorful watercolor illustration by Karina Cocq showing a child sitting inside a white house shape surrounded by vibrant plants and magical elements.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Imagen de campaña contra la contaminación para niños en español",
+    "image_info": {
+      "url": "https://www.greenpeace.org/static/planet4-chile-stateless/2024/08/cd72dc39-chile.png",
+      "img_format": "PNG",
+      "mode": "RGBA",
+      "file_size": 854372,
+      "width": 1400,
+      "height": 700,
+      "total_pixels": 980000,
+      "basic_score": 0.9461717003414227,
+      "file_name": "campana-mision-recicla-greenpeace-chile-ninos.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 90.0,
+      "watermark_score": 85.0,
+      "overall_score": 92.0,
+      "explanation": "The image perfectly matches the search query and prompt. It is a promotional graphic for an environmental campaign ('Misión Recicla') specifically targeted at children in Chile. It features a cartoon character, mentions water/surfing, shows a pile of waste (pollution), and is entirely in Spanish. While it contains branding logos (Greenpeace, Zoom), these are integral to the campaign's context.",
+      "file_name": "campana-mision-recicla-greenpeace-chile-ninos.jpg",
+      "caption": "A promotional poster for a Greenpeace 'Recycle Mission' eco-event for children in Chile, featuring a cartoon eco-hero surfing on a wave next to a pile of trash, with text in Spanish.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Imagen de campaña contra la contaminación para niños en español",
+    "image_info": {
+      "url": "https://capes.cl/wp-content/uploads/2022/03/lanzamiento_mjaime.jpeg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 331343,
+      "width": 1066,
+      "height": 1280,
+      "total_pixels": 1364480,
+      "basic_score": 0.8940763989146213,
+      "file_name": "campana-educativa-contaminacion-plastico-oceano-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 80.0,
+      "overall_score": 88.0,
+      "explanation": "The image is an excellent match for the search query and prompt. It is a Spanish-language educational campaign flyer about reducing plastic pollution in the ocean, specifically tailored for a Chilean audience as indicated by the institutional logos (UdeC, SEREMI) and regional mentions (Bio-Bio). The use of colorful cartoon sea animals makes it very appropriate for children. While it contains institutional logos and specific event details, it perfectly exemplifies the requested campaign material.",
+      "file_name": "campana-educativa-contaminacion-plastico-oceano-chile.jpg",
+      "caption": "An educational campaign poster in Spanish titled 'Programa Educativo Reduciendo la Contaminación por Plástico en el Océano,' featuring colorful cartoon sea creatures like an orca, clownfish, and seahorse. The poster invites viewers to a book launch in Chile and includes logos of various Chilean environmental and educational institutions.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Imagen de campaña contra la contaminación para niños en español",
+    "image_info": {
+      "url": "https://www.eha.cl/upload/blog/posts/23707-post-1742589982.jpeg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 105682,
+      "width": 800,
+      "height": 864,
+      "total_pixels": 691200,
+      "basic_score": 0.8961787504269002,
+      "file_name": "campana-educativa-chile-separemos-las-aguas-suralis.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 40.0,
+      "overall_score": 85.0,
+      "explanation": "The image is a perfect match for the search query and prompt. it is an actual Chilean water conservation campaign ('Separemos las Aguas' by Suralis) designed for children using puppets. It is in Spanish and focuses on water management. The only drawback for general use is the prominent corporate branding and logos, which act as watermarks for the specific company.",
+      "file_name": "campana-educativa-chile-separemos-las-aguas-suralis.jpg",
+      "caption": "A promotional image for a Chilean environmental campaign titled 'Separemos las Aguas' featuring three puppets made from recycled materials: a brown character holding a hose, a cardboard robot, and a doll made from plastic bottles and caps. The text is in Spanish and aimed at educating children about water use.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Imagen de campaña contra la contaminación para niños en español",
+    "image_info": {
+      "url": "https://www.educarchile.cl/sites/default/files/styles/style_image_slider_multimedia/public/2023-03/dia-mundia-agua_0.jpg?itok=KJXmiKQw",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 30259,
+      "width": 700,
+      "height": 490,
+      "total_pixels": 343000,
+      "basic_score": 0.7989523371626104,
+      "file_name": "dia-mundial-del-agua-campana-educativa.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 75.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 85.0,
+      "explanation": "The image is highly relevant as it is a Spanish-language campaign graphic for World Water Day ('Día Mundial del Agua'). While it doesn't explicitly show pollution or children, its clean and illustrative style is very suitable for educational campaigns for children. It is not specific to Chile, but the general message is applicable.",
+      "file_name": "dia-mundial-del-agua-campana-educativa.jpg",
+      "caption": "A professional graphic design for World Water Day featuring a large water droplet containing a textured map of the Earth with green forests and blue oceans, set against a light blue background with the text 'DÍA MUNDIAL DEL AGUA'.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Imagen de campaña contra la contaminación para niños en español",
+    "image_info": {
+      "url": "https://www.eha.cl/upload/blog/portada/normal/-campana-separemos-las-aguas-con-titeres-ensenan-a-ninos-sobre-la-importancia-de-la-potabilizacion-y-saneamiento-del-agua-03ef3767b8dd3d72cabe844040053e06.webp",
+      "img_format": "WEBP",
+      "mode": "RGB",
+      "file_size": 47448,
+      "width": 800,
+      "height": 600,
+      "total_pixels": 480000,
+      "basic_score": 0.8556155471365697,
+      "file_name": "campana-educativa-agua-ninos-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 60.0,
+      "watermark_score": 100.0,
+      "overall_score": 78.0,
+      "explanation": "The image perfectly matches the search query, showing a water-themed educational campaign for children with a mascot. The setting and clothing are consistent with a Chilean educational context. However, the image quality is relatively low, with noticeable grain and soft focus.",
+      "file_name": "campana-educativa-agua-ninos-chile.jpg",
+      "caption": "A group of children and adults participating in a water awareness campaign in an auditorium, featuring a large blue water drop mascot and small plush water drops.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Infografía sobre animales de Chile para niños, fauna nativa ilustrada",
+    "image_info": {
+      "url": "https://i.pinimg.com/736x/ba/82/8a/ba828a3e3fac7a7ca3d406e88f9ac432.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 107840,
+      "width": 612,
+      "height": 626,
+      "total_pixels": 383112,
+      "basic_score": 0.8239616002723882,
+      "file_name": "infografia-fauna-chilena-ilustrada-ninos.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 90.0,
+      "overall_score": 95.0,
+      "explanation": "The image is a perfect match for the search query. it provides a colorful and educational infographic of Chilean fauna specifically designed for children, featuring multiple native species with their names in Spanish and a stylized map of Chile. There is a small, non-intrusive artist credit on the right edge.",
+      "file_name": "infografia-fauna-chilena-ilustrada-ninos.jpg",
+      "caption": "A colorful infographic for children featuring illustrated native animals of Chile such as the Condor, Pudú, Llama, and Fox, complete with names and a map of the country.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Infografía sobre animales de Chile para niños, fauna nativa ilustrada",
+    "image_info": {
+      "url": "https://i.pinimg.com/originals/87/d3/7c/87d37ce4311ff3d0e936b717cbbf742c.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 126064,
+      "width": 884,
+      "height": 1225,
+      "total_pixels": 1082900,
+      "basic_score": 0.9091409019358496,
+      "file_name": "infografia-fauna-chilena-nativa-peligro.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 80.0,
+      "watermark_score": 90.0,
+      "overall_score": 92.0,
+      "explanation": "The image is an excellent match for the search query and prompt. It is a professional infographic titled 'Chilenos en Peligro' (Chileans in Danger), featuring 25 illustrated native species from the Los Lagos region of Chile. The watercolor-style illustrations are high quality and suitable for educational purposes for children. While there are institutional logos at the bottom, they are part of the original educational poster and not intrusive stock watermarks. The resolution is good, though the fine scientific names are slightly difficult to read at this size.",
+      "file_name": "infografia-fauna-chilena-nativa-peligro.jpg",
+      "caption": "An educational infographic poster titled 'Chilenos en Peligro' featuring 25 illustrated native species of Chilean fauna and flora from the Los Lagos region, including the puma, huemul, and various birds.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Infografía sobre animales de Chile para niños, fauna nativa ilustrada",
+    "image_info": {
+      "url": "https://i.pinimg.com/736x/89/44/92/894492ec301126ef0685b7a5a376fbfb.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 78124,
+      "width": 600,
+      "height": 867,
+      "total_pixels": 520200,
+      "basic_score": 0.8537396977612377,
+      "file_name": "fauna-chilena-infografia-ninos-animales-nativos.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 90.0,
+      "watermark_score": 100.0,
+      "overall_score": 92.0,
+      "explanation": "The image perfectly matches the search query and prompt. It provides a clear, educational resource for children about Chilean fauna, featuring native animals like the Guanaco, Chinchilla, Vizcacha, Flamingo, Chilla Fox, and Vicuña. The layout is clean and the text is legible.",
+      "file_name": "fauna-chilena-infografia-ninos-animales-nativos.jpg",
+      "caption": "A set of six circular educational labels or badges featuring native Chilean animals: Guanaco, Chinchilla, Vizcacha, Flamingo, Chilla Fox, and Vicuña. Each circle includes the animal's name and educational text in Spanish for school presentations.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Infografía sobre animales de Chile para niños, fauna nativa ilustrada",
+    "image_info": {
+      "url": "https://i.pinimg.com/originals/19/81/d9/1981d98e8115ad966096081df951b812.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 111643,
+      "width": 804,
+      "height": 592,
+      "total_pixels": 475968,
+      "basic_score": 0.8518417413590654,
+      "file_name": "infografia-aves-emblematicas-fauna-chilena.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 80.0,
+      "overall_score": 90.0,
+      "explanation": "This image is a perfect match for the search query and prompt. It is a high-quality educational infographic detailing 10 emblematic birds of Chile with illustrations and descriptions. The text is legible, and the layout is engaging for children. It contains small source logos (El Mercurio) at the bottom, but they do not interfere with the content.",
+      "file_name": "infografia-aves-emblematicas-fauna-chilena.jpg",
+      "caption": "An educational infographic titled 'Las 10 aves emblemáticas de Chile' showcasing illustrated native birds such as the Chilean Flamingo, Humboldt Penguin, and Black Woodpecker with descriptive text in Spanish.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Infografía sobre animales de Chile para niños, fauna nativa ilustrada",
+    "image_info": {
+      "url": "https://colegiomontessori.cl/wp2/wp-content/uploads/2021/11/06-de-nov-Dia-de-la-fauna-Chilena-724x1024.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 141178,
+      "width": 724,
+      "height": 1024,
+      "total_pixels": 741376,
+      "basic_score": 0.8991424048532669,
+      "file_name": "infografia-dia-fauna-chilena-ninos-picaflor.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 75.0,
+      "watermark_score": 85.0,
+      "overall_score": 88.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It is an educational infographic specifically about Chilean fauna (the Juan Fernández Firecrown) designed for children. It includes simple illustrations and clear, educational text. While it contains a small institutional logo and a student attribution at the bottom, it remains highly useful for its intended purpose.",
+      "file_name": "infografia-dia-fauna-chilena-ninos-picaflor.jpg",
+      "caption": "An educational infographic titled 'Día de la Fauna Chilena' featuring illustrations of hummingbirds (Picaflor de Juan Fernández) and text explaining the importance of protecting native Chilean wildlife.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Cartel publicitario educativo chileno sobre salud o alimentación",
+    "image_info": {
+      "url": "https://m.media-amazon.com/images/I/81AQLlnbKhL.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 453231,
+      "width": 1707,
+      "height": 2560,
+      "total_pixels": 4369920,
+      "basic_score": 0.4964317613043268,
+      "file_name": "educational-healthy-eating-poster-english.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 65.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 75.0,
+      "explanation": "The image is a high-quality educational poster about healthy eating, which aligns with the general theme of the query. However, the text is in English rather than Spanish, and there are no specific cultural markers that identify it as Chilean, which reduces its relevance for the specific geographic request.",
+      "file_name": "educational-healthy-eating-poster-english.jpg",
+      "caption": "A colorful educational poster on a chalkboard background featuring cartoon vegetables with smiling faces and the text 'YOU ARE WHAT YOU EAT FROM YOUR HEAD TO YOUR FEET'.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Cartel publicitario educativo chileno sobre salud o alimentación",
+    "image_info": {
+      "url": "https://images.twinkl.co.uk/tw1n/image/private/t_630_eco/image_repo/b9/ad/sa-es-1737386361-cartel-de-salud-mental-para-ninos_ver_1.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 68475,
+      "width": 630,
+      "height": 315,
+      "total_pixels": 198450,
+      "basic_score": 0.740929407565809,
+      "file_name": "cartel_educativo_salud_mental_escolar.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 85.0,
+      "clarity_score": 60.0,
+      "watermark_score": 50.0,
+      "overall_score": 65.0,
+      "explanation": "The image is a relevant educational poster about mental health in Spanish, which aligns well with the search query for school health materials. However, the image resolution is low, resulting in pixelation, and it contains prominent branding/watermarks from 'Twinkl'. While not specifically Chilean in design, the language makes it applicable to that region.",
+      "file_name": "cartel_educativo_salud_mental_escolar.jpg",
+      "caption": "A Spanish-language educational poster titled '¿Qué es la salud mental?' (What is mental health?) featuring cartoon brain characters illustrating various aspects of mental well-being for children.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Esquema de sociedad colonial chilena o pirámide social",
+    "image_info": {
+      "url": "https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/E9DB/production/_98276895_10-241348.jpg.webp",
+      "img_format": "WEBP",
+      "mode": "RGB",
+      "file_size": 71042,
+      "width": 640,
+      "height": 898,
+      "total_pixels": 574720,
+      "basic_score": 0.8749190184588078,
+      "file_name": "pintura-castas-sociedad-colonial-hispanoamericana.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 100.0,
+      "overall_score": 92.0,
+      "explanation": "The image is a classic 'Pintura de Castas' (Caste Painting), which is the primary historical visual representation of the social hierarchy in Spanish colonial America. It perfectly illustrates the mixing of Spaniards (españoles), indigenous people (indígenas), and other groups. While it is a grid rather than a literal pyramid diagram, it is the most historically accurate 'scheme' of colonial society requested in the prompt.",
+      "file_name": "pintura-castas-sociedad-colonial-hispanoamericana.jpg",
+      "caption": "An 18th-century 'Pintura de Castas' depicting 16 different racial combinations and social classifications in the Spanish colonial empire, illustrating the hierarchy between Spaniards, indigenous peoples, and Africans.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Esquema de sociedad colonial chilena o pirámide social",
+    "image_info": {
+      "url": "https://storage.googleapis.com/portaleducativo-net-class-g3p6/biblioteca/contenidos/5BC-la-colonia-en-chile-3.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 42307,
+      "width": 540,
+      "height": 460,
+      "total_pixels": 248400,
+      "basic_score": 0.7623647117214285,
+      "file_name": "piramide-social-sociedad-colonial-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 70.0,
+      "watermark_score": 100.0,
+      "overall_score": 85.0,
+      "explanation": "The image perfectly matches the search query and prompt, providing a clear visual representation of the colonial social pyramid in Latin America/Chile. It includes the specific groups requested (Españoles, Criollos, Mestizos, Indígenas). While the resolution is somewhat low and slightly blurry, the content is highly educational and accurate to the requested theme.",
+      "file_name": "piramide-social-sociedad-colonial-chile.jpg",
+      "caption": "An educational illustration of the colonial social pyramid in Chile, depicting the hierarchy from Españoles at the top, followed by Criollos, Mestizos, and Indígenas y Mulatos at the base.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Esquema de sociedad colonial chilena o pirámide social",
+    "image_info": {
+      "url": "https://www.icarito.cl/wp-content/uploads/2009/12/601374.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 35744,
+      "width": 470,
+      "height": 603,
+      "total_pixels": 283410,
+      "basic_score": 0.7788212470662159,
+      "file_name": "vestuario-sociedad-colonial-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 75.0,
+      "clarity_score": 90.0,
+      "watermark_score": 100.0,
+      "overall_score": 80.0,
+      "explanation": "The image is highly relevant to the topic of colonial society in Chile, specifically showing various social types and their clothing (Soldier, Creole, Lady, Miner, and Peon). However, it does not depict a 'social pyramid' or a hierarchical scheme as requested in the prompt, and it lacks an explicit label for indigenous people, though the lower classes are represented.",
+      "file_name": "vestuario-sociedad-colonial-chile.jpg",
+      "caption": "An educational illustration titled 'Vestuario colonial' showcasing different social figures from the Chilean colonial era, including a Spanish soldier, a Creole man, a Creole lady, a miner, and a laborer (peón), detailing their typical attire.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Línea de tiempo con eventos históricos de Chile",
+    "image_info": {
+      "url": "https://website-assets.studocu.com/img/document_thumbnails/926d083bb34e06276d7fba74d8799807/thumb_1200_927.png",
+      "img_format": "PNG",
+      "mode": "RGB",
+      "file_size": 456139,
+      "width": 1200,
+      "height": 927,
+      "total_pixels": 1112400,
+      "basic_score": 0.9484505228283208,
+      "file_name": "linea-tiempo-independencia-chile-1808-1811.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 92.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It is a clear, well-structured educational timeline of the Independence of Chile, featuring key historical figures like Fernando VII and Napoleon Bonaparte, along with significant dates and descriptions. The text is legible and the layout is professional.",
+      "file_name": "linea-tiempo-independencia-chile-1808-1811.jpg",
+      "caption": "An educational timeline titled 'Independencia de Chile' depicting key historical events from 1808 to 1811, including the capture of King Fernando VII, the rise of Napoleon Bonaparte, and the formation of the First National Government Junta.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Línea de tiempo con eventos históricos de Chile",
+    "image_info": {
+      "url": "https://profe.social/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMmhVRHc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--80ac6d3ea649066f3a3fc28ebdaf8753512e46c1/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDVG9MWm05eWJXRjBTU0lJY0c1bkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFKWUFta0NoQU02QzJ4dllXUmxjbnNHT2dsd1lXZGxhUUE2REdOdmJuWmxjblE2Q1hkbFluQT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--ed2d5ae0495d2f3fade53825507ab6e1e1070441/Timeline_Cycle%20(2)_20220527_231448_0001.png",
+      "img_format": "WEBP",
+      "mode": "RGB",
+      "file_size": 22986,
+      "width": 600,
+      "height": 338,
+      "total_pixels": 202800,
+      "basic_score": 0.757063631704502,
+      "file_name": "linea-tiempo-independencia-chile-etapas.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 85.0,
+      "watermark_score": 100.0,
+      "overall_score": 92.0,
+      "explanation": "The image is a perfect match for the search query and prompt. It provides a clear, categorized timeline of the Chilean independence process (Patria Vieja, Reconquista, and Patria Nueva) with key dates, events, and historical figures. The layout is educational and easy to follow, and there are no watermarks.",
+      "file_name": "linea-tiempo-independencia-chile-etapas.jpg",
+      "caption": "Una infografía educativa que detalla la línea de tiempo de la independencia de Chile, dividida en las etapas de Patria Vieja (1810-1814), Reconquista (1814-1817) y Patria Nueva (1817-1823), incluyendo hitos clave y retratos de José Miguel Carrera, Casimiro Marcó del Pont y Bernardo O'Higgins.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Línea de tiempo con eventos históricos de Chile",
+    "image_info": {
+      "url": "https://imgv2-1-f.scribdassets.com/img/document/477468418/original/9a152d9f5e/1?v=1",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 97004,
+      "width": 768,
+      "height": 576,
+      "total_pixels": 442368,
+      "basic_score": 0.8406134194967836,
+      "file_name": "linea-de-tiempo-independencia-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 85.0,
+      "watermark_score": 100.0,
+      "overall_score": 90.0,
+      "explanation": "The image perfectly matches the search query and prompt. It provides a clear, chronological timeline of the Chilean Independence period, including key events from 1808 to 1823. The text is legible, and the layout is easy to follow, making it an excellent educational resource.",
+      "file_name": "linea-de-tiempo-independencia-chile.jpg",
+      "caption": "Una línea de tiempo educativa que detalla los eventos clave del periodo de Independencia de Chile, desde la invasión de Napoleón a España en 1808 hasta la abdicación de Bernardo O'Higgins en 1823.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Línea de tiempo con eventos históricos de Chile",
+    "image_info": {
+      "url": "https://imgv2-2-f.scribdassets.com/img/document/422037308/original/7702172ae1/1?v=1",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 133050,
+      "width": 768,
+      "height": 1024,
+      "total_pixels": 786432,
+      "basic_score": 0.9045378306805186,
+      "file_name": "linea-de-tiempo-independencia-de-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 60.0,
+      "watermark_score": 100.0,
+      "overall_score": 70.0,
+      "explanation": "The image is perfectly relevant to the search query, showing the key periods of Chilean Independence (Patria Vieja, Reconquista, and Patria Nueva) along with specific dates and events. However, the image resolution is low, resulting in pixelation, and the same infographic is redundantly duplicated vertically.",
+      "file_name": "linea-de-tiempo-independencia-de-chile.jpg",
+      "caption": "An educational infographic in Spanish displaying a timeline of the Chilean Independence process, featuring the three main stages: Patria Vieja (1810-1814), Reconquista (1814-1817), and Patria Nueva (1817-1823), including significant events like the First Government Junta and the Battle of Maipú.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Mapa histórico de Chile colonial o mapa geográfico de Chile con regiones",
+    "image_info": {
+      "url": "https://www.curriculumnacional.cl/614/articles-32968_thumbnail.thumb_iNormal.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 70201,
+      "width": 720,
+      "height": 932,
+      "total_pixels": 671040,
+      "basic_score": 0.8825667399630492,
+      "file_name": "mapa-historico-chile-inicio-colonia.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 90.0,
+      "clarity_score": 85.0,
+      "watermark_score": 80.0,
+      "overall_score": 85.0,
+      "explanation": "The image is a high-quality historical map of Chile during the early colonial period (16th century). While the search query mentioned the 19th century, the map perfectly matches the 'Chile colonial' part of the query and the prompt. It is a professional educational resource from the Instituto Geográfico Militar (IGM).",
+      "file_name": "mapa-historico-chile-inicio-colonia.jpg",
+      "caption": "A historical map of Chile depicting the territory at the beginning of the colonial era, specifically showing the governorships of Pedro de Valdivia and Jerónimo de Alderete between 1548 and 1554.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Mapa histórico de Chile colonial o mapa geográfico de Chile con regiones",
+    "image_info": {
+      "url": "http://www.memoriachilena.gob.cl/archivos2/thumb750/MC0018395.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 401016,
+      "width": 749,
+      "height": 598,
+      "total_pixels": 447902,
+      "basic_score": 0.8707765823897506,
+      "file_name": "mapa-historico-chili-provincia-amplissima-colonial.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 70.0,
+      "overall_score": 82.0,
+      "explanation": "The image is an authentic historical map of colonial Chile, perfectly matching the search query and prompt. The text is legible, and the geographical features are well-defined. However, it contains a visible watermark/URL at the bottom right and a grey UI bar at the bottom, which slightly detracts from its professional use without cropping.",
+      "file_name": "mapa-historico-chili-provincia-amplissima-colonial.jpg",
+      "caption": "An antique historical map titled 'Chili Provincia Amplissima' depicting the colonial geography of Chile, featuring the coastline, the Andes mountain range, and various settlements with Latin labels.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Fotografía histórica de personajes históricos chilenos",
+    "image_info": {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Fotografia_Eduardo_Frei_Montalva.jpg",
+      "img_format": "JPEG",
+      "mode": "L",
+      "file_size": 147792,
+      "width": 1024,
+      "height": 1442,
+      "total_pixels": 1476608,
+      "basic_score": 0.8503808912200931,
+      "file_name": "eduardo-frei-montalva-chilean-president-historical-portrait.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 80.0,
+      "clarity_score": 85.0,
+      "watermark_score": 100.0,
+      "overall_score": 85.0,
+      "explanation": "The image is a historical photograph of Eduardo Frei Montalva, a former President of Chile. While the search query mentions Bernardo O'Higgins (who lived before the invention of photography) and contains a slight misspelling of Frei Montalva's name, the image perfectly matches the prompt for historical Chilean figures. The clarity is good for a vintage photograph, though some minor vertical scan lines are visible.",
+      "file_name": "eduardo-frei-montalva-chilean-president-historical-portrait.jpg",
+      "caption": "A black and white formal portrait of Eduardo Frei Montalva, President of Chile from 1964 to 1970, dressed in a formal tailcoat and wearing the presidential sash.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Fotografía histórica de personajes históricos chilenos",
+    "image_info": {
+      "url": "https://tienda.casamoneda.cl/wp-content/uploads/2025/11/90000863-medalla-conmemorativa-bernardo-ohiggins-1761252251221803881323.png",
+      "img_format": "PNG",
+      "mode": "P",
+      "file_size": 336417,
+      "width": 800,
+      "height": 800,
+      "total_pixels": 640000,
+      "basic_score": 0.9013489004185082,
+      "file_name": "bernardo-ohiggins-bronze-plaque-chile.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 55.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 70.0,
+      "explanation": "The image is a high-quality photograph of a commemorative plaque featuring Bernardo O'Higgins, which matches part of the search query. However, it does not include Eduardo Frei Montt, and the prompt requested a 'historical photograph' (typically implying a portrait of the person) rather than a photo of a metal relief. The image itself is technically excellent in terms of clarity and lack of watermarks.",
+      "file_name": "bernardo-ohiggins-bronze-plaque-chile.jpg",
+      "caption": "A detailed photograph of a bronze commemorative plaque depicting the profile of Chilean independence leader Bernardo O'Higgins Riquelme, showing his birth and death years (1778-1842).",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Documento histórico o mapa antiguo de Chile para educación",
+    "image_info": {
+      "url": "https://cehmp.wordpress.com/wp-content/uploads/2025/10/b-0183-1-p.1_page-0001.jpg?w=720",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 173785,
+      "width": 720,
+      "height": 1024,
+      "total_pixels": 737280,
+      "basic_score": 0.9016884545282322,
+      "file_name": "tratado-paz-amistad-chile-peru-1883.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 85.0,
+      "watermark_score": 100.0,
+      "overall_score": 92.0,
+      "explanation": "The image is an authentic historical document: the first page of the Treaty of Ancón (1883) between Chile and Peru. It perfectly matches both the search query and the educational prompt. The text is legible, and the document's aged appearance adds to its historical value. There are no digital watermarks.",
+      "file_name": "tratado-paz-amistad-chile-peru-1883.jpg",
+      "caption": "A scan of the first page of the Treaty of Peace and Friendship (Treaty of Ancón) signed in 1883 between the Republics of Peru and Chile, ending the War of the Pacific. The document features elegant 19th-century calligraphy and formal headings on aged parchment.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Documento histórico o mapa antiguo de Chile para educación",
+    "image_info": {
+      "url": "https://doncaliche.com/wp-content/uploads/2024/08/Copia-del-tratado-de-1874.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 34118,
+      "width": 325,
+      "height": 509,
+      "total_pixels": 165425,
+      "basic_score": 0.7391333720400596,
+      "file_name": "documento-historico-chile-bolivia-tratado-1874.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 90.0,
+      "overall_score": 92.0,
+      "explanation": "This is an authentic historical document from 1879 regarding the diplomatic issues between Chile and Bolivia and the 1874 treaty. It is highly relevant to the search query and the educational prompt. The library stamps are part of the document's provenance rather than intrusive digital watermarks. The aged appearance, including stains and tears, adds to its historical value for educational purposes.",
+      "file_name": "documento-historico-chile-bolivia-tratado-1874.jpg",
+      "caption": "The cover page of an 1879 Chilean historical document titled 'Nueva Cuestión de Chile con Bolivia,' addressing the violation of the treaty of August 1874. Printed in Valparaiso, the document features official stamps from the National Library of Chile and shows characteristic signs of age.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "Documento histórico o mapa antiguo de Chile para educación",
+    "image_info": {
+      "url": "https://www.urgente.bo/sites/default/files/styles/thumb_600x465/public/tratado_1904.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 31942,
+      "width": 620,
+      "height": 349,
+      "total_pixels": 216380,
+      "basic_score": 0.7538903644298387,
+      "file_name": "mapa-historico-tratado-chile-bolivia-1904.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 65.0,
+      "watermark_score": 100.0,
+      "overall_score": 78.0,
+      "explanation": "The image is a perfect match for the search query and prompt, showing the title page of the 1904 border treaty map between Chile and Bolivia. While the historical relevance is excellent, the image quality is average due to a slight blur and the photograph being taken at an angle rather than a flat scan.",
+      "file_name": "mapa-historico-tratado-chile-bolivia-1904.jpg",
+      "caption": "A historical document showing the 'Plano de la Línea de Frontera entre Chile i Bolivia', established by the Treaty of Peace and Friendship signed in Santiago on October 20, 1904.",
+      "recommend": true,
+      "error": ""
+    }
+  }
+]

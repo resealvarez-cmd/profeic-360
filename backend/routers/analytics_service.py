@@ -27,15 +27,27 @@ def calculate_global_stats(supabase: Client):
     Core logic to calculate global engagement and impact metrics.
     Ensures consistency between Admin and Telemetry dashboards.
     """
+    def fetch_all_rows(table_name: str, select_query: str = '*'):
+        all_rows = []
+        page_size = 1000
+        for offset in range(0, 20000, page_size): # Cap at 20k to protect memory
+            res = supabase.table(table_name).select(select_query).range(offset, offset + page_size - 1).execute()
+            data = res.data or []
+            all_rows.extend(data)
+            if len(data) < page_size:
+                break
+        return all_rows
+
     # 1. Fetch Data
     res_auth = supabase.table('authorized_users').select('email', count='exact').execute()
     total_authorized = res_auth.count or 1
 
-    res_events = supabase.table('telemetry_events').select('*').order('created_at', desc=True).limit(2000).execute()
-    events = res_events.data or []
+    events = fetch_all_rows('telemetry_events', '*')
+    
+    # Sort events descending by date for recent_events
+    events.sort(key=lambda x: x.get('created_at', ''), reverse=True)
 
-    res_lib = supabase.table('biblioteca_recursos').select('tipo, user_id, created_at').execute()
-    lib_items = res_lib.data or []
+    lib_items = fetch_all_rows('biblioteca_recursos', 'tipo, user_id, created_at')
 
     res_profiles = supabase.table('profiles').select('id, email, full_name, school_id').execute()
     profiles_data = res_profiles.data or []

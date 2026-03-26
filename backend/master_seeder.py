@@ -16,12 +16,15 @@ from dotenv import load_dotenv
 from typing import List, Dict
 import time
 
+from pathlib import Path
+
 load_dotenv()
 
 # Configuración
+BASE_DIR = Path(__file__).resolve().parent.parent
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-CSV_PATH = "curriculum_oficial_v2.csv"  # Ajusta la ruta según corresponda
+CSV_PATH = BASE_DIR / "curriculum_oficial_v2.csv"
 TABLE_NAME = "curriculum"
 BATCH_SIZE = 500  # Supabase recomienda batches de 500-1000 para evitar timeouts
 

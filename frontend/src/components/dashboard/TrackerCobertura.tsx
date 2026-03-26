@@ -6,6 +6,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { ChevronDown, Sparkles, CheckCircle2, Bookmark, Target, Loader2, ArrowRight, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogroBanner, TipoLogro } from "@/components/dashboard/LogroBanner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CoberturaRecord {
     id: string;
@@ -23,6 +24,7 @@ interface OA {
 }
 
 export function TrackerCobertura() {
+    const { userId } = useAuth();
     const [loadingRecords, setLoadingRecords] = useState(true);
     const [loadingOas, setLoadingOas] = useState(false);
 
@@ -48,8 +50,7 @@ export function TrackerCobertura() {
 
     useEffect(() => {
         const fetchCoverage = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user) {
+            if (!userId) {
                 setLoadingRecords(false);
                 return;
             }
@@ -57,7 +58,7 @@ export function TrackerCobertura() {
             const { data, error } = await supabase
                 .from("cobertura_curricular")
                 .select("*")
-                .eq("user_id", session.user.id);
+                .eq("user_id", userId);
 
             if (data && !error) {
                 setRecords(data);
@@ -81,7 +82,7 @@ export function TrackerCobertura() {
                 const { data: logros, error: logrosError } = await supabase
                     .from("logros_usuario")
                     .select("tipo_logro, asignatura, nivel")
-                    .eq("user_id", session.user.id);
+                    .eq("user_id", userId);
                 if (logros && !logrosError) {
                     setLogrosObtenidos(new Set(logros.map((l: any) => `${l.tipo_logro}|${l.asignatura}|${l.nivel}`)));
                 }
@@ -127,11 +128,10 @@ export function TrackerCobertura() {
         if (logrosObtenidos.has(key)) return;
 
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user) return;
+            if (!userId) return;
 
             const { error } = await supabase.from("logros_usuario").insert({
-                user_id: session.user.id,
+                user_id: userId,
                 tipo_logro: tipo,
                 asignatura: course.asignatura,
                 nivel: course.nivel,

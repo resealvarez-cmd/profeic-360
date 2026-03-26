@@ -9,14 +9,21 @@ router = APIRouter(prefix="/admin", tags=["SuperAdmin"])
 # === CLIENTE SUPABASE CON SERVICE ROLE ===
 # ATENCIÓN: Esta clave es 'admin' y se usa para crear usuarios o sobreescribir RLS.
 # NO EXPORTAR NUNCA AL CLIENTE FRONTEND.
+# === CLIENTE SUPABASE CON SERVICE ROLE ===
 SUPABASE_URL = os.getenv("SUPABASE_URL")
+# Si no hay SERVICE_ROLE, intentamos usar la KEY normal (anon) como fallback para evitar que rompa todo, 
+# aunque algunas funciones de admin podrían fallar si RLS es estricto.
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
 
-if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
-    print("WARNING: SUPABASE_SERVICE_ROLE_KEY is missing. Admin endpoints will fail.")
+if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY or "false" in SUPABASE_URL:
+    print("WARNING: SUPABASE_URL or SERVICE_ROLE_KEY is missing/invalid. Admin endpoints will fail.")
     supabase_admin: Client = None
 else:
-    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    try:
+        supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    except Exception as e:
+        print(f"ERROR: Failed to initialize Supabase Admin: {e}")
+        supabase_admin = None
 
 
 from typing import Optional

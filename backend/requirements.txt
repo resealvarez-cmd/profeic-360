@@ -12,3 +12,12 @@ requests
 google-generativeai
 python-multipart
 pypdf
+opencv-python-headless
+numpy
+reportlab
+pyzbar
+imutils
+qrcode
+pillow
+google-genai
+matplotlib

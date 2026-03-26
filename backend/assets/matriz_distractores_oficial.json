@@ -1,0 +1,213 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "fuente": "Análisis SIMCE/PAES oficiales",
+    "total_patrones": 16
+  },
+  "tipos_error": {
+    "información_parcial": {
+      "descripcion": "El estudiante se centra solo en parte de la información, ignorando el contexto completo",
+      "ejemplos": [
+        "C) Su carácter estratégico y vanguardista, porque se centra en el impacto \neconómico y social de los avances tecnológicos. \nD) Su carácter inclusivo y mediador, porque establece un consenso en las man",
+        "compartir en redes sociales y reproducir total o \nparcialmente, por cualquier medio, las preguntas de esta prueba.\n11.\tTampoco se permite el uso de teléfono celular, calculadora o cualquier otro dispo",
+        "lemente son elegidas por aquellos estudiantes que solo consideran la segunda \nparte de la descripción, es decir “…una figura que tiene 3 vértices”.\nLos estudiantes que marcan la opción B posiblemente "
+      ],
+      "frecuencia": 3
+    },
+    "confusión_conceptual": {
+      "descripcion": "El estudiante confunde conceptos relacionados pero distintos",
+      "ejemplos": [
+        ", en cosechar el aplauso barato. \n \nLa mayoría se confunde y acepta como escritor a quien detenta este virtuosismo de \nrecetario, pero nosotros procuraremos no caer en el error. Para el escritor autén",
+        "onstante. Los estudiantes que eligen esta opción, no distinguen \nentre aceleración uniforme y no uniforme, dado que escogen el gráfico que presenta un continuo aumento de \nla rapidez, acentuado en la "
+      ],
+      "frecuencia": 2
+    },
+    "información_local": {
+      "descripcion": "El estudiante responde basándose en información local sin considerar el texto global",
+      "ejemplos": [
+        "ctivo sobre la diva. \nB) A través de la alusión a localidades reales donde vivió la diva. \nC) A través del reconocimiento que da la autoridad a la diva. \nD) A través del debate generado sobre el mérit",
+        "es permite evaluar las relaciones de significado, específicamente causa-consecuencia, \nque realiza el estudiante al leer un texto organizado de forma discontinua.\nPara responder correctamente, primero"
+      ],
+      "frecuencia": 2
+    },
+    "distractor_plausible": {
+      "descripcion": "La alternativa parece correcta desde una lógica común pero no corresponde al texto",
+      "ejemplos": [
+        "or de \nortografía o redacción. Por esta razón, es posible que en esta prueba no encuentres textos \nredactados de forma inclusiva, al igual que las preguntas asociadas a ellos, que conservan \nel uso or"
+      ],
+      "frecuencia": 1
+    },
+    "calculo_erroneo": {
+      "descripcion": "Error en el procedimiento de cálculo o en la aplicación de operaciones",
+      "ejemplos": [
+        "llos, 60 de las cuales serán consideradas para el cálculo del \npuntaje final de la prueba. Las preguntas tienen 4 opciones de respuesta (A, B, C y D), donde solo una de ellas es correcta.\n  2.\tComprue",
+        "pregunta que puede ser respondida a partir \nde un procedimiento experimental particular, lo que se enmarca en el dominio cognitivo de razonamiento.\nEl ítem se contextualiza en la liberación de oxígeno",
+        "os, ya que los estudiantes deben \nseleccionar una operación que les permita saber cuál es el total de deportistas que participaron en los Juegos \nOlímpicos de Londres. Por lo tanto, se espera que sume"
+      ],
+      "frecuencia": 3
+    },
+    "conocimiento_previo": {
+      "descripcion": "El estudiante usa conocimiento externo en lugar de la información del texto",
+      "ejemplos": [
+        "or hacia un tema lejano por medio de la alusión a experiencias \nfamiliares. \nC) Para involucrar al lector en la práctica científica a través del análisis de ejemplos \ncotidianos.  \nD) Para ayudar al l",
+        "aparece la palabra, y no necesariamente acudir a conocimiento de mundo para \ninferir su significado.\nPara responder este ítem correctamente, el estudiante debe relacionar la palabra por la cual se pre",
+        "ente imagen muestra una balanza en equilibrio. Se sabe que cada una de las \nbolitas pesa 1 kilo. ¿Cuánto pesa el objeto marcado con una cruz? \n \n \n \n \n \n \n \n \n \na) 3 kilos \nb) 4 kilos \nc) 7 kilos \nd) "
+      ],
+      "frecuencia": 3
+    },
+    "lectura_literal": {
+      "descripcion": "El estudiante interpreta el texto de forma literal sin hacer inferencias",
+      "ejemplos": [
+        "ños. De esta manera, \nse presenta una complejidad textual poco común para los lectores del nivel, que leen una exposición \nsobre el supuesto origen de un cuento en la primera parte del texto, y a cont",
+        "ta no \npresenta errores de \nortografía acentual, \nliteral o puntual. \nLa respuesta presenta \n1 o 2 errores de \nortografía acentual, \nliteral o puntual. \nLa respuesta presenta \n3 o más errores de \norto"
+      ],
+      "frecuencia": 2
+    }
+  },
+  "patrones_detallados": [
+    {
+      "tipo_error": "información_parcial",
+      "keyword_detectada": "se centra en",
+      "contexto": "C) Su carácter estratégico y vanguardista, porque se centra en el impacto \neconómico y social de los avances tecnológicos. \nD) Su carácter inclusivo y mediador, porque establece un consenso en las maneras \nde entender la educación tecnológica.",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Competencia_Lectora.pdf"
+    },
+    {
+      "tipo_error": "confusión_conceptual",
+      "keyword_detectada": "confunde",
+      "contexto": ", en cosechar el aplauso barato. \n \nLa mayoría se confunde y acepta como escritor a quien detenta este virtuosismo de \nrecetario, pero nosotros procuraremos no caer en el error. Para el escritor auténtico, escribir \nes una disposición de la naturalez",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Competencia_Lectora.pdf"
+    },
+    {
+      "tipo_error": "información_local",
+      "keyword_detectada": "local",
+      "contexto": "ctivo sobre la diva. \nB) A través de la alusión a localidades reales donde vivió la diva. \nC) A través del reconocimiento que da la autoridad a la diva. \nD) A través del debate generado sobre el mérito de la diva. \n \n \n \n \n \n30. En el cuento, ¿cuál d",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Competencia_Lectora.pdf"
+    },
+    {
+      "tipo_error": "distractor_plausible",
+      "keyword_detectada": "posible",
+      "contexto": "or de \nortografía o redacción. Por esta razón, es posible que en esta prueba no encuentres textos \nredactados de forma inclusiva, al igual que las preguntas asociadas a ellos, que conservan \nel uso original del lenguaje del texto. \n \nPor otro lado, e",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Competencia_Lectora.pdf"
+    },
+    {
+      "tipo_error": "calculo_erroneo",
+      "keyword_detectada": "cálculo",
+      "contexto": "llos, 60 de las cuales serán consideradas para el cálculo del \npuntaje final de la prueba. Las preguntas tienen 4 opciones de respuesta (A, B, C y D), donde solo una de ellas es correcta.\n  2.\tComprueba que la forma que aparece en tu hoja de respuest",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Competencia_Lectora.pdf"
+    },
+    {
+      "tipo_error": "conocimiento_previo",
+      "keyword_detectada": "experiencia",
+      "contexto": "or hacia un tema lejano por medio de la alusión a experiencias \nfamiliares. \nC) Para involucrar al lector en la práctica científica a través del análisis de ejemplos \ncotidianos.  \nD) Para ayudar al lector a entender una idea abstracta a través de la",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Competencia_Lectora.pdf"
+    },
+    {
+      "tipo_error": "información_parcial",
+      "keyword_detectada": "parcial",
+      "contexto": "compartir en redes sociales y reproducir total o \nparcialmente, por cualquier medio, las preguntas de esta prueba.\n11.\tTampoco se permite el uso de teléfono celular, calculadora o cualquier otro dispositivo electrónico durante la \nrendición de la pru",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "PAES_Invierno_2026_Matematica_M1.pdf"
+    },
+    {
+      "tipo_error": "lectura_literal",
+      "keyword_detectada": "textual",
+      "contexto": "ños. De esta manera, \nse presenta una complejidad textual poco común para los lectores del nivel, que leen una exposición \nsobre el supuesto origen de un cuento en la primera parte del texto, y a continuación, el cuento mismo. \nEsta estructura poco c",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_media_2016.pdf"
+    },
+    {
+      "tipo_error": "calculo_erroneo",
+      "keyword_detectada": "procedimiento",
+      "contexto": "pregunta que puede ser respondida a partir \nde un procedimiento experimental particular, lo que se enmarca en el dominio cognitivo de razonamiento.\nEl ítem se contextualiza en la liberación de oxígeno producto de la transformación de energía lumínica",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_media_2016.pdf"
+    },
+    {
+      "tipo_error": "confusión_conceptual",
+      "keyword_detectada": "no distingue",
+      "contexto": "onstante. Los estudiantes que eligen esta opción, no distinguen \nentre aceleración uniforme y no uniforme, dado que escogen el gráfico que presenta un continuo aumento de \nla rapidez, acentuado en la segunda parte (después de los 10 segundos).  \nLa a",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_media_2016.pdf"
+    },
+    {
+      "tipo_error": "conocimiento_previo",
+      "keyword_detectada": "conocimiento de mundo",
+      "contexto": "aparece la palabra, y no necesariamente acudir a conocimiento de mundo para \ninferir su significado.\nPara responder este ítem correctamente, el estudiante debe relacionar la palabra por la cual se pregunta \n–endémica- con la clave sugerida en el tex",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_4_6_basico_2016.pdf"
+    },
+    {
+      "tipo_error": "información_local",
+      "keyword_detectada": "específica",
+      "contexto": "es permite evaluar las relaciones de significado, específicamente causa-consecuencia, \nque realiza el estudiante al leer un texto organizado de forma discontinua.\nPara responder correctamente, primero el estudiante debe ubicar el hecho (cucarachas qu",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_4_6_basico_2016.pdf"
+    },
+    {
+      "tipo_error": "información_parcial",
+      "keyword_detectada": "solo considera",
+      "contexto": "lemente son elegidas por aquellos estudiantes que solo consideran la segunda \nparte de la descripción, es decir “…una figura que tiene 3 vértices”.\nLos estudiantes que marcan la opción B posiblemente solo se basan en la primera parte de la descripció",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_4_6_basico_2016.pdf"
+    },
+    {
+      "tipo_error": "calculo_erroneo",
+      "keyword_detectada": "operación",
+      "contexto": "os, ya que los estudiantes deben \nseleccionar una operación que les permita saber cuál es el total de deportistas que participaron en los Juegos \nOlímpicos de Londres. Por lo tanto, se espera que sumen las frecuencias que indica cada barra del gráfic",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ejemplos_preguntas_4_6_basico_2016.pdf"
+    },
+    {
+      "tipo_error": "lectura_literal",
+      "keyword_detectada": "literal",
+      "contexto": "ta no \npresenta errores de \nortografía acentual, \nliteral o puntual. \nLa respuesta presenta \n1 o 2 errores de \nortografía acentual, \nliteral o puntual. \nLa respuesta presenta \n3 o más errores de \nortografía acentual, \nliteral o puntual.",
+      "fuente": "análisis_oficial",
+      "asignatura": "Lenguaje",
+      "nivel": "4° Básico",
+      "pdf_origen": "Ensayo C Lenguaje 4º básico PAUTA DE CORRECCIÓN.pdf"
+    },
+    {
+      "tipo_error": "conocimiento_previo",
+      "keyword_detectada": "sabe que",
+      "contexto": "ente imagen muestra una balanza en equilibrio. Se sabe que cada una de las \nbolitas pesa 1 kilo. ¿Cuánto pesa el objeto marcado con una cruz? \n \n \n \n \n \n \n \n \n \na) 3 kilos \nb) 4 kilos \nc) 7 kilos \nd) 10 kilos \n \n \n \n \n15. Los siguientes dibujos  mues",
+      "fuente": "análisis_oficial",
+      "asignatura": "Matemática",
+      "nivel": "4° Básico",
+      "pdf_origen": "ENSAYO SIMCE O OFICIAL 4°.pdf"
+    }
+  ]
+}

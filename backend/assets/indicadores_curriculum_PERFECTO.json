@@ -1,0 +1,3803 @@
+[
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 01",
+    "indicadores": [
+      "Reconocer por medio de la exploración que un ecosistema está compuesto por elementos vivos (animales, plantas, etc.)",
+      "Reconocer por medio de la exploración que un ecosistema está compuesto por elementos no vivos (piedras, agua, tierra, etc.)",
+      "Reconocer que los elementos vivos y no vivos interactúan entre sí en un ecosistema."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 02",
+    "indicadores": [
+      "Observar y comparar adaptaciones de plantas y animales para sobrevivir en los ecosistemas.",
+      "Relacionar las adaptaciones con su estructura.",
+      "Relacionar las adaptaciones con su conducta.",
+      "Ejemplos de adaptaciones: cubierta corporal, camuflaje.",
+      "Ejemplos de adaptaciones: tipo de hojas.",
+      "Ejemplos de adaptaciones: hibernación."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 03",
+    "indicadores": [
+      "Identificar organismos productores, consumidores y descomponedores en cadenas alimentarias.",
+      "Ejemplificar cadenas alimentarias en diferentes ecosistemas de Chile (ej: bosque nativo, desierto, océano).",
+      "Describir la función de los productores (ej: plantas) en la base de la cadena alimentaria.",
+      "Describir la función de los consumidores (ej: herbívoros, carnívoros) en la transferencia de energía.",
+      "Describir la función de los descomponedores (ej: hongos, bacterias) en el reciclaje de la materia orgánica.",
+      "Relacionar la estructura de una cadena alimentaria con el flujo de energía en un ecosistema.",
+      "Dar ejemplos concretos de especies chilenas que ocupan diferentes roles tróficos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 04",
+    "indicadores": [
+      "Analizar los efectos de la actividad humana en los ecosistemas de Chile.",
+      "Proponer medidas para proteger los ecosistemas de Chile, incluyendo parques nacionales.",
+      "Proponer medidas para proteger los ecosistemas de Chile, incluyendo vedas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 05",
+    "indicadores": [
+      "Identifica y describe estructuras del sistema esquelético.",
+      "Describe la función de protección del sistema esquelético (costillas y cráneo).",
+      "Describe la función de soporte del sistema esquelético (vértebras y columna vertebral).",
+      "Describe la función de movimiento del sistema esquelético (pelvis y fémur)."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 06",
+    "indicadores": [
+      "Explicar, con apoyo de modelos, el movimiento del cuerpo.",
+      "Considerar la acción coordinada de músculos, huesos, tendones y articulación (ejemplo: brazo y pierna).",
+      "Describir los beneficios de la actividad física para el sistema musculo-esquelético."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 07",
+    "indicadores": [
+      "Identifica estructuras del sistema nervioso.",
+      "Describe la función de conducción de información de la médula espinal.",
+      "Describe la función de conducción de información de los nervios.",
+      "Describe la función de elaboración y control del cerebro."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 08",
+    "indicadores": [
+      "Investigar en diversas fuentes los efectos del consumo excesivo de alcohol en la salud humana.",
+      "Comunicar los efectos del consumo excesivo de alcohol en la salud humana.",
+      "Ejemplificar efectos del consumo excesivo de alcohol: descoordinación.",
+      "Ejemplificar efectos del consumo excesivo de alcohol: confusión.",
+      "Ejemplificar efectos del consumo excesivo de alcohol: lentitud."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 09",
+    "indicadores": [
+      "Demostrar por medio de la investigación experimental que la materia tiene masa.",
+      "Demostrar por medio de la investigación experimental que la materia ocupa espacio.",
+      "Usar materiales del entorno en la investigación experimental."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 10",
+    "indicadores": [
+      "Comparar los tres estados de la materia (sólido, líquido y gaseoso).",
+      "Comparar la capacidad de fluir de los tres estados de la materia.",
+      "Comparar la capacidad de cambiar de forma de los tres estados de la materia.",
+      "Comparar la capacidad de cambiar de volumen de los tres estados de la materia."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 11",
+    "indicadores": [
+      "Medir la masa de la materia (en estados sólido, líquido y gaseoso) utilizando instrumentos y unidades de medida apropiados.",
+      "Medir el volumen de la materia (en estados sólido, líquido y gaseoso) utilizando instrumentos y unidades de medida apropiados.",
+      "Medir la temperatura de la materia (en estados sólido, líquido y gaseoso) utilizando instrumentos y unidades de medida apropiados."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 12",
+    "indicadores": [
+      "Demostrar, por medio de la investigación experimental, los efectos de la aplicación de fuerzas sobre objetos.",
+      "Considerar cambios en la forma.",
+      "Considerar la rapidez del movimiento.",
+      "Considerar la dirección del movimiento.",
+      "Considerar otros efectos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 13",
+    "indicadores": [
+      "Identificar por medio de la investigación experimental diferentes tipos de fuerzas.",
+      "Analizar sus efectos en situaciones concretas: fuerza de roce (arrastrando objetos).",
+      "Analizar sus efectos en situaciones concretas: peso (fuerza de gravedad).",
+      "Analizar sus efectos en situaciones concretas: fuerza magnética (en imanes)."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 14",
+    "indicadores": [
+      "Diseñar objetos tecnológicos.",
+      "Construir objetos tecnológicos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 15",
+    "indicadores": [
+      "Describe por medio de modelos que la Tierra tiene una estructura de capas (corteza, manto y núcleo).",
+      "Identifica las características distintivas de cada capa en cuanto a su composición.",
+      "Identifica las características distintivas de cada capa en cuanto a su rigidez.",
+      "Identifica las características distintivas de cada capa en cuanto a su temperatura."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 16",
+    "indicadores": [
+      "Explicar los cambios en la superficie terrestre.",
+      "Relacionar los cambios con la interacción de las capas de la Tierra.",
+      "Vincular los cambios a los movimientos de las placas tectónicas.",
+      "Mencionar sismos como un resultado de los movimientos tectónicos.",
+      "Mencionar tsunamis como un resultado de los movimientos tectónicos.",
+      "Mencionar erupciones volcánicas como un resultado de los movimientos tectónicos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA 17",
+    "indicadores": [
+      "Proponer medidas de prevención y seguridad ante riesgos naturales en la escuela.",
+      "Proponer medidas de prevención y seguridad ante riesgos naturales en la calle.",
+      "Proponer medidas de prevención y seguridad ante riesgos naturales en el hogar.",
+      "Desarrollar una cultura preventiva ante riesgos naturales."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA A A",
+    "indicadores": [
+      "Demuestra curiosidad e interés por conocer seres vivos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA A B",
+    "indicadores": [
+      "Estilo de trabajo riguroso y perseverante."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA A C",
+    "indicadores": [
+      "Reconocer la importancia del entorno natural.",
+      "Reconocer la importancia de sus recursos.",
+      "Desarrollar conductas de cuidado del ambiente.",
+      "Desarrollar conductas de protección del ambiente."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA A D",
+    "indicadores": [
+      "Asumir responsabilidades.",
+      "Interactuar en forma colaborativa y flexible en los trabajos en equipo.",
+      "Aportar y enriquecer el trabajo común."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA A E",
+    "indicadores": [
+      "Manifestar compromiso con un estilo de vida saludable.",
+      "Demostrar compromiso a través del desarrollo físico.",
+      "Demostrar compromiso a través del autocuidado."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA A F",
+    "indicadores": [
+      "Reconocer la importancia de seguir normas y procedimientos.",
+      "Resguardar la seguridad personal.",
+      "Promover la seguridad colectiva."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA H a",
+    "indicadores": [
+      "Plantear preguntas en forma guiada sobre objetos y eventos del entorno.",
+      "Formular predicciones en forma guiada sobre objetos y eventos del entorno."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA H b",
+    "indicadores": [
+      "Planificar y llevar a cabo investigaciones guiadas experimentales y no experimentales.",
+      "Obtener información para responder a preguntas dadas a partir de diversas fuentes.",
+      "Responder una pregunta formulada por ellos u otros.",
+      "Establecer un procedimiento previo simple para responder la pregunta.",
+      "Trabajar de forma individual o colaborativa."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA H c",
+    "indicadores": [
+      "Observar, medir, registrar y comparar datos en forma precisa.",
+      "Utilizar instrumentos de medición.",
+      "Emplear tablas y gráficos.",
+      "Usar las TIC cuando corresponda."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA H d",
+    "indicadores": [
+      "Utilizar materiales e instrumentos en forma segura y autónoma.",
+      "Usar reglas para hacer mediciones.",
+      "Usar termómetros para hacer mediciones.",
+      "Usar vasos graduados para hacer mediciones.",
+      "Realizar observaciones.",
+      "Realizar mediciones."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA H e",
+    "indicadores": []
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN04 OA H f",
+    "indicadores": [
+      "Comunicar ideas, explicaciones, observaciones y mediciones.",
+      "Utilizar diagramas, modelos físicos, informes y presentaciones.",
+      "Usar Tecnologías de la Información y Comunicación (TIC)."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 01",
+    "indicadores": [
+      "Ubicación geográfica de la civilización maya.",
+      "Organización política de la civilización maya.",
+      "Actividades económicas de la civilización maya.",
+      "Formas de cultivo de la civilización maya.",
+      "Alimentos de la civilización maya.",
+      "Organización de la sociedad maya.",
+      "Roles y oficios de hombres y mujeres en la civilización maya.",
+      "Religión y ritos de la civilización maya.",
+      "Desarrollo de la astronomía y la matemática en la civilización maya.",
+      "Sistemas de escritura de la civilización maya.",
+      "Guerras y sacrificios humanos en la civilización maya.",
+      "Construcciones de la civilización maya.",
+      "Costumbres y vida cotidiana en la civilización maya."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 02",
+    "indicadores": [
+      "Ubicación geográfica de la civilización azteca.",
+      "Organización política y extensión del imperio azteca.",
+      "Descripción de la ciudad de Tenochtitlán.",
+      "Formas de cultivo y alimentos de los aztecas.",
+      "Religión y ritos aztecas.",
+      "Avances tecnológicos de la civilización azteca.",
+      "Organización de la sociedad azteca.",
+      "Roles y oficios de hombres y mujeres en la sociedad azteca.",
+      "Construcciones aztecas.",
+      "Costumbres y vida cotidiana de los aztecas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 03",
+    "indicadores": [
+      "Ubicación geográfica de la civilización inca.",
+      "Organización política inca.",
+      "Sistema de caminos y correos inca.",
+      "Religión y ritos incas.",
+      "Avances tecnológicos incas.",
+      "Organización de la sociedad inca.",
+      "Roles y oficios de hombres y mujeres en la sociedad inca.",
+      "Formas de cultivo y alimentos de los incas.",
+      "Construcciones incas.",
+      "Costumbres y vida cotidiana de los incas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 04",
+    "indicadores": [
+      "Analizar las características de la civilización Maya.",
+      "Analizar las características de la civilización Azteca.",
+      "Analizar las características de la civilización Inca.",
+      "Comparar las características de las civilizaciones Mayas, Aztecas e Incas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 05",
+    "indicadores": [
+      "Investigar en diversas fuentes (imágenes, medios audiovisuales, TICs, gráficos, textos y otras) sobre temas relacionados con el presente de los pueblos indígenas americanos.",
+      "Ejemplos de temas a investigar: protagonismo actual de los pueblos indígenas americanos.",
+      "Ejemplos de temas a investigar: influencia de las civilizaciones maya, azteca e inca sobre la cultura y la sociedad de los países actuales situados donde ellos se desarrollaron.",
+      "Ejemplos de temas a investigar: influencia de las civilizaciones maya, azteca e inca en las comidas que consumimos actualmente.",
+      "Ejemplos de temas a investigar: influencia de las civilizaciones maya, azteca e inca en la lengua que empleamos en la actualidad."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 06",
+    "indicadores": [
+      "Ubicar lugares en un mapa utilizando coordenadas geográficas como referencia (paralelos y meridianos)."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 07",
+    "indicadores": [
+      "Distinguir recursos naturales renovables y no renovables.",
+      "Reconocer el carácter limitado de los recursos naturales y la necesidad de cuidarlos.",
+      "Identificar recursos presentes en objetos y bienes cotidianos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 08",
+    "indicadores": [
+      "Describe distintos paisajes del continente americano.",
+      "Considera climas.",
+      "Considera ríos.",
+      "Considera población.",
+      "Considera idiomas.",
+      "Considera países.",
+      "Considera grandes ciudades.",
+      "Utiliza vocabulario geográfico adecuado."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 09",
+    "indicadores": [
+      "Reconocer los principales recursos naturales de América.",
+      "Ubicar geográficamente los recursos naturales de América.",
+      "Considerar la distribución geográfica de los recursos naturales.",
+      "Analizar el uso de los recursos naturales.",
+      "Evaluar la importancia de cuidar los recursos naturales.",
+      "Promover el desarrollo sostenible en relación con los recursos naturales."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 10",
+    "indicadores": [
+      "Comparar mediante la observación en imágenes, mapas y otras fuentes, paisajes de su región con paisajes de América.",
+      "Distinguir distintas formas de adaptación de la población a su ambiente natural.",
+      "Distinguir distintas formas de transformación de la población a su ambiente natural."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 11",
+    "indicadores": [
+      "Distinguir los roles de actores en la organización política y democrática de Chile.",
+      "Identificar al Presidente de la República, ministros, senadores, diputados y alcaldes.",
+      "Considerar las instituciones en las que ejercen dichos actores.",
+      "Comprender cómo son nombrados o elegidos estos actores."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 12",
+    "indicadores": [
+      "Reconocer sus principales derechos en situaciones de la vida cotidiana.",
+      "Derecho a la educación.",
+      "Derecho a contar con alimentación.",
+      "Derecho a vivienda.",
+      "Derecho al recreo.",
+      "Derecho a servicios médicos adecuados.",
+      "Derecho a expresarse.",
+      "Derecho a ser protegido contra el abandono y la crueldad.",
+      "Derecho a no trabajar antes de la edad apropiada.",
+      "Dar ejemplos de cómo se pueden ejercer y proteger esos derechos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 13",
+    "indicadores": [
+      "Mantener una conducta honesta en la vida cotidiana.",
+      "Mantener una conducta honesta en los juegos.",
+      "Mantener una conducta honesta en el trabajo escolar.",
+      "Hablar con la verdad.",
+      "Respetar las reglas de los juegos sin hacer trampa.",
+      "Evitar la copia y el plagio.",
+      "Reconocer sus errores.",
+      "Reconocer sus acciones."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 14",
+    "indicadores": [
+      "Demuestra respeto por todas las personas mediante acciones en su vida diaria."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 15",
+    "indicadores": [
+      "Participar en su comunidad.",
+      "Tomar parte en elecciones para una directiva del curso.",
+      "Asignar roles y funciones a cada cargo.",
+      "Considerar la importancia de mantener una buena convivencia.",
+      "Considerar la importancia de una organización del curso que favorezca el trabajo escolar."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 16",
+    "indicadores": [
+      "Resolver conflictos aplicando estrategias.",
+      "Determinar la causa del problema.",
+      "Proponer posibles soluciones.",
+      "Dialogar.",
+      "Buscar un punto de vista común y votar entre otras.",
+      "Demostrar respeto y empatía por las partes involucradas para mejorar la convivencia en el curso y en la comunidad escolar."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 17",
+    "indicadores": [
+      "Diseñar un proyecto grupal para solucionar un problema de la comunidad escolar.",
+      "Participar activamente en el proyecto grupal.",
+      "Ejemplos de problemas a abordar: reciclaje de basura, exceso de ruido.",
+      "Ejemplos de actividades: organización de turnos, leer o entretener a alumnos más pequeños."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA 18",
+    "indicadores": [
+      "Opina y argumenta con fundamentos sobre temas de la asignatura u otros."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A A",
+    "indicadores": [
+      "Trabajar en forma rigurosa y perseverante.",
+      "Poseer espíritu emprendedor.",
+      "Mantener una disposición positiva a la crítica y la autocrítica."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A B",
+    "indicadores": [
+      "Reconocer la importancia y la dignidad de todos los trabajos.",
+      "Valorar y respetar a las personas que los realizan."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A C",
+    "indicadores": [
+      "Respetar y defender la igualdad de derechos entre hombres y mujeres.",
+      "Apreciar la importancia de desarrollar relaciones que potencien su participación equitativa en la vida económica, familiar, social y cultural."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A D",
+    "indicadores": [
+      "Respetar y defender la igualdad de derechos esenciales de todas las personas.",
+      "No hacer distinción de sexo, edad, condición física, etnia, religión o situación económica."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A E",
+    "indicadores": [
+      "Participar solidaria y responsablemente en las actividades y proyectos del establecimiento.",
+      "Participar solidaria y responsablemente en las actividades y proyectos del espacio comunitario.",
+      "Demostrar espíritu emprendedor."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A F",
+    "indicadores": [
+      "Establecer lazos de pertenencia con su entorno social y natural.",
+      "Conocimiento, valoración y reflexión sobre su historia personal.",
+      "Conocimiento, valoración y reflexión sobre su comunidad.",
+      "Conocimiento, valoración y reflexión sobre el país."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A G",
+    "indicadores": [
+      "Comportarse y actuar en la vida cotidiana según principios y virtudes ciudadanas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A H",
+    "indicadores": [
+      "Demostrar valoración por la democracia reconociendo su importancia para la convivencia.",
+      "Demostrar valoración por la democracia reconociendo su importancia para el resguardo de derechos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA A I",
+    "indicadores": [
+      "Demostrar valoración por la vida en sociedad"
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H a",
+    "indicadores": [
+      "Leer y representar secuencias cronológicas.",
+      "Leer y representar acontecimientos del pasado.",
+      "Representar secuencias cronológicas mediante líneas de tiempo.",
+      "Representar acontecimientos del pasado mediante líneas de tiempo."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H b",
+    "indicadores": [
+      "Utiliza hitos temporales relevantes para estructurar la narración de experiencias.",
+      "Distingue claramente entre experiencias pasadas, presentes y futuras en la descripción de su trayectoria.",
+      "Sitúa sus logros y experiencias en períodos de tiempo específicos (décadas, siglos, etc.).",
+      "Establece conexiones entre experiencias antiguas y modernas para demostrar adaptabilidad y evolución profesional.",
+      "Proyecta metas y aspiraciones futuras realistas y alineadas con su experiencia y el contexto actual."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H c",
+    "indicadores": [
+      "Comparar aspectos sociales, económicos, culturales y políticos entre sociedades y civilizaciones del pasado y del presente.",
+      "Identificar continuidades y cambios en aspectos sociales, económicos, culturales y políticos entre sociedades y civilizaciones del pasado y del presente."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H d",
+    "indicadores": [
+      "Usar herramientas geográficas para ubicar elementos del espacio geográfico.",
+      "Usar herramientas geográficas para caracterizar paisajes.",
+      "Usar herramientas geográficas para caracterizar población.",
+      "Usar herramientas geográficas para caracterizar recursos naturales."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H e",
+    "indicadores": [
+      "Orientarse en el espacio utilizando categorías de ubicación absoluta (coordenadas geográficas) y relativa."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H f",
+    "indicadores": [
+      "Obtener información sobre el pasado y el presente a partir de diversas fuentes dadas (entrevistas, narraciones, textos, medios audiovisuales, mapas, imágenes, gráficos, tablas y pictogramas, entre otros).",
+      "Aplicar estrategias para registrar las ideas más relevantes."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H g",
+    "indicadores": [
+      "Formula y responde preguntas.",
+      "Relaciona pasado y presente.",
+      "Relaciona información con el entorno geográfico.",
+      "Profundiza sobre temas de su interés.",
+      "Utiliza textos y fuentes diversas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H h",
+    "indicadores": [
+      "Formula opiniones fundamentadas sobre temas de su interés.",
+      "Apoya sus opiniones en datos y evidencia."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H i",
+    "indicadores": [
+      "Participar en conversaciones grupales intercambiando opiniones sobre temas estudiados.",
+      "Respetar turnos y otros puntos de vista."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI04 OA H j",
+    "indicadores": [
+      "Presentar"
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 01",
+    "indicadores": [
+      "Pronuncia las palabras correctamente y con fluidez, aunque ocasionalmente realice lectura silábica en palabras que desconoce.",
+      "Respeta los signos de puntuación: punto, coma, signos de exclamación y de interrogación.",
+      "Utiliza la entonación adecuada según el sentido del texto.",
+      "Mantiene una velocidad de lectura que demuestra la decodificación automática de la mayoría de las palabras."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 02",
+    "indicadores": [
+      "Relacionar la información del texto con sus experiencias y conocimientos.",
+      "Releer lo que no fue comprendido.",
+      "Visualizar lo que describe el texto.",
+      "Recapitular.",
+      "Formular preguntas sobre lo leído y responderlas.",
+      "Subrayar información relevante en un texto."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 03",
+    "indicadores": [
+      "Poemas",
+      "Cuentos folclóricos y de autor",
+      "Fábulas",
+      "Leyendas",
+      "Mitos",
+      "Novelas",
+      "Historietas",
+      "Otros"
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 04",
+    "indicadores": [
+      "Extraer información explícita e implícita.",
+      "Determinar las consecuencias de hechos o acciones.",
+      "Describir y comparar a los personajes.",
+      "Describir los diferentes ambientes que aparecen en un texto.",
+      "Reconocer el problema y la solución en una narración.",
+      "Expresar opiniones fundamentadas sobre actitudes y acciones de los personajes.",
+      "Comparar diferentes textos escritos por un mismo autor."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 05",
+    "indicadores": [
+      "Comprender poemas adecuados al nivel.",
+      "Interpretar el lenguaje figurado presente en ellos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 06",
+    "indicadores": [
+      "Extraer información explícita e implícita.",
+      "Utilizar los organizadores de textos expositivos (títulos, subtítulos, índice y glosario) para encontrar información específica.",
+      "Comprender la información entregada por textos discontinuos, como imágenes, gráficos, tablas, mapas o diagramas.",
+      "Interpretar expresiones en lenguaje figurado.",
+      "Comparar información.",
+      "Responder preguntas como ¿por qué sucede...?, ¿cuál es la consecuencia de...?, ¿qué sucedería si...?",
+      "Formular una opinión sobre algún aspecto de la lectura.",
+      "Fundamentar su opinión con información del texto o sus conocimientos previos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 07",
+    "indicadores": [
+      "Leen libros para entretenerse, para encontrar información, etc.",
+      "Leen periódicos, revistas y artículos en internet para informarse sobre temas de su interés.",
+      "Comentan los libros que han leído.",
+      "Eligen libros de su interés.",
+      "Expresan por qué les gustó un texto leído.",
+      "Comparten los libros que les han gustado.",
+      "Leen durante un tiempo definido, manteniendo la atención en el texto sin distractores.",
+      "Consideran a sus autores favoritos.",
+      "Solicitan sugerencias a otros.",
+      "Leen la primera página para evaluar el vocabulario.",
+      "Solicitan que les lean o relean un cuento.",
+      "Reproducen la historia usando sus propias palabras.",
+      "Relacionan situaciones de la vida cotidiana con personajes o acciones de los textos escuchados en clases.",
+      "Relacionan aspectos de un texto escuchado y comentado en clases con otros textos leídos o escuchados previamente.",
+      "Formulan preguntas que demuestran su interés por lo escuchado.",
+      "Explican qué les gustó o no de un texto escuchado en clases."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 08",
+    "indicadores": [
+      "Asisten de manera independiente a la biblioteca para leer, trabajar, estudiar o buscar material.",
+      "Solicitan textos o recursos para satisfacer sus intereses.",
+      "Identifican los principales sectores de la biblioteca y señalan dónde se encuentran sus libros favoritos.",
+      "Mantienen un ambiente de trabajo, respetando a los otros usuarios.",
+      "Manipulan los libros y otros materiales con cuidado.",
+      "Devuelven el material puntualmente."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 09",
+    "indicadores": [
+      "Buscar y clasificar información sobre un tema en internet.",
+      "Buscar y clasificar información sobre un tema en libros, diarios, revistas, enciclopedias, atlas, etc., para llevar a cabo una investigación."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 10",
+    "indicadores": [
+      "Subrayan o anotan las palabras desconocidas que encuentran en los textos leídos y escuchados.",
+      "Explican a qué ámbito pertenece una palabra, haciendo alusión al contexto en el que se encuentra inserta.",
+      "Identifican la raíz o afijos de la palabra y hacen una aproximación a su significado a partir de estos conocimientos.",
+      "Preguntan a otros el significado de palabras que desconocen.",
+      "Recurren a diccionarios u otras fuentes para buscar el significado de las palabras.",
+      "Encuentran las palabras en diccionarios, enciclopedias y glosarios usando el orden alfabético.",
+      "Seleccionan la acepción de la palabra que se adecua al contexto."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 11",
+    "indicadores": [
+      "Escribe frecuentemente para desarrollar la creatividad.",
+      "Expresa sus ideas en textos como poemas, diarios de vida, cuentos, anécdotas, cartas, comentarios sobre sus lecturas, noticias, etc."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 12",
+    "indicadores": [
+      "Secuencia lógica de eventos: inicio, desarrollo y desenlace.",
+      "Uso de conectores adecuados.",
+      "Descripciones claras y detalladas.",
+      "Lenguaje expresivo para desarrollar la acción."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 13",
+    "indicadores": [
+      "Presenta el tema en una oración.",
+      "Desarrolla una idea central por párrafo.",
+      "Utiliza sus propias palabras."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 14",
+    "indicadores": [
+      "Usar un formato adecuado.",
+      "Transmitir el mensaje con claridad."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 15",
+    "indicadores": [
+      "Escriben con letra ligada o imprenta, sin mezclar estilos.",
+      "Escriben con letra clara, que otros lectores entienden fácilmente."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 16",
+    "indicadores": [
+      "Estableciendo propósito y destinatario",
+      "Generando ideas a partir de conversaciones",
+      "Generando ideas a partir de investigaciones",
+      "Generando ideas a partir de lluvia de ideas",
+      "Generando ideas a partir de otra estrategia"
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 17",
+    "indicadores": [
+      "Organizan las ideas en párrafos separados con punto aparte.",
+      "Utilizan conectores apropiados.",
+      "Emplean un vocabulario preciso y variado.",
+      "Adecuán el registro al propósito del texto y al destinatario.",
+      "Mejoran la redacción del texto a partir de sugerencias de los pares y el docente.",
+      "Corrigen la ortografía y la presentación."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 18",
+    "indicadores": [
+      "Incorporan adecuadamente en sus escritos las palabras que han aprendido.",
+      "Utilizan un vocabulario variado y preciso para transmitir mensajes."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 19",
+    "indicadores": [
+      "Comprender la función de los adverbios en textos orales y escritos.",
+      "Reemplazar adverbios para enriquecer las producciones.",
+      "Combinar adverbios para enriquecer las producciones.",
+      "Reemplazar adverbios para precisar las producciones.",
+      "Combinar adverbios para precisar las producciones."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 20",
+    "indicadores": [
+      "Comprender la función de los verbos en textos orales.",
+      "Comprender la función de los verbos en textos escritos.",
+      "Usar los verbos manteniendo la concordancia con el sujeto."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 21",
+    "indicadores": [
+      "Uso correcto de palabras con b y v.",
+      "Uso correcto de palabras con h de uso frecuente.",
+      "Escritura correcta de ay, hay, ahí.",
+      "Acentuación correcta de palabras agudas, graves, esdrújulas y sobreesdrújulas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 22",
+    "indicadores": [
+      "Cuentos folclóricos y de autor",
+      "Poemas",
+      "Mitos y leyendas",
+      "Capítulos de novelas"
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 23",
+    "indicadores": [
+      "Establece conexiones con sus propias experiencias.",
+      "Identifica el propósito.",
+      "Formula preguntas para obtener información adicional.",
+      "Aclara dudas y profundiza la comprensión.",
+      "Establece relaciones entre distintos textos.",
+      "Responde preguntas sobre información explícita e implícita.",
+      "Formula una opinión sobre lo escuchado."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 24",
+    "indicadores": [
+      "Disfrutar de la experiencia de asistir a obras de teatro infantiles.",
+      "Ampliar sus posibilidades de expresión.",
+      "Desarrollar su creatividad.",
+      "Familiarizarse con el género (teatro)."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 25",
+    "indicadores": [
+      "Mantener el foco de la conversación, expresando sus ideas u opiniones y fundamentándolas.",
+      "Formular preguntas para aclarar dudas y verificar la comprensión.",
+      "Demostrar interés ante lo escuchado.",
+      "Mostrar empatía frente a situaciones expresadas por otros.",
+      "Respetar turnos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 26",
+    "indicadores": [
+      "Se presentan a sí mismos o a la persona con la que están.",
+      "Usan las convenciones de cortesía en sus interacciones de la vida cotidiana.",
+      "Adecuan su registro y vocabulario según la situación comunicativa."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 27",
+    "indicadores": [
+      "Organiza las ideas en introducción, desarrollo y cierre.",
+      "Incorpora descripciones y ejemplos que ilustren las ideas.",
+      "Utiliza un vocabulario variado.",
+      "Reemplaza los pronombres y algunos adverbios por construcciones sintácticas que expliciten o describan al referente.",
+      "Usa gestos y posturas acordes a la situación.",
+      "Usa material de apoyo (PowerPoint, papelógrafo, objetos, etc.) si es pertinente."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 28",
+    "indicadores": [
+      "Usan adecuadamente en sus intervenciones orales las palabras aprendidas.",
+      "Recuentan historias, hechos noticiosos o nuevos contenidos leídos y escuchados, utilizando parte del vocabulario del texto de origen.",
+      "Utilizan un vocabulario variado y preciso para transmitir mensajes."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 29",
+    "indicadores": [
+      "Caracterización de distintos personajes para desarrollar su lenguaje.",
+      "Fomento de la autoestima a través de la caracterización.",
+      "Aprendizaje del trabajo en equipo mediante actividades de caracterización."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA 30",
+    "indicadores": [
+      "Recitar poemas con entonación y expresión.",
+      "Fortalecer la confianza en sí mismos a través de la recitación.",
+      "Aumentar el vocabulario mediante la exposición a la poesía.",
+      "Desarrollar la capacidad expresiva a través de la interpretación poética."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A A",
+    "indicadores": [
+      "Demuestra interés en la lectura.",
+      "Mantiene una actitud activa frente a la lectura.",
+      "Orienta la lectura al disfrute.",
+      "Valora el conocimiento que se puede obtener a partir de la lectura."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A B",
+    "indicadores": [
+      "Demostrar disposición e interés por compartir ideas, experiencias y opiniones con otros."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A C",
+    "indicadores": [
+      "Demuestra disposición e interés por expresarse de manera creativa.",
+      "Se expresa de manera creativa por medio de la comunicación oral.",
+      "Se expresa de manera creativa por medio de la comunicación escrita."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A D",
+    "indicadores": [
+      "Realizar tareas y trabajos de forma rigurosa.",
+      "Realizar tareas y trabajos de forma perseverante.",
+      "Desarrollar tareas de manera adecuada a los propósitos de la asignatura.",
+      "Desarrollar trabajos de manera adecuada a los propósitos de la asignatura."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A E",
+    "indicadores": [
+      "Reflexionar sobre sí mismos, sus ideas y sus intereses para comprenderse y valorarse."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A F",
+    "indicadores": [
+      "Demostrar empatía hacia los demás"
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE04 OA A G",
+    "indicadores": [
+      "Demuestra respeto por las diversas opiniones.",
+      "Demuestra respeto por los diversos puntos de vista.",
+      "Reconoce el diálogo como una herramienta de enriquecimiento personal.",
+      "Reconoce el diálogo como una herramienta de enriquecimiento social."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 01",
+    "indicadores": [
+      "Expresan números en palabras y cifras.",
+      "Representan en números cantidades dadas en billetes o monedas.",
+      "Ordenan cantidades de dinero dado en billetes o en monedas de $10, $100, $1 000 y de $10 000.",
+      "Descomponen cantidades de dinero en valores de $1, $10, $100 y $1 000.",
+      "Leen y escriben números presentados en la tabla posicional.",
+      "Descomponen números hasta 10 000 y los ubican en la tabla posicional.",
+      "Ordenan y comparan números en la tabla posicional.",
+      "Marcan la posición de números en la recta numérica.",
+      "Identifican números en la recta numérica según la posición de su marca.",
+      "Identifican números vecinos de números dados en la recta numérica.",
+      "Identifican números que faltan en una secuencia numérica."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 02",
+    "indicadores": [
+      "Aplicar la descomposición y el conteo en el cálculo mental para multiplicar números hasta 10 por 10.",
+      "Multiplicar en el cálculo mental por 4, doblando el primer factor.",
+      "Multiplicar números en el cálculo mental doblando y dividiendo por 2."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 03",
+    "indicadores": [
+      "Suman y restan números mentalmente, descomponiéndolos de acuerdo a su valor posicional.",
+      "Usan dinero en el algoritmo de la adición y de la sustracción con y sin reserva.",
+      "Estiman sumas y restas, usando más de una estrategia.",
+      "Aplican el algoritmo de la adición y de la sustracción en la resolución de problemas rutinarios.",
+      "Aplican el algoritmo de la adición y de la sustracción en la resolución de problemas monetarios.",
+      "Resuelven problemas rutinarios y no rutinarios que involucran adiciones y sustracciones de más de dos números."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 04",
+    "indicadores": [
+      "Aplicación de la propiedad del 1 en la multiplicación, empleando secuencias de ecuaciones.",
+      "Explicación con palabras propias de la propiedad del 1 de manera concreta, pictórica y simbólica.",
+      "Descubrimiento de la propiedad del 0 en la multiplicación, empleando secuencias de ecuaciones hasta llegar a 0.",
+      "Explicación con palabras propias de la propiedad del 0 de manera concreta, pictórica y simbólica.",
+      "Muestra y explicación de manera concreta, pictórica y simbólica de la repartición de elementos por 1 o por sí mismo."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 05",
+    "indicadores": [
+      "Descomponen números de tres dígitos en centenas, decenas y unidades.",
+      "Multiplican cada centena, decena y unidad por el mismo factor.",
+      "Aplican la propiedad distributiva de la multiplicación respecto de la suma.",
+      "Estiman productos, usando como estrategias el redondeo de factores.",
+      "Resuelven multiplicaciones usando el algoritmo de la multiplicación.",
+      "Resuelven problemas rutinarios de la vida diaria, aplicando el algoritmo de la multiplicación."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 06",
+    "indicadores": [
+      "Representan pictóricamente o con material concreto divisiones de dos dígitos por un dígito, descomponiendo el dividendo en sumandos.",
+      "Estiman el cociente de una división, aplicando diferentes estrategias.",
+      "Resuelven problemas rutinarios de la vida diaria, aplicando el algoritmo de la división."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 07",
+    "indicadores": [
+      "Seleccionan la operación y la estrategia de resolución de un problema.",
+      "Resuelven problemas que requieren sustracciones.",
+      "Resuelven problemas rutinarios y no rutinarios, que requieren adiciones, sustracciones, multiplicaciones o divisiones.",
+      "Resuelven problemas cuya resolución requiere una combinación de operaciones."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 08",
+    "indicadores": [
+      "Explica que una fracción representa la parte de un todo.",
+      "Explica que una fracción representa parte de un grupo de elementos.",
+      "Explica que una fracción representa un lugar en la recta numérica.",
+      "Describe situaciones en las cuales se pueden usar fracciones.",
+      "Muestra que una fracción puede tener representaciones diferentes.",
+      "Compara fracciones con material concreto.",
+      "Compara fracciones con representaciones pictóricas.",
+      "Ordena fracciones con material concreto.",
+      "Ordena fracciones con representaciones pictóricas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 09",
+    "indicadores": [
+      "Resolver adiciones de fracciones con igual denominador (100, 12, 10, 8, 6, 5, 4, 3) de manera concreta.",
+      "Resolver adiciones de fracciones con igual denominador (100, 12, 10, 8, 6, 5, 4, 3) de manera pictórica.",
+      "Resolver adiciones de fracciones con igual denominador (100, 12, 10, 8, 6, 5, 4, 3) en la resolución de problemas.",
+      "Resolver sustracciones de fracciones con igual denominador (100, 12, 10, 8, 6, 5, 4, 3) de manera concreta.",
+      "Resolver sustracciones de fracciones con igual denominador (100, 12, 10, 8, 6, 5, 4, 3) de manera pictórica.",
+      "Resolver sustracciones de fracciones con igual denominador (100, 12, 10, 8, 6, 5, 4, 3) en la resolución de problemas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 10",
+    "indicadores": [
+      "Identificar fracciones propias.",
+      "Escribir fracciones propias.",
+      "Representar fracciones propias de manera concreta.",
+      "Representar fracciones propias de manera pictórica.",
+      "Representar fracciones propias de manera simbólica.",
+      "Identificar números mixtos hasta el 5.",
+      "Escribir números mixtos hasta el 5.",
+      "Representar números mixtos hasta el 5 de manera concreta.",
+      "Representar números mixtos hasta el 5 de manera pictórica.",
+      "Representar números mixtos hasta el 5 de manera simbólica.",
+      "Resolver problemas que involucren fracciones propias.",
+      "Resolver problemas que involucren números mixtos hasta el 5."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 11",
+    "indicadores": [
+      "Representan decimales en forma concreta.",
+      "Representan decimales en forma pictórica.",
+      "Representan decimales en forma simbólica.",
+      "Comparan decimales hasta la centésima.",
+      "Ordenan decimales hasta la centésima."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 12",
+    "indicadores": [
+      "Resuelve adiciones y sustracciones de números decimales.",
+      "Utiliza el valor posicional hasta la centésima.",
+      "Aplica los conocimientos en la resolución de problemas.",
+      "Contextualiza la resolución de problemas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 13",
+    "indicadores": [
+      "Identifica patrones numéricos en tablas.",
+      "Describe patrones numéricos en tablas.",
+      "Utiliza una operación matemática para encontrar patrones numéricos.",
+      "Realiza la identificación de patrones de manera manual.",
+      "Utiliza software educativo para identificar patrones numéricos.",
+      "Describe patrones numéricos identificados."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 14",
+    "indicadores": [
+      "Resuelven ecuaciones e inecuaciones de un paso que involucren adiciones y sustracciones.",
+      "Comprueban los resultados en forma pictórica y simbólica del 0 al 100.",
+      "Aplican las relaciones inversas entre la adición y la sustracción."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 15",
+    "indicadores": [
+      "Describe la localización absoluta de un objeto en un mapa simple utilizando coordenadas informales (por ejemplo, con letras y números).",
+      "Describe la localización relativa de un objeto en relación a otros objetos en un mapa."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 16",
+    "indicadores": [
+      "Determinar las vistas de figuras 3D desde el frente.",
+      "Determinar las vistas de figuras 3D desde el lado.",
+      "Determinar las vistas de figuras 3D desde arriba."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 17",
+    "indicadores": [
+      "Identifican figuras simétricas 2D.",
+      "Crean figuras simétricas 2D.",
+      "Dibujan una o más líneas de simetría en figuras 2D.",
+      "Usan software geométrico."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 18",
+    "indicadores": [
+      "Trasladar, rotar y reflejar figuras 2D."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 19",
+    "indicadores": [
+      "Construir ángulos con el transportador y compás."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 20",
+    "indicadores": [
+      "Leer y registrar diversas mediciones del tiempo en relojes análogos.",
+      "Leer y registrar diversas mediciones del tiempo en relojes digitales.",
+      "Usar los conceptos A.M. en la medición del tiempo.",
+      "Usar los conceptos P.M. en la medición del tiempo.",
+      "Usar el formato de 24 horas en la medición del tiempo."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 21",
+    "indicadores": [
+      "Realiza conversiones entre unidades de tiempo.",
+      "Convierte segundos a minutos en la resolución de problemas.",
+      "Convierte minutos a horas en la resolución de problemas.",
+      "Convierte días a meses en la resolución de problemas.",
+      "Convierte meses a años en la resolución de problemas."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 22",
+    "indicadores": [
+      "Medir longitudes utilizando unidades estandarizadas (metros y centímetros).",
+      "Realizar transformaciones entre unidades de longitud (metros a centímetros y viceversa).",
+      "Resolver problemas que involucren la medición y transformación de longitudes."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 23",
+    "indicadores": [
+      "Reconoce que el área de una superficie se mide en unidades cuadradas.",
+      "Selecciona y justifica la elección de la unidad estandarizada (cm² y m²).",
+      "Determina y registra el área en cm² y m² en contextos cercanos.",
+      "Construye diferentes rectángulos para un área dada.",
+      "Usa software geométrico."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 24",
+    "indicadores": [
+      "Selecciona una unidad no estandarizada para medir el volumen de un cuerpo.",
+      "Reconoce que el volumen se mide en unidades de cubo.",
+      "Mide y registra el volumen en unidades de cubo.",
+      "Utiliza software geométrico."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 25",
+    "indicadores": [
+      "Realizar encuestas.",
+      "Analizar los datos.",
+      "Comparar con los resultados de muestras aleatorias usando tablas y gráficos."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 26",
+    "indicadores": [
+      "Realiza experimentos aleatorios lúdicos y cotidianos.",
+      "Tabula datos de experimentos aleatorios.",
+      "Representa datos mediante gráficos de manera manual.",
+      "Representa datos mediante gráficos utilizando software educativo."
+    ]
+  },
+  {
+    "nivel": "4° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA04 OA 27",
+    "indicadores": [
+      "Leen e interpretan pictogramas.",
+      "Leen e interpretan gráficos de barra simple con escala.",
+      "Comunican sus conclusiones."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 01",
+    "indicadores": [
+      "Los modelos de la célula han evolucionado sobre la base de evidencias."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 02",
+    "indicadores": [
+      "Desarrollar modelos que expliquen la relación entre la función de una célula y sus partes.",
+      "Distinguir células eucariontes y procariontes.",
+      "Identificar tipos celulares."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 03",
+    "indicadores": [
+      "Describe los mecanismos de intercambio de partículas entre la célula y su ambiente.",
+      "Explica el proceso de difusión como mecanismo de intercambio celular.",
+      "Explica el proceso de ósmosis como mecanismo de intercambio celular."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 04",
+    "indicadores": [
+      "Crear modelos que expliquen que las plantas tienen estructuras especializadas para responder a estímulos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 05",
+    "indicadores": [
+      "Explica la interacción entre el sistema nervioso y el sistema endocrino en la regulación de funciones corporales.",
+      "Describe cómo el sistema circulatorio trabaja en conjunto con el sistema respiratorio para el intercambio de gases.",
+      "Analiza la relación entre el sistema digestivo y el sistema circulatorio en la absorción y distribución de nutrientes.",
+      "Comprende la coordinación entre el sistema esquelético y el sistema muscular para el movimiento y la locomoción.",
+      "Explica la interacción del sistema excretor con otros sistemas para mantener la homeostasis del cuerpo."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 06",
+    "indicadores": [
+      "Investigar experimentalmente las características de los nutrientes."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 07",
+    "indicadores": [
+      "Analizar los factores que contribuyen a mantener un cuerpo saludable.",
+      "Evaluar los factores que contribuyen a mantener un cuerpo saludable."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 08",
+    "indicadores": [
+      "Analizar las fuerzas eléctricas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 09",
+    "indicadores": [
+      "Investigar las tecnologías que permiten la generación de energía eléctrica.",
+      "Evaluar las tecnologías que permiten la generación de energía eléctrica."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 10",
+    "indicadores": [
+      "Analiza un circuito eléctrico domiciliario.",
+      "Compara circuitos en serie y en paralelo."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 11",
+    "indicadores": [
+      "Desarrollar modelos que expliquen el calor como un proceso de transferencia de energía térmica."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 12",
+    "indicadores": [
+      "Investigar cómo ha evolucionado el conocimiento de la constitución de la materia."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 13",
+    "indicadores": [
+      "Desarrolla modelos que expliquen que la materia está constituida por átomos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 14",
+    "indicadores": [
+      "Utiliza la tabla periódica como modelo para predecir propiedades de elementos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA 15",
+    "indicadores": [
+      "Investigar la existencia de elementos químicos frecuentes en la Tierra que también son comunes en los seres vivos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA A A",
+    "indicadores": [
+      "Demuestra curiosidad e interés por conocer seres vivos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA A B",
+    "indicadores": [
+      "Manifestar un estilo de trabajo riguroso y perseverante"
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA A C",
+    "indicadores": [
+      "Reconocer la importancia del entorno natural y sus recursos.",
+      "Desarrollar conductas de cuidado del medio ambiente.",
+      "Desarrollar conductas de protección del medio ambiente."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA A D",
+    "indicadores": [
+      "Asumir responsabilidades.",
+      "Interactuar en forma colaborativa y flexible en los trabajos en equipo.",
+      "Aportar y enriquecer el trabajo común."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA A E",
+    "indicadores": [
+      "Manifestar compromiso con un estilo de vida saludable.",
+      "Desarrollar el físico.",
+      "Practicar el autocuidado."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA A F",
+    "indicadores": [
+      "Reconocer la importancia de seguir normas y procedimientos.",
+      "Resguardar y promover la seguridad personal.",
+      "Resguardar y promover la seguridad colectiva."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA H a",
+    "indicadores": [
+      "Observar objetos, organismos y eventos del entorno natural.",
+      "Plantear preguntas sobre objetos, organismos y eventos del entorno natural.",
+      "Utilizar los sentidos para la observación.",
+      "Utilizar diferentes instrumentos para la observación."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA H b",
+    "indicadores": [
+      "Planificar investigaciones experimentales.",
+      "Conducir investigaciones experimentales.",
+      "Planificar investigaciones no experimentales para explorar fenómenos naturales.",
+      "Conducir investigaciones no experimentales para explorar fenómenos naturales.",
+      "Planificar investigaciones no experimentales para describir fenómenos naturales.",
+      "Conducir investigaciones no experimentales para describir fenómenos naturales.",
+      "Planificar investigaciones no experimentales para explicar fenómenos naturales.",
+      "Conducir investigaciones no experimentales para explicar fenómenos naturales."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA H c",
+    "indicadores": [
+      "Medir, registrar y organizar datos cuantitativos y cualitativos.",
+      "Utilizar tablas, gráficos y modelos.",
+      "Usar Tecnologías de la Información y Comunicación (TIC) cuando corresponda."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA H d",
+    "indicadores": [
+      "Analizar e interpretar datos obtenidos de diversas fuentes.",
+      "Formular explicaciones, conclusiones y predicciones."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA H e",
+    "indicadores": [
+      "Evaluar la validez de sus investigaciones.",
+      "Identificar fuentes de error.",
+      "Proponer mejoras."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "CN08 OA H f",
+    "indicadores": [
+      "Comunicar investigaciones a través de informes.",
+      "Comunicar investigaciones a través de presentaciones.",
+      "Comunicar investigaciones a través de debates.",
+      "Argumentar investigaciones usando evidencias.",
+      "Argumentar investigaciones usando lenguaje científico adecuado."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 01",
+    "indicadores": [
+      "Leer habitualmente para aprender y recrearse.",
+      "Seleccionar textos de acuerdo con sus preferencias y propósitos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 02",
+    "indicadores": [
+      "Reflexionar sobre las diferentes dimensiones de la experiencia humana, tanto propia como ajena.",
+      "Utilizar la lectura de obras literarias y otros textos que forman parte de nuestras herencias culturales como base para la reflexión.",
+      "Abordar los temas estipulados para el curso.",
+      "Analizar las obras sugeridas para cada tema."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 03",
+    "indicadores": [
+      "Analizar el o los conflictos de la historia para enriquecer su comprensión.",
+      "Analizar los personajes para enriquecer su comprensión.",
+      "Analizar la evolución de los personajes para enriquecer su comprensión.",
+      "Analizar la relación de los personajes con otros personajes para enriquecer su comprensión.",
+      "Analizar la relación de un fragmento de la obra con el total para enriquecer su comprensión.",
+      "Analizar el narrador, distinguiéndolo del autor, para enriquecer su comprensión.",
+      "Identificar personajes tipo (por ejemplo, el pícaro, el avaro, el seductor, la madrastra, etc.) presentes en el texto.",
+      "Identificar símbolos y tópicos literarios presentes en el texto.",
+      "Identificar los prejuicios, estereotipos y creencias presentes en el relato y su conexión con el mundo actual.",
+      "Analizar la disposición temporal de los hechos, con atención a los recursos léxicos y gramaticales empleados para expresarla.",
+      "Identificar elementos en común con otros textos leídos en el año."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 04",
+    "indicadores": [
+      "Analizar los poemas leídos para enriquecer su comprensión.",
+      "Considerar cómo el lenguaje poético apela a los sentidos.",
+      "Considerar cómo el lenguaje poético sugiere estados de ánimo y crea imágenes en el lector.",
+      "Analizar el significado o el efecto que produce el uso de lenguaje figurado en el poema.",
+      "Evaluar el efecto del uso de repeticiones (de estructuras, sonidos, palabras o ideas) en el poema.",
+      "Identificar elementos en común con otros textos leídos durante el año."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 05",
+    "indicadores": [
+      "Analizar los textos dramáticos leídos o vistos para enriquecer su comprensión.",
+      "Considerar el conflicto y qué problema humano se expresa a través de él.",
+      "Analizar los personajes principales y cómo sus acciones y dichos conducen al desenlace o afectan a otros personajes.",
+      "Identificar personajes tipo, símbolos y tópicos literarios.",
+      "Identificar los prejuicios, estereotipos y creencias presentes en el relato y su conexión con el mundo actual.",
+      "Reconocer las características del género dramático.",
+      "Diferenciar entre obra dramática y obra teatral.",
+      "Identificar elementos en común con otros textos leídos en el año."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 06",
+    "indicadores": [
+      "Leer y comprender fragmentos de epopeyas.",
+      "Considerar las características de los fragmentos de epopeyas.",
+      "Considerar el contexto en el que se enmarcan los fragmentos de epopeyas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 07",
+    "indicadores": [
+      "Formular una interpretación de los textos literarios leídos o vistos, que sea coherente con su análisis.",
+      "Considerar la experiencia personal y conocimientos al formular la interpretación.",
+      "Identificar un dilema presentado en el texto y expresar una postura personal acerca del mismo.",
+      "Relacionar la obra con la visión de mundo.",
+      "Relacionar la obra con el contexto histórico en el que se ambienta y/o en el que fue creada."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 08",
+    "indicadores": [
+      "Analiza y evalúa textos argumentativos (columnas de opinión, cartas, discursos, ensayos).",
+      "Identifica la tesis principal del texto, ya sea explícita o implícita.",
+      "Reconoce y evalúa los argumentos e información que sustentan la tesis.",
+      "Distingue entre hechos y opiniones presentes en el texto.",
+      "Formula una postura personal frente a lo leído.",
+      "Presenta argumentos que sustentan su postura personal.",
+      "Determina si la información del texto es suficiente y pertinente para sustentar la tesis del autor."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 09",
+    "indicadores": [
+      "Analizar textos de medios de comunicación (noticias, reportajes, cartas al director, propaganda, crónicas).",
+      "Evaluar propósitos explícitos e implícitos del texto.",
+      "Distinguir entre hechos y opiniones expresadas.",
+      "Identificar la presencia de estereotipos y prejuicios.",
+      "Evaluar la suficiencia de la información entregada.",
+      "Analizar los efectos de recursos no lingüísticos (diseño, imágenes, disposición gráfica, efectos de audio).",
+      "Analizar los efectos de recursos lingüísticos (uso de imperativo, figuras literarias, expresiones populares, palabras en otros idiomas, intertextualidad, modalizaciones)."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 10",
+    "indicadores": [
+      "Leer y comprender textos no literarios"
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 11",
+    "indicadores": [
+      "Usar estrategias de comprensión ANTES de la lectura de textos no literarios, tales como: definir el propósito de la lectura.",
+      "Usar estrategias de comprensión ANTES de la lectura de textos no literarios, tales como: hacer preguntas antes de comenzar a leer.",
+      "Usar estrategias de comprensión DURANTE la lectura de textos no literarios, tales como: localizar información.",
+      "Usar estrategias de comprensión DURANTE la lectura de textos no literarios, tales como: clasificar y categorizar información.",
+      "Usar estrategias de comprensión DESPUÉS de la lectura de textos no literarios, tales como: resumir.",
+      "Usar estrategias de comprensión DESPUÉS de la lectura de textos no literarios, tales como: comparar información dentro del texto o con otros textos.",
+      "Usar estrategias de comprensión DESPUÉS de la lectura de textos no literarios, tales como: interpretar expresiones en lenguaje figurado.",
+      "Usar estrategias de comprensión DESPUÉS de la lectura de textos no literarios, tales como: evaluar la confiabilidad de la información."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 12",
+    "indicadores": [
+      "Aplicar estrategias de comprensión de acuerdo con sus propósitos de lectura.",
+      "Resumir.",
+      "Formular preguntas.",
+      "Analizar los distintos tipos de relaciones que establecen las imágenes o el sonido con el texto escrito (en textos multimodales).",
+      "Identificar los elementos del texto que dificultan la comprensión (pérdida de los referentes, vocabulario desconocido, inconsistencias entre la información del texto y los propios conocimientos) y buscar soluciones."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 13",
+    "indicadores": [
+      "Expresarse en forma creativa por medio de la escritura de textos de diversos géneros (por ejemplo)."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 14",
+    "indicadores": [
+      "Escribir textos de diversos géneros (artículos, informes, reportajes, etc.) con el propósito de explicar un tema.",
+      "Presentación clara del tema, esbozando los aspectos que se abordarán.",
+      "Información proveniente de distintas fuentes.",
+      "Inclusión de hechos, descripciones, ejemplos o explicaciones que desarrollen el tema.",
+      "Progresión temática clara, con especial atención al empleo de recursos anafóricos y conectores.",
+      "Uso de imágenes u otros recursos gráficos pertinentes.",
+      "Cierre coherente con las características del género.",
+      "Uso de referencias según un formato previamente acordado."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 15",
+    "indicadores": [
+      "Escribir con el propósito de persuadir textos breves de diversos géneros (por ejemplo, cartas al director, editoriales, críticas literarias, etc.).",
+      "Caracterizados por: la presentación de una afirmación referida a temas contingentes o literarios.",
+      "La presencia de evidencias e información pertinente.",
+      "La mantención de la coherencia temática.",
+      "El uso de recursos variados que favorezcan el interés y la comprensión del lector, tales como anécdotas, citas, síntesis, imágenes, infografías, etc."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 16",
+    "indicadores": [
+      "Planificar, escribir, revisar, reescribir y editar sus textos en función del contexto, el destinatario y el propósito.",
+      "Recopilar información e ideas, organizándolas antes de escribir.",
+      "Adecuar el registro, específicamente el vocabulario (uso de términos técnicos, frases hechas, palabras propias de las redes sociales, términos y expresiones propios del lenguaje hablado), el uso de la persona gramatical y la estructura del texto al género discursivo, contexto y destinatario.",
+      "Incorporar información pertinente, asegurando la coherencia y la cohesión del texto.",
+      "Cuidar la organización a nivel oracional y textual, usando conectores adecuados para unir las secciones que componen el texto y relacionando las ideas dentro de cada párrafo.",
+      "Usar un vocabulario variado y preciso.",
+      "Reconocer y corregir usos inadecuados, especialmente de pronombres personales y reflejos, conjugaciones verbales, participios irregulares y concordancia sujeto-verbo, artículo-sustantivo y sustantivo-adjetivo.",
+      "Corregir la ortografía y mejorar la presentación usando eficazmente las herramientas del procesador de textos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 17",
+    "indicadores": [
+      "Emplea recursos de correferencia léxica compleja en sus textos.",
+      "Utiliza adecuadamente la nominalización.",
+      "Utiliza adecuadamente la pronominalización."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 18",
+    "indicadores": [
+      "Escribir correctamente para facilitar la comprensión al lector.",
+      "Aplicar todas las reglas de ortografía literal y acentual.",
+      "Verificar la escritura de las palabras cuya ortografía no está sujeta a reglas.",
+      "Usar correctamente: punto, coma, rayados, puntos, paréntesis, puntos suspensivos y comillas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 19",
+    "indicadores": [
+      "Comprender, comparar y evaluar textos orales y audiovisuales (exposiciones, discursos, documentales, noticias, reportajes, etc.).",
+      "Considerar la postura personal frente a lo escuchado y argumentos que la sustentan.",
+      "Identificar los temas, conceptos o hechos principales.",
+      "Analizar el contexto en el que se enmarcan los textos.",
+      "Distinguir entre hechos y opiniones expresadas.",
+      "Identificar diferentes puntos de vista expresados en los textos.",
+      "Analizar las relaciones que se establecen entre imágenes, texto y sonido.",
+      "Establecer relaciones entre lo escuchado y los temas y obras estudiados durante el curso."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 20",
+    "indicadores": [
+      "Dialogar constructivamente para debatir o explorar ideas.",
+      "Mantener el foco en el tema de discusión.",
+      "Demostrar comprensión de lo expresado por el interlocutor.",
+      "Fundamentar su postura de manera pertinente.",
+      "Formular preguntas o comentarios que estimulen o hagan avanzar la discusión.",
+      "Profundizar en algún aspecto del tema.",
+      "Negociar acuerdos con los interlocutores.",
+      "Considerar al interlocutor para la toma de turnos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 21",
+    "indicadores": [
+      "Expresarse frente a una audiencia de manera clara y adecuada a la situación.",
+      "Comunicar temas de su interés.",
+      "Presentar información fidedigna que denota una investigación previa.",
+      "Seguir una progresión temática clara.",
+      "Dar ejemplos y explicar términos o conceptos clave para la comprensión de la información.",
+      "Usar un vocabulario variado y preciso.",
+      "Evitar el uso de muletillas.",
+      "Usar material visual que apoye lo dicho.",
+      "Relacionar directamente el material visual con lo que se explica."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 22",
+    "indicadores": [
+      "Usar conscientemente los elementos que influyen y configuran los textos orales.",
+      "Comparar textos orales y escritos para establecer las diferencias.",
+      "Considerar el contexto y el destinatario.",
+      "Demostrar dominio de los distintos registros y emplearlos adecuadamente según la situación.",
+      "Utilizar estrategias que permiten cuidar la relación con el otro, especialmente al mostrar desacuerdo.",
+      "Utilizar un volumen, una velocidad y una dicción adecuados al propósito y a la situación."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 23",
+    "indicadores": [
+      "Realizar investigaciones sobre diversos temas para complementar sus lecturas o responder interrogantes relacionadas con el lenguaje y la literatura.",
+      "Delimitar el tema de investigación.",
+      "Aplicar criterios para determinar la confiabilidad de las fuentes consultadas.",
+      "Usar organizadores y la estructura textual para encontrar información de manera eficiente.",
+      "Evaluar si los textos entregan suficiente información para responder una determinada pregunta o cumplir un propósito.",
+      "Organizar en categorías la información encontrada en las fuentes investigadas.",
+      "Registrar la información bibliográfica de las fuentes consultadas.",
+      "Elaborar un texto oral o escrito bien estructurado que comunique sus hallazgos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 24",
+    "indicadores": [
+      "Sintetizar, registrar y ordenar ideas principales.",
+      "Aplicar a textos escuchados o leídos.",
+      "Satisfacer propósitos de estudio.",
+      "Satisfacer propósitos de investigación.",
+      "Satisfacer propósitos de recordar detalles, etc."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 25",
+    "indicadores": [
+      "Realizar investigaciones sobre diversos temas para completar una tarea.",
+      "Realizar investigaciones sobre diversos temas para complementar sus lecturas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE08 OA 26",
+    "indicadores": [
+      "Evaluar información obtenida de diversas fuentes.",
+      "Seleccionar información obtenida de diversas fuentes."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 01",
+    "indicadores": [
+      "Representan la multiplicación por -1 de manera concreta.",
+      "Desarrollan la regla de los signos en ejemplos concretos o en la recta numérica.",
+      "Representan la multiplicación de números enteros positivos y negativos de forma pictórica o simbólica.",
+      "Aplican la regla de los signos de las multiplicaciones y de las divisiones en ejercicios rutinarios.",
+      "Representan de forma concreta o pictórica la división de un número negativo por un número natural.",
+      "Multiplican números enteros positivos y/o negativos.",
+      "Resuelven problemas cotidianos que requieren la multiplicación o división de números enteros."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 02",
+    "indicadores": [
+      "Representa las cuatro operaciones con fracciones negativas y decimales negativos en la recta numérica.",
+      "Realiza ejercicios rutinarios que involucren las cuatro operaciones con fracciones y decimales.",
+      "Reconoce la operación matemática adecuada en problemas sencillos.",
+      "Resuelve problemas que involucren la multiplicación y la división de números racionales.",
+      "Utiliza diferente notación simbólica para un número racional."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 03",
+    "indicadores": [
+      "Representan potencias de base y exponente natural hasta 3 con material concreto.",
+      "Representan pictóricamente la multiplicación de potencias de igual base o de igual exponente.",
+      "Representan la división de potencias de igual base o de igual exponente.",
+      "Descubren y aplican las propiedades de la multiplicación y división de potencias.",
+      "Representan la potencia de potencias de manera concreta.",
+      "Relacionan situaciones reales con multiplicación, división y potencias de potencias.",
+      "Resuelven ejercicios rutinarios aplicando la multiplicación, división y potenciaciónde potencias."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 04",
+    "indicadores": [
+      "Estiman el largo de un cuadrado cuya área no tiene un número cuadrado.",
+      "Ubican la posición aproximada de raíces no exactas en la recta numérica.",
+      "Resuelven problemas de transformación de rectángulos en cuadrados del mismo contenido.",
+      "Calculan el perímetro en situaciones de la vida diaria que involucran cuadrados.",
+      "Aplican la raíz cuadrada en la solución de problemas de la vida cotidiana o de ciencias."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 05",
+    "indicadores": [
+      "Resuelve problemas que involucran variaciones porcentuales.",
+      "Aplica variaciones porcentuales en diversos contextos.",
+      "Utiliza representaciones pictóricas para modelar variaciones porcentuales.",
+      "Registra el proceso de resolución de problemas de variaciones porcentuales de manera simbólica.",
+      "Aplica el cálculo de interés anual del ahorro en la resolución de problemas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 06",
+    "indicadores": [
+      "Representación pictórica y simbólica.",
+      "Relación con el área de cuadrados.",
+      "Relación con el área de rectángulos.",
+      "Relación con volúmenes de paralelepípedos.",
+      "Determinación de formas factorizadas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 07",
+    "indicadores": [
+      "Utiliza tablas para organizar y presentar información.",
+      "Emplea metáforas relacionadas con máquinas para explicar conceptos.",
+      "Establece reglas claras y relaciones entre variables (x e y).",
+      "Representa información gráficamente utilizando planos cartesianos.",
+      "Representa información gráficamente utilizando diagramas de Venn.",
+      "Crea representaciones gráficas de manera manual.",
+      "Crea representaciones gráficas utilizando software educativo."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 08",
+    "indicadores": [
+      "Modelar situaciones de la vida diaria.",
+      "Modelar situaciones de otras asignaturas.",
+      "Usar ecuaciones lineales de la forma: ax = b.",
+      "Usar ecuaciones lineales de la forma: x/a = b, a ≠ 0.",
+      "Usar ecuaciones lineales de la forma: ax + b = c.",
+      "Usar ecuaciones lineales de la forma: x/a + b = c.",
+      "Usar ecuaciones lineales de la forma: ax = b + cx.",
+      "Usar ecuaciones lineales de la forma: a(x + b) = c.",
+      "Usar ecuaciones lineales de la forma: ax + b = cx + d, donde a, b, c, d, e ϵ Q."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 09",
+    "indicadores": [
+      "Desarrollar las fórmulas para encontrar el área de superficies y el volumen de prismas rectos con diferentes bases y cilindros.",
+      "Estimar de manera intuitiva desplegando la red de prismas rectos para encontrar la fórmula del área de la superficie.",
+      "Transferir la fórmula del volumen de un prisma a otro.",
+      "Aplicar las fórmulas a la resolución de problemas geométricos y de la vida diaria."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 10",
+    "indicadores": [
+      "Generalizar la función afín como la suma de una constante con una función lineal.",
+      "Trasladar funciones lineales en el plano cartesiano.",
+      "Determinar el cambio constante de un intervalo a otro, de manera gráfica y simbólica, de manera manual y/o con software educativo.",
+      "Relacionar la función afín con el interés simple.",
+      "Utilizar la función afín para resolver problemas de la vida diaria y de otras asignaturas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 11",
+    "indicadores": [
+      "Aplican la fórmula del volumen de prismas rectos a prismas diversos.",
+      "Aplican la fórmula del volumen de prismas rectos a cilindros.",
+      "Estiman de manera intuitiva áreas de superficies.",
+      "Estiman de manera intuitiva volúmenes.",
+      "Despliegan redes de prismas rectos para encontrar la fórmula del área de superficie.",
+      "Aplican las fórmulas del área de superficie a la resolución de problemas.",
+      "Aplican las fórmulas del volumen a la resolución de problemas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 12",
+    "indicadores": [
+      "Verifican concretamente la validez del teorema de Pitágoras.",
+      "Representan pictóricamente el teorema de Pitágoras.",
+      "Aplican el teorema de Pitágoras a la resolución de problemas geométricos y de la vida cotidiana."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 13",
+    "indicadores": [
+      "Usan vectores para representar la traslación.",
+      "Usan los ejes del plano cartesiano como ejes de reflexión.",
+      "Usan los puntos del plano para las rotaciones."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 14",
+    "indicadores": [
+      "Componer rotaciones, traslaciones y reflexiones en el plano cartesiano de manera manual.",
+      "Componer rotaciones, traslaciones y reflexiones en el plano cartesiano utilizando software educativo.",
+      "Componer rotaciones, traslaciones y reflexiones en el espacio de manera manual.",
+      "Componer rotaciones, traslaciones y reflexiones en el espacio utilizando software educativo.",
+      "Aplicar composiciones a las simetrías de polígonos.",
+      "Aplicar composiciones a las simetrías de poliedros.",
+      "Aplicar composiciones a la resolución de problemas geométricos relacionados con el arte."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 15",
+    "indicadores": [
+      "Identifican la población que está sobre o bajo el percentil.",
+      "Representan las medidas de posición con diagramas, incluyendo el diagrama de cajón.",
+      "Utilizan las medidas de posición para comparar poblaciones."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 16",
+    "indicadores": [
+      "Comparan la información de los mismos datos representada en distintos tipos de gráficos.",
+      "Justifican la elección del gráfico para una determinada situación.",
+      "Detectan manipulaciones de gráficos para representar datos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA08 OA 17",
+    "indicadores": [
+      "Representan el principio combinatorio multiplicativo con tablas y árboles regulares.",
+      "Utilizan el principio combinatorio multiplicativo para calcular la probabilidad de un evento compuesto."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 01",
+    "indicadores": [
+      "Relacionar la transformación cultural del período de entreguerras con la ruptura de los cánones culturales y estéticos tradicionales.",
+      "Reconocer cómo se manifestó la ruptura de los cánones en las vanguardias artísticas (dadaísmo, surrealismo, jazz, moda, entre otros).",
+      "Identificar la manifestación de la ruptura de los cánones en la aparición de una cultura de masas (cine, radio, publicidad, prensa, deporte)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 02",
+    "indicadores": [
+      "Analizar la crisis del Estado liberal decimonónico a comienzos del siglo XX.",
+      "Considerar la Gran Depresión de 1929.",
+      "Considerar el surgimiento de distintos modelos políticos y económicos en Europa, Estados Unidos y América Latina.",
+      "Analizar los totalitarismos y su oposición a la democracia liberal (por ejemplo, nazismo, comunismo y fascismo).",
+      "Analizar el populismo latinoamericano.",
+      "Analizar los inicios del Estado de Bienestar."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 03",
+    "indicadores": [
+      "Fragilidad del orden mundial de entreguerras.",
+      "Enfrentamiento ideológico entre los regímenes de Hitler, Stalin y las democracias occidentales.",
+      "Horror de la población por los genocidios, como el exterminio judío.",
+      "Desplazamientos forzados de personas.",
+      "Bombardeos y la alta cifra de víctimas civiles.",
+      "Extensión planetaria del conflicto.",
+      "Potencial destructivo de la bomba atómica."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 04",
+    "indicadores": [
+      "Evaluar las consecuencias de la Segunda Guerra Mundial.",
+      "Considerar el surgimiento de Estados Unidos y la URSS como superpotencias.",
+      "Considerar la pérdida de hegemonía de Europa.",
+      "Considerar el inicio del proceso de descolonización.",
+      "Analizar los acuerdos de las conferencias de paz.",
+      "Analizar la creación de un nuevo marco regulador de las relaciones internacionales reflejado en la ONU.",
+      "Analizar la Declaración Universal de Derechos Humanos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 05",
+    "indicadores": [
+      "Analizar la crisis del sistema político del período parlamentario.",
+      "Analizar la posterior reconstrucción de la institucionalidad por medio de la Constitución de 1925.",
+      "Analizar el fortalecimiento del régimen presidencial.",
+      "Analizar la reforma del sistema de partidos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 06",
+    "indicadores": [
+      "Analizar las transformaciones económicas post-Gran Depresión: fin de la riqueza salitrera y del modelo de crecimiento hacia afuera.",
+      "Evaluar la redefinición del rol del Estado como promotor de la Industrialización por Sustitución de Importaciones (ISI) y la CORFO.",
+      "Analizar el rol del Estado en el bienestar social: escolarización, salud, vivienda y previsión social.",
+      "Evaluar la creciente participación de Estados Unidos en la economía local."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 07",
+    "indicadores": [
+      "Evaluar la contribución de nuevos actores sociales a la democratización de la sociedad chilena a mediados del siglo XX.",
+      "Evaluar la contribución de la expansión de la cultura de masas a la democratización de la sociedad chilena a mediados del siglo XX.",
+      "Considerar la incorporación de las mujeres a la ciudadanía política.",
+      "Considerar el empoderamiento de la clase media.",
+      "Considerar el empoderamiento de la clase obrera.",
+      "Considerar el creciente acceso a la radio.",
+      "Considerar el creciente acceso al cine.",
+      "Considerar el creciente acceso al deporte."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 08",
+    "indicadores": [
+      "Analizar la Guerra Fría como la confrontación ideológica de dos proyectos antagónicos.",
+      "Comprender cómo la amenaza del enfrentamiento nuclear se manifestó en distintos escenarios locales.",
+      "Ejemplificar cómo la Guerra Fría afectó diversas esferas como:",
+      "la política",
+      "la cultura",
+      "el deporte",
+      "las ciencias."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 09",
+    "indicadores": [
+      "Reconocer las transformaciones que experimentó la sociedad occidental en diversos ámbitos durante la Guerra Fría.",
+      "Identificar el crecimiento económico y el auge del Estado de Bienestar.",
+      "Distinguir la expansión del consumo y de los medios de comunicación de masas.",
+      "Analizar la ampliación de los derechos civiles de grupos marginados.",
+      "Evaluar el desarrollo tecnológico, entre otros aspectos relevantes."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 10",
+    "indicadores": [
+      "Caracteriza el contexto de movilización social en América Latina como un escenario de tensión permanente entre revolución y reforma.",
+      "Considera la Revolución Cubana como un factor influyente.",
+      "Analiza la influencia de Estados Unidos en la región.",
+      "Identifica los golpes de Estado y las dictaduras militares (por ejemplo, en Argentina, Chile, Brasil, Uruguay y Paraguay, entre otros) como elementos clave del contexto.",
+      "Reconoce la violación de los derechos humanos como una característica significativa de dicho período."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 11",
+    "indicadores": [
+      "Analizar los principales procesos que marcaron el fin de la Guerra Fría.",
+      "Considerar la crisis de la URSS y el derrumbe del comunismo.",
+      "Considerar las transformaciones geopolíticas.",
+      "Considerar el auge del neoliberalismo.",
+      "Considerar la aceleración de la globalización (por ejemplo, la internacionalización de la economía, la revolución tecnológica, la sociedad de la información)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 12",
+    "indicadores": [
+      "Caracterizar la extendida pobreza y precariedad de la sociedad chilena de mediados del siglo XX.",
+      "Identificar magros indicadores sociodemográficos.",
+      "Identificar bajo poder adquisitivo y acceso limitado al crédito.",
+      "Identificar desnutrición y marginalidad.",
+      "Evaluar el impacto de la migración del campo a la ciudad en la sociedad chilena.",
+      "Evaluar el progresivo crecimiento de la población urbana.",
+      "Evaluar la segregación urbana.",
+      "Evaluar la escasez de viviendas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 13",
+    "indicadores": [
+      "Analizar la década de 1960 en Chile, caracterizada por la organización y movilización de nuevos actores sociales (jóvenes, campesinado, pobladores, etc.).",
+      "Evaluar cómo el sistema político chileno respondió a las demandas de estos nuevos actores sociales.",
+      "Considerar las reformas estructurales implementadas durante este período.",
+      "Considerar los proyectos excluyentes de la Democracia Cristiana (revolución en libertad).",
+      "Considerar los proyectos excluyentes de la Unidad Popular (vía chilena al socialismo)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 14",
+    "indicadores": [
+      "Analizar el ambiente de crisis a inicios de la década del 70.",
+      "Considerar la polarización social y política.",
+      "Considerar la retórica de la violencia.",
+      "Considerar la desvalorización de la institucionalidad democrática.",
+      "Considerar los conflictos en torno a la reforma agraria.",
+      "Considerar las estatizaciones y expropiaciones.",
+      "Considerar la crisis económica y la hiperinflación.",
+      "Considerar la movilización social.",
+      "Considerar la intervención extranjera.",
+      "Considerar el rol de las Fuerzas Armadas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 15",
+    "indicadores": [
+      "Analiza críticamente distintas interpretaciones historiográficas sobre el golpe de Estado de 1973.",
+      "Compara críticamente distintas interpretaciones historiográficas sobre el golpe de Estado de 1973.",
+      "Analiza críticamente distintas interpretaciones historiográficas sobre el quiebre de la democracia.",
+      "Compara críticamente distintas interpretaciones historiográficas sobre el quiebre de la democracia."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 16",
+    "indicadores": [
+      "Durante la dictadura militar, se suprimió el Estado de derecho.",
+      "Durante la dictadura militar, se violaron sistemáticamente los derechos humanos.",
+      "Instituciones civiles y religiosas procuraron la defensa de las víctimas durante la dictadura militar."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 17",
+    "indicadores": [
+      "Caracterizar el modelo económico neoliberal implementado en Chile durante el régimen militar.",
+      "Analizar la transformación del rol del Estado y la disminución del gasto social.",
+      "Evaluar la supremacía del libre mercado como asignador de recursos.",
+      "Evaluar la apertura comercial y la disponibilidad de bienes.",
+      "Analizar la política de privatizaciones e incentivo a la empresa privada.",
+      "Analizar el cambio en las relaciones y derechos laborales.",
+      "Evaluar las consecuencias sociales en el corto y largo plazo del modelo neoliberal."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 18",
+    "indicadores": [
+      "Analizar la nueva institucionalidad política creada por la Constitución de 1980.",
+      "Considerar los artículos transitorios de la Constitución de 1980.",
+      "Considerar el cuórum calificado establecido en la Constitución de 1980.",
+      "Considerar la función tutelar de las Fuerzas Armadas en la Constitución de 1980.",
+      "Considerar los senadores designados en la Constitución de 1980.",
+      "Considerar el Consejo de Seguridad del Estado en la Constitución de 1980.",
+      "Evaluar los cambios y continuidades de la institucionalidad política de la Constitución de 1980 con el presente."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 19",
+    "indicadores": [
+      "Crisis económica de la década de 1980.",
+      "Surgimiento y movilización de protestas sociales.",
+      "Rearticulación de los partidos y actores políticos.",
+      "Rol mediador de la Iglesia Católica.",
+      "Acción de los organismos de defensa de los derechos humanos.",
+      "Influencia y presión de la comunidad internacional."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 20",
+    "indicadores": [
+      "Análisis de la transición a la democracia, considerando el plebiscito de 1988 como hito.",
+      "Identificación de la búsqueda de acuerdos entre el gobierno y la oposición durante la transición.",
+      "Evaluación de las reformas constitucionales implementadas en el proceso de transición.",
+      "Análisis de las tensiones cívico-militares presentes durante la transición.",
+      "Comprensión del consenso generado en torno a la democracia representativa como sistema político.",
+      "Análisis de la reivindicación de los derechos humanos a través de políticas de reparación."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 21",
+    "indicadores": [
+      "Análisis de la estructura social chilena posterior a la recuperación de la democracia.",
+      "Evaluación de la disponibilidad y el acceso a bienes en la sociedad chilena post-dictadura.",
+      "Descripción de la infraestructura en Chile después del retorno a la democracia.",
+      "Análisis del impacto de los medios y las tecnologías de comunicación en la sociedad chilena reciente.",
+      "Evaluación del sistema educacional chileno y su evolución tras la recuperación de la democracia.",
+      "Análisis del mercado del trabajo en Chile en el contexto post-dictadura.",
+      "Descripción y análisis de la demanda de derechos de grupos históricamente discriminados en Chile."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 22",
+    "indicadores": [
+      "Analizar el concepto de derechos humanos.",
+      "Considerar la característica de universalidad de los derechos humanos.",
+      "Considerar la característica de indivisibilidad de los derechos humanos.",
+      "Considerar la característica de interdependencia de los derechos humanos.",
+      "Considerar la característica de imprescriptibilidad de los derechos humanos.",
+      "Analizar la institucionalidad creada para resguardar los derechos humanos a nivel nacional.",
+      "Analizar la institucionalidad creada para resguardar los derechos humanos a nivel internacional.",
+      "Reconocer los derechos vinculados a los grupos de especial protección."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 23",
+    "indicadores": [
+      "Explicar los elementos que constituyen un Estado de derecho, como la Constitución.",
+      "Explicar la división de los poderes del Estado.",
+      "Explicar el respeto a los derechos humanos, entre otros elementos.",
+      "Analizar la importancia del Estado de derecho para la gobernabilidad.",
+      "Analizar la importancia del Estado de derecho para la representación.",
+      "Analizar la importancia del Estado de derecho para la participación ciudadana.",
+      "Analizar la importancia del Estado de derecho para la convivencia pacífica.",
+      "Debatir sobre el perfeccionamiento del Estado de derecho.",
+      "Debatir sobre la defensa del Estado de derecho.",
+      "Debatir sobre los riesgos a los que está expuesto el Estado de derecho."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 24",
+    "indicadores": [
+      "Reducir la pobreza y la desigualdad.",
+      "Garantizar los derechos de los grupos discriminados.",
+      "Lograr un desarrollo sustentable.",
+      "Perfeccionar el sistema político.",
+      "Fortalecer la relación con los países vecinos.",
+      "Reconocer los deberes del Estado y la responsabilidad de todos los miembros de la sociedad para avanzar en ellos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "HI2M OA 25",
+    "indicadores": [
+      "Reconocer la diversidad inherente a las sociedades como manifestación de la libertad y de la dignidad humana.",
+      "Evaluar las oportunidades y desafíos que un mundo globalizado entrega para evitar toda forma de discriminación, sea por raza, etnia, nacionalidad, situación socioeconómica, religión o creencia, género, orientación sexual o discapacidad, entre otras."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 01",
+    "indicadores": [
+      "Leer habitualmente para aprender y recrearse.",
+      "Seleccionar textos de acuerdo con sus preferencias y propósitos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 02",
+    "indicadores": [
+      "Reflexionar sobre las diferentes dimensiones de la experiencia humana propia y ajena.",
+      "Reflexionar a partir de la lectura de obras literarias y otros textos que forman parte de nuestras herencias culturales.",
+      "Abordar los temas estipulados para el curso.",
+      "Abordar las obras sugeridas para cada uno."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 03",
+    "indicadores": [
+      "El o los conflictos de la historia.",
+      "Un análisis de los personajes que considere su relación con otros personajes, qué dicen, qué se dice de ellos, sus acciones y motivaciones, sus convicciones y los dilemas que enfrentan.",
+      "La relación de un fragmento de la obra con el total.",
+      "Cómo el relato está influido por la visión del narrador.",
+      "Personajes tipo (por ejemplo, el pícaro, el avaro, el seductor, la madrastra, etc.), símbolos y tópicos literarios presentes en el texto.",
+      "Las creencias, prejuicios y estereotipos presentes en el relato, a la luz de la visión de mundo de la época en la que fue escrito y su conexión con el mundo actual.",
+      "El efecto producido por recursos como flashback, indicios, caja china (historia dentro de una historia), historia paralela.",
+      "Relaciones intertextuales con otras obras."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 04",
+    "indicadores": [
+      "Análisis de los símbolos presentes en el texto y su relación con la totalidad del poema.",
+      "Descripción de la actitud del hablante hacia el tema que aborda en el poema.",
+      "Explicación del significado o el efecto que produce el uso del lenguaje figurado en el poema.",
+      "Evaluación del efecto que tiene el uso de repeticiones (de estructuras, sonidos, palabras o ideas) en el poema.",
+      "Determinación de la relación que hay entre un fragmento específico y el total del poema.",
+      "Identificación de relaciones intertextuales con otras obras literarias.",
+      "Reconocimiento y descripción de las características formales del soneto."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 05",
+    "indicadores": [
+      "El conflicto central de la obra y el problema humano que este expresa.",
+      "Análisis de la evolución de los personajes principales.",
+      "Relación de los personajes principales con otros personajes.",
+      "Análisis de lo que dicen los personajes principales.",
+      "Análisis de lo que se dice de los personajes principales.",
+      "Análisis de las acciones de los personajes principales.",
+      "Análisis de las reacciones de los personajes principales.",
+      "Análisis de los pensamientos de los personajes principales.",
+      "Análisis de las motivaciones de los personajes principales.",
+      "Identificación de personajes tipo, símbolos y tópicos literarios presentes en la obra.",
+      "Identificación de creencias, prejuicios y estereotipos presentes en el relato.",
+      "Análisis de la visión de mundo de la época en la que fue escrita la obra y su conexión con el mundo actual.",
+      "Análisis de la atmósfera de la obra y cómo se construye a través de los diálogos.",
+      "Análisis de la atmósfera de la obra y cómo se construye a través de los monólogos.",
+      "Análisis de la atmósfera de la obra y cómo se construye a través de las acciones.",
+      "Análisis de la atmósfera de la obra y cómo se construye a través de las acotaciones.",
+      "Análisis de cómo la iluminación aporta a la comprensión de la obra.",
+      "Análisis de cómo el sonido aporta a la comprensión de la obra.",
+      "Análisis de cómo el vestuario aporta a la comprensión de la obra.",
+      "Análisis de cómo la escenografía aporta a la comprensión de la obra.",
+      "Análisis de cómo la actuación aporta a la comprensión de la obra.",
+      "Relaciones intertextuales con otras obras."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 06",
+    "indicadores": [
+      "Comprender la relevancia de las obras del Siglo de Oro.",
+      "Considerar las características de las obras del Siglo de Oro.",
+      "Considerar el contexto en el que se enmarcan las obras del Siglo de Oro."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 07",
+    "indicadores": [
+      "Leer y comprender cuentos latinoamericanos modernos y contemporáneos.",
+      "Considerar las características de los cuentos leídos.",
+      "Considerar el contexto en el que se enmarcan los cuentos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 08",
+    "indicadores": [
+      "Una hipótesis sobre el sentido de la obra, que muestre un punto de vista personal, histórico, social o universal.",
+      "Una crítica de la obra sustentada en citas o ejemplos.",
+      "Los antecedentes culturales que influyen en la visión que refleja la obra sobre temas como el destino, la muerte, la trascendencia, la guerra u otros.",
+      "La relación de la obra con la visión de mundo y el contexto histórico en el que se ambienta y/o en el que fue creada, ejemplificando dicha relación."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 09",
+    "indicadores": [
+      "La tesis, ya sea explícita o implícita, y los argumentos e información que la sostienen.",
+      "Los recursos emocionales que usa el autor para persuadir o convencer al lector, evaluándolos.",
+      "Fallas evidentes en la argumentación, por ejemplo, exageración, estereotipos, generalizaciones, descalificaciones personales, entre otras.",
+      "El efecto que produce el uso de modalizadores en el grado de certeza con que se presenta la información.",
+      "La manera en que el autor organiza el texto.",
+      "Con qué intención el autor usa distintos elementos léxicos valorativos y figuras retóricas.",
+      "Su postura personal frente a lo leído, refutando o apoyando los argumentos que la sustentan."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 10",
+    "indicadores": [
+      "Identificación de los propósitos explícitos e implícitos del texto, con ejemplos que justifiquen las afirmaciones.",
+      "Análisis y evaluación de las estrategias de persuasión utilizadas en el texto, tales como el uso del humor, la presencia de estereotipos, la apelación a los sentimientos, etc.",
+      "Evaluación de las evidencias que se entregan o se omiten para apoyar una afirmación.",
+      "Análisis de los efectos causados por recursos no lingüísticos (diseño, imágenes, disposición gráfica, efectos de audio) y lingüísticos (uso del imperativo, figuras literarias, expresiones populares, palabras en otros idiomas, intertextualidad, modalizaciones, etc.) presentes en el texto.",
+      "Identificación de similitudes y diferencias en la forma en que distintas fuentes presentan un mismo hecho.",
+      "Análisis de los elementos del texto que influyen en las propias opiniones, la percepción de sí mismo y las opciones que se toman."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 11",
+    "indicadores": [
+      "Leer y comprender textos no literarios"
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 12",
+    "indicadores": [
+      "Investiga las características del género antes de escribir.",
+      "Adeca el texto a los propósitos de escritura y a la situación comunicativa."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 13",
+    "indicadores": [
+      "Presentación clara del tema, esbozando los aspectos que se abordarán.",
+      "Organización y redacción clara de la información.",
+      "Inclusión de hechos, descripciones, ejemplos o explicaciones que reflejen una reflexión personal sobre el tema.",
+      "Progresión temática clara, con especial atención al empleo de recursos anafóricos y conectores.",
+      "Uso de recursos variados que favorezcan el interés y la comprensión del lector, tales como anécdotas, citas, síntesis, imágenes, infografías, etc.",
+      "Cierre coherente con las características del género y el propósito del autor.",
+      "Uso de citas y referencias según un formato previamente acordado."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 14",
+    "indicadores": [
+      "Presentación de una hipótesis o afirmación referida a temas contingentes o literarios.",
+      "Presencia de evidencias e información pertinente, extraídas de textos literarios y no literarios.",
+      "Uso de contraargumentos cuando es pertinente.",
+      "Uso de recursos variados que favorezcan el interés y la comprensión del lector, tales como anécdotas, citas, síntesis, imágenes, infografías, etc.",
+      "Mantención de la coherencia temática.",
+      "Conclusión coherente con los argumentos presentados.",
+      "Uso de citas y referencias según un formato previamente acordado."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 15",
+    "indicadores": [
+      "Recopilación, organización de información e ideas previas a la escritura.",
+      "Adecuación del registro: vocabulario técnico, frases hechas, lenguaje de redes sociales, expresiones coloquiales; persona gramatical y estructura textual, según género discursivo, contexto y destinatario.",
+      "Consideración de conocimientos e intereses del lector al presentar la información.",
+      "Aseguramiento de la coherencia y cohesión textual.",
+      "Cuidado de la organización oracional y textual.",
+      "Uso de conectores adecuados para unir secciones del texto y relacionar ideas dentro de cada párrafo.",
+      "Uso de vocabulario variado y preciso.",
+      "Reconocimiento y corrección de usos inadecuados: pronombres personales y reflexivos, conjugaciones verbales, participios irregulares, conectores, preposiciones, concordancia sujeto-verbo, artículo-sustantivo, sustantivo-adjetivo y complementos.",
+      "Corrección ortográfica y mejora de la presentación.",
+      "Uso eficaz de herramientas del procesador de textos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 16",
+    "indicadores": [
+      "Emplea adecuadamente los tiempos verbales en el estilo indirecto.",
+      "Reflexiona sobre el contraste en aspectos formales y de significado entre el estilo directo e indirecto, especialmente en textos del ámbito académico."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 17",
+    "indicadores": [
+      "Emplear frases nominales complejas como recurso"
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 18",
+    "indicadores": [
+      "Aplicar todas las reglas de ortografía literal y acentual.",
+      "Verificar la escritura de las palabras cuya ortografía no está sujeta a reglas.",
+      "Usar correctamente el punto, la coma, la raya, los dos puntos, los paréntesis, los puntos suspensivos, las comillas y el punto y coma."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 19",
+    "indicadores": [
+      "Postura personal frente a lo escuchado y argumentos que la sustenten.",
+      "Ordenación de la información en términos de su relevancia.",
+      "Contexto en el que se enmarcan los textos.",
+      "Uso de estereotipos, clichés y generalizaciones.",
+      "Argumentos y elementos de persuasión que usa el hablante para sostener una postura.",
+      "Diferentes puntos de vista expresados en los textos.",
+      "Contribución de imágenes y sonido al significado del texto.",
+      "Relaciones que se establecen entre imágenes, texto y sonido.",
+      "Relaciones entre lo escuchado y los temas y obras estudiados durante el curso."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 20",
+    "indicadores": [
+      "Evaluar el punto de vista de un emisor.",
+      "Evaluar su razonamiento.",
+      "Evaluar el uso de recursos retóricos (vocabulario, organización de las ideas, desarrollo y progresión de los argumentos, etc.)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 21",
+    "indicadores": [
+      "Manteniendo el foco.",
+      "Demostrando comprensión de lo dicho por el interlocutor.",
+      "Fundamentando su postura de manera pertinente y usando información que permita cumplir los propósitos establecidos.",
+      "Distinguiendo afirmaciones basadas en evidencias de aquellas que no lo están.",
+      "Retomando lo dicho por otros a través del parafraseo antes de contribuir con una idea nueva o refutar un argumento.",
+      "Negociando acuerdos con los interlocutores.",
+      "Reformulando sus comentarios para desarrollarlos mejor.",
+      "Considerando al interlocutor para la toma de turnos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 22",
+    "indicadores": [
+      "Presenta información fidedigna que denota una investigación previa.",
+      "Sigue una progresión temática clara.",
+      "Gradúa la cantidad de información que se entrega en cada parte de la exposición para asegurarse de que la audiencia comprenda.",
+      "Usa un vocabulario que denota dominio del tema.",
+      "Usa conectores adecuados para hilar la presentación.",
+      "Usa material visual que destaca solo lo más relevante y/o explica los conceptos más complejos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 23",
+    "indicadores": [
+      "Analizar los posibles efectos de los elementos lingüísticos que usa un hablante en una situación determinada.",
+      "Analizar los posibles efectos de los elementos paralingüísticos que usa un hablante en una situación determinada.",
+      "Analizar los posibles efectos de los elementos no lingüísticos que usa un hablante en una situación determinada."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Lengua y Literatura",
+    "oa_codigo": "LE2M OA 24",
+    "indicadores": [
+      "Delimitar el tema de investigación.",
+      "Seleccionar páginas y fuentes según la profundidad y la cobertura de la información que buscan.",
+      "Usar los organizadores y la estructura textual para encontrar información de manera eficiente.",
+      "Evaluar si los textos entregan suficiente información para responder una determinada pregunta o cumplir un propósito.",
+      "Evaluar la validez y confiabilidad de las fuentes consultadas.",
+      "Jerarquizar la información encontrada en las fuentes investigadas.",
+      "Registrar la información bibliográfica de las fuentes consultadas.",
+      "Elaborar un texto oral o escrito bien estructurado que comunique sus hallazgos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 01",
+    "indicadores": [
+      "Utilizar la descomposición de raíces y las propiedades de las raíces.",
+      "Combinar raíces con números racionales.",
+      "Resolver problemas que involucren estas operaciones en contextos diversos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 02",
+    "indicadores": [
+      "Comparar representaciones de potencias de exponente racional con raíces enésimas en la recta numérica.",
+      "Convertir raíces enésimas a potencias de exponente racional y viceversa.",
+      "Describir la relación entre potencias y logaritmos.",
+      "Resolver problemas rutinarios que involucren potencias, logaritmos y raíces enésimas.",
+      "Resolver problemas no rutinarios que involucren potencias, logaritmos y raíces enésimas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 03",
+    "indicadores": [
+      "Reconoce la función cuadrática f(x) = ax² en situaciones de la vida diaria y en otras asignaturas.",
+      "Representa la función cuadrática en tablas y gráficos de manera manual o con software educativo.",
+      "Determina puntos especiales de la gráfica de la función cuadrática.",
+      "Selecciona la función cuadrática como modelo de situaciones de cambio cuadrático en otras asignaturas, en particular, de la oferta y la demanda."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 04",
+    "indicadores": [
+      "ax2 = b",
+      "(ax + b)2 = c",
+      "ax2 + bx = 0",
+      "ax2 + bx = c",
+      "(a, b, c son números racionales, a ≠ 0)"
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 05",
+    "indicadores": [
+      "Representar funciones utilizando la metáfora de una máquina, por medio de tablas y gráficos, de manera manual o con software educativo.",
+      "Reflexionar sobre la función representada en el gráfico en un plano cartesiano.",
+      "Calcular las inversas en casos de funciones lineales.",
+      "Calcular las inversas en casos de funciones cuadráticas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 06",
+    "indicadores": [
+      "Aplicar el concepto de interés compuesto a través de situaciones de la vida real y de otras asignaturas.",
+      "Identificar el interés compuesto en diversos contextos.",
+      "Representar el interés compuesto de manera concreta, pictórica y simbólica, utilizando métodos manuales y/o software educativo.",
+      "Expresar el interés compuesto en forma recursiva: f(t+1) - f(t) = a · f(t).",
+      "Resolver problemas de interés compuesto aplicados a la vida diaria y a otras asignaturas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 07",
+    "indicadores": [
+      "Conjetura la fórmula.",
+      "Representa de manera concreta y simbólica.",
+      "Representa de manera manual y/o con software educativo.",
+      "Resuelve problemas de la vida diaria.",
+      "Resuelve problemas de geometría."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 08",
+    "indicadores": [
+      "Relacionar las propiedades de la semejanza con los ángulos.",
+      "Explicar las propiedades de la semejanza y los ángulos de manera pictórica y simbólica.",
+      "Utilizar métodos manuales y/o software educativo para explicar las propiedades de la semejanza y los ángulos.",
+      "Aplicar las propiedades de la semejanza para determinar ángulos o medidas de lados.",
+      "Resolver problemas geométricos y de otras asignaturas utilizando las propiedades de la semejanza."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 09",
+    "indicadores": [
+      "Aplicar las razones trigonométricas en diversos contextos.",
+      "Componer y descomponer vectores.",
+      "Determinar las proyecciones de vectores."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 10",
+    "indicadores": [
+      "Definición de la variable.",
+      "Determinación de los posibles valores de la incógnita.",
+      "Cálculo de su probabilidad.",
+      "Graficación de sus distribuciones."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 11",
+    "indicadores": [
+      "Utiliza permutaciones y combinatoria sencilla para calcular probabilidades de eventos.",
+      "Resuelve problemas utilizando permutaciones y combinatoria sencilla."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Matemática",
+    "oa_codigo": "MA2M OA 12",
+    "indicadores": [
+      "Revisión de información en medios de comunicación.",
+      "Identificación de suposiciones basadas en probabilidades.",
+      "Explicación de cómo una probabilidad puede sustentar suposiciones opuestas.",
+      "Explicación de decisiones basadas en situaciones subjetivas o en probabilidades."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 1",
+    "indicadores": [
+      "Analizar, apoyándose en diversas fuentes,",
+      "la centralidad del ser humano",
+      "y su capacidad de transformar el mundo",
+      "en las expresiones culturales del Humanismo y del Renacimiento."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 2",
+    "indicadores": [
+      "Comparar la sociedad medieval y moderna.",
+      "Considerar los cambios que implicó la ruptura de la unidad religiosa de Europa.",
+      "Considerar el surgimiento del Estado centralizado.",
+      "Considerar el impacto de la imprenta en la difusión del conocimiento y de las ideas.",
+      "Considerar la revolución científica y el nacimiento de la ciencia moderna."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 3",
+    "indicadores": [
+      "Caracterizar el Estado moderno considerando sus principales rasgos.",
+      "Concentración del poder en la figura del rey.",
+      "Desarrollo de la burocracia.",
+      "Desarrollo de un sistema fiscal centralizado.",
+      "Expansión del territorio.",
+      "Creación de ejércitos profesionales.",
+      "Monopolio del comercio internacional.",
+      "Contrastar con la fragmentación del poder que caracterizó a la Edad Media."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 4",
+    "indicadores": [
+      "Caracterización de la economía mercantilista del siglo XVI.",
+      "Acumulación y circulación de metales preciosos.",
+      "Ampliación de rutas comerciales.",
+      "Expansión mundial de la economía europea.",
+      "Revolución de los precios.",
+      "Aumento de la competencia."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 5",
+    "indicadores": [
+      "Profundas diferencias culturales entre europeos e indígenas americanos generaron incomprensión y conflicto.",
+      "La magnitud del continente americano presentó desafíos logísticos y estratégicos para los europeos, intensificando el choque cultural.",
+      "La llegada de los europeos desarticuló la cosmovisión de las sociedades indígenas, provocando crisis social y resistencia cultural."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 6",
+    "indicadores": [
+      "Analizar los factores que explican la rapidez de la conquista y la caída de los grandes imperios americanos.",
+      "Considerar la organización política de los imperios americanos.",
+      "Considerar las diferencias en la forma de hacer la guerra entre conquistadores e imperios americanos.",
+      "Considerar los intereses de los conquistadores.",
+      "Considerar la catástrofe demográfica que afectó a la población indígena."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 7",
+    "indicadores": [
+      "Analizar y evaluar el impacto de la conquista de América en la cultura europea.",
+      "Considerar la ampliación del mundo conocido.",
+      "Considerar el desafío de representar una nueva realidad.",
+      "Considerar los debates morales relacionados con la condición humana de los indígenas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 8",
+    "indicadores": [
+      "Analizar el rol de la ciudad en la administración del territorio del Imperio español.",
+      "Considerar las instituciones que concentraba la ciudad.",
+      "Analizar la relación de la ciudad con la metrópoli.",
+      "Evaluar el monopolio del comercio ejercido por la ciudad.",
+      "Considerar la consolidación del poder local de las élites criollas en la ciudad."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 9",
+    "indicadores": [
+      "Caracterizar el barroco a través de distintas expresiones culturales de la sociedad colonial.",
+      "Analizar el arte arquitectural barroco.",
+      "Analizar la música barroca.",
+      "Analizar el teatro barroco.",
+      "Analizar las ceremonias barrocas."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 10",
+    "indicadores": [
+      "Importancia del monopolio comercial americano en el comercio atlántico de los siglos XVII y XVIII.",
+      "Relevancia de la exportación de materias primas americanas en el comercio atlántico de los siglos XVII y XVIII.",
+      "Impacto de las distintas regiones productivas americanas en el comercio atlántico de los siglos XVII y XVIII.",
+      "Rol del tráfico y empleo masivo de mano de obra esclava en el comercio atlántico de los siglos XVII y XVIII.",
+      "Desarrollo de rutas comerciales atlánticas en los siglos XVII y XVIII."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 11",
+    "indicadores": [
+      "Analiza el proceso de formación de la sociedad colonial americana.",
+      "Considera la evangelización como elemento formativo.",
+      "Considera la esclavitud como elemento formativo.",
+      "Considera otras formas de trabajo no remunerado (encomienda y mita) como elementos formativos.",
+      "Considera los roles de género en la sociedad colonial americana.",
+      "Considera la transculturación en la sociedad colonial americana.",
+      "Considera el mestizaje en la sociedad colonial americana.",
+      "Considera la sociedad de castas en la sociedad colonial americana."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 12",
+    "indicadores": [
+      "Analiza las formas de convivencia entre españoles, mestizos y mapuches.",
+      "Evalúa los tipos de conflicto que surgen entre españoles, mestizos y mapuches como resultado del fracaso de la conquista de Arauco.",
+      "Relaciona el fracaso de la conquista de Arauco con el consiguiente desarrollo de una sociedad de frontera durante la Colonia en Chile."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 13",
+    "indicadores": [
+      "Analizar el rol de la hacienda en la conformación de los principales rasgos del Chile colonial.",
+      "Considerar el carácter rural de la economía colonial.",
+      "Considerar el desarrollo de un sistema de inquilinaje en la colonia.",
+      "Considerar la configuración de una élite terrateniente en la colonia.",
+      "Considerar la configuración de una sociedad con rasgos estamentales en la colonia.",
+      "Reconocer la proyección de estos elementos en los siglos XIX y XX."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 14",
+    "indicadores": [
+      "Caracterizar la Ilustración como corriente de pensamiento basada en la razón.",
+      "Considerar sus principales ideas tales como el ordenamiento constitucional.",
+      "Analizar la separación y el equilibrio de poderes del Estado.",
+      "Evaluar los principios de libertad, igualdad y soberanía popular.",
+      "Examinar la secularización.",
+      "Fundamentar su rol en la crítica al absolutismo.",
+      "Promoción del ideario republicano."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 15",
+    "indicadores": [
+      "Analizar cómo las ideas ilustradas se manifestaron en los procesos revolucionarios de fines del siglo XVIII y comienzos del siglo XIX.",
+      "Considerar la independencia de Estados Unidos.",
+      "Considerar la Revolución Francesa.",
+      "Considerar las independencias de las colonias españolas en Latinoamérica."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 16",
+    "indicadores": [
+      "Explicar la independencia de las colonias hispanoamericanas como un proceso continental.",
+      "Identificar la crisis del sistema colonial como factor determinante en la independencia hispanoamericana.",
+      "Analizar la apropiación de las ideas ilustradas en el contexto de la independencia hispanoamericana.",
+      "Comprender la opción por el modelo republicano en los procesos de independencia.",
+      "Analizar el proceso de Independencia de Chile en el marco de la independencia hispanoamericana."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 17",
+    "indicadores": [
+      "Contrastar las distintas posturas que surgieron en el debate sobre la legitimidad de la conquista durante el siglo XVI.",
+      "Fundamentar la relevancia de este debate para la concepción de los derechos humanos en la actualidad."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 18",
+    "indicadores": [
+      "Explicar el concepto de Derechos del Hombre y del Ciudadano difundido en el marco de la Ilustración.",
+      "Explicar el concepto de Derechos del Hombre y del Ciudadano difundido en el marco de la Revolución francesa.",
+      "Reconocer la vigencia actual de los Derechos del Hombre y del Ciudadano en los derechos humanos."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 19",
+    "indicadores": [
+      "Evaluar las principales transformaciones generadas por la independencia de Chile.",
+      "Evaluar los desafíos generados por la independencia de Chile.",
+      "Evaluar la conformación de un orden republicano en Chile.",
+      "Evaluar la constitución de una ciudadanía inspirada en la soberanía popular.",
+      "Evaluar la formación de un Estado nacional.",
+      "Fundamentar la relevancia de estas transformaciones para el Chile de la actualidad."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 20",
+    "indicadores": [
+      "Explica los criterios que definen una región.",
+      "Considera factores físicos (vegetación, suelo, clima) en la definición de región.",
+      "Considera factores humanos (lengua común, religión, historia) en la definición de región.",
+      "Proporciona ejemplos de distintos tipos de regiones en Chile (culturales, geográficas, económicas, político-administrativas).",
+      "Proporciona ejemplos de distintos tipos de regiones en América (culturales, geográficas, económicas, político-administrativas)."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 21",
+    "indicadores": [
+      "Analizar problemáticas asociadas a la región en Chile.",
+      "Evaluar grados de conexión y aislamiento (considerando redes de transporte y comunicaciones).",
+      "Evaluar acceso a bienes, servicios e información.",
+      "Evaluar índices demográficos y migración.",
+      "Evaluar impacto en el mercado laboral.",
+      "Evaluar impacto en los servicios de salud.",
+      "Evaluar impacto en la relación campo-ciudad.",
+      "Evaluar impacto en la relación centro-periferia."
+    ]
+  },
+  {
+    "nivel": "8° Básico",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 22",
+    "indicadores": [
+      "Analizar aspectos del desarrollo regional en Chile.",
+      "Considerar el Índice de Desarrollo Humano (IDH).",
+      "Evaluar la diversidad productiva.",
+      "Evaluar la diversidad de intercambio.",
+      "Evaluar la diversidad de consumo.",
+      "Analizar las ventajas comparativas de las regiones.",
+      "Analizar la inserción de las regiones en los mercados internacionales.",
+      "Evaluar el desarrollo sustentable en las regiones."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 1",
+    "indicadores": [
+      "Relacionar la transformación cultural del período de entreguerras con la ruptura de los cánones culturales y estéticos tradicionales.",
+      "Reconocer cómo se manifestó la ruptura de cánones en las vanguardias artísticas (dadaísmo, surrealismo, jazz, moda, entre otros).",
+      "Identificar la manifestación de la ruptura de cánones en la aparición de una cultura de masas (cine, radio, publicidad, prensa, deporte)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 2",
+    "indicadores": [
+      "Analizar la crisis del Estado liberal decimonónico a comienzos del siglo XX.",
+      "Considerar la Gran Depresión de 1929.",
+      "Considerar el surgimiento de distintos modelos políticos y económicos en Europa, Estados Unidos y América Latina.",
+      "Analizar los totalitarismos y su oposición a la democracia liberal (por ejemplo, nazismo, comunismo y fascismo).",
+      "Analizar el populismo latinoamericano.",
+      "Analizar los inicios del Estado de Bienestar."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 3",
+    "indicadores": [
+      "Fragilidad del orden mundial de entreguerras.",
+      "Enfrentamiento ideológico entre los regímenes de Hitler, Stalin y las democracias occidentales.",
+      "Horror de la población por los genocidios, como el exterminio judío.",
+      "Desplazamientos forzados de personas.",
+      "Bombardeos y la alta cifra de víctimas civiles.",
+      "Extensión planetaria del conflicto.",
+      "Potencial destructivo de la bomba atómica."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 4",
+    "indicadores": [
+      "Evaluar las consecuencias de la Segunda Guerra Mundial.",
+      "Considerar el surgimiento de Estados Unidos y la URSS como superpotencias.",
+      "Considerar la pérdida de hegemonía de Europa.",
+      "Analizar el inicio del proceso de descolonización.",
+      "Analizar los acuerdos de las conferencias de paz.",
+      "Analizar la creación de un nuevo marco regulador de las relaciones internacionales reflejado en la ONU.",
+      "Analizar la Declaración Universal de Derechos Humanos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 5",
+    "indicadores": [
+      "Analiza la crisis del sistema político durante el período parlamentario.",
+      "Analiza la reconstrucción de la institucionalidad a través de la Constitución de 1925.",
+      "Evalúa el fortalecimiento del régimen presidencial.",
+      "Evalúa la reforma del sistema de partidos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 6",
+    "indicadores": [
+      "Analizar las transformaciones económicas post-Gran Depresión en Chile.",
+      "Evaluar el impacto del fin de la riqueza salitrera y el modelo de crecimiento hacia afuera.",
+      "Analizar la redefinición del rol del Estado como promotor de la industrialización (ISI, CORFO).",
+      "Evaluar el rol del Estado como garante del bienestar social (escolarización, salud, vivienda, previsión).",
+      "Analizar la creciente participación de Estados Unidos en la economía local."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 7",
+    "indicadores": [
+      "Evaluar la contribución de nuevos actores sociales a la democratización de la sociedad chilena a mediados del siglo XX.",
+      "Evaluar la contribución de la expansión de la cultura de masas a la democratización de la sociedad chilena a mediados del siglo XX.",
+      "Considerar la incorporación de las mujeres a la ciudadanía política.",
+      "Considerar el empoderamiento de la clase media.",
+      "Considerar el empoderamiento de la clase obrera.",
+      "Considerar el creciente acceso a la radio.",
+      "Considerar el creciente acceso al cine.",
+      "Considerar el creciente acceso al deporte."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 8",
+    "indicadores": [
+      "Analizar la Guerra Fría como la confrontación ideológica de dos proyectos antagónicos.",
+      "Comprender que la amenaza del enfrentamiento nuclear se manifestó en distintos escenarios locales.",
+      "Ejemplificar cómo la Guerra Fría afectó diversas esferas como la política.",
+      "Ejemplificar cómo la Guerra Fría afectó diversas esferas como la cultura.",
+      "Ejemplificar cómo la Guerra Fría afectó diversas esferas como el deporte.",
+      "Ejemplificar cómo la Guerra Fría afectó diversas esferas como las ciencias."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 9",
+    "indicadores": [
+      "Reconocer las transformaciones que experimentó la sociedad occidental en diversos ámbitos durante la Guerra Fría.",
+      "Identificar el crecimiento económico y el auge del Estado de Bienestar.",
+      "Identificar la expansión del consumo y de los medios de comunicación de masas.",
+      "Identificar la ampliación de los derechos civiles de grupos marginados.",
+      "Identificar el desarrollo tecnológico, entre otros."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 10",
+    "indicadores": [
+      "Caracteriza el contexto de movilización social en América Latina.",
+      "Identifica la tensión permanente entre revolución y reforma en el contexto latinoamericano.",
+      "Considera la influencia de la Revolución Cubana en los movimientos sociales.",
+      "Analiza la influencia de Estados Unidos en la región.",
+      "Reconoce los golpes de Estado y las dictaduras militares como factores relevantes (ejemplos: Argentina, Chile, Brasil, Uruguay y Paraguay).",
+      "Identifica la violación de los derechos humanos como una característica del período."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 11",
+    "indicadores": [
+      "Analizar los principales procesos que marcaron el fin de la Guerra Fría.",
+      "Considerar la crisis de la URSS y el derrumbe del comunismo.",
+      "Evaluar las transformaciones geopolíticas.",
+      "Analizar el auge del neoliberalismo.",
+      "Evaluar la aceleración de la globalización (por ejemplo, la internacionalización de la economía, la revolución tecnológica, la sociedad de la información)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 12",
+    "indicadores": [
+      "Caracterizar la extendida pobreza y precariedad de la sociedad chilena de mediados del siglo XX.",
+      "Identificar magros indicadores sociodemográficos.",
+      "Evaluar el bajo poder adquisitivo y acceso al crédito.",
+      "Analizar los niveles de desnutrición y marginalidad.",
+      "Evaluar el impacto de la migración del campo a la ciudad en la sociedad chilena.",
+      "Analizar el progresivo crecimiento de la población urbana.",
+      "Evaluar la segregación urbana.",
+      "Analizar la escasez de viviendas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 13",
+    "indicadores": [
+      "Analizar el Chile de la década de 1960 como un escenario caracterizado por la organización y la movilización de nuevos actores sociales (por ejemplo, jóvenes, campesinado, pobladores).",
+      "Evaluar cómo el sistema político respondió a estas demandas.",
+      "Considerar las reformas estructurales de la Democracia Cristiana (revolución en libertad).",
+      "Considerar los proyectos excluyentes de la Democracia Cristiana (revolución en libertad).",
+      "Considerar las reformas estructurales de la Unidad Popular (vía chilena al socialismo).",
+      "Considerar los proyectos excluyentes de la Unidad Popular (vía chilena al socialismo)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 14",
+    "indicadores": [
+      "Analizar la polarización social y política a inicios de la década de 1970.",
+      "Analizar la retórica de la violencia a inicios de la década de 1970.",
+      "Analizar la desvalorización de la institucionalidad democrática a inicios de la década de 1970.",
+      "Analizar los conflictos en torno a la reforma agraria a inicios de la década de 1970.",
+      "Analizar las estatizaciones y expropiaciones a inicios de la década de 1970.",
+      "Analizar la crisis económica y la hiperinflación a inicios de la década de 1970.",
+      "Analizar la movilización social a inicios de la década de 1970.",
+      "Analizar la intervención extranjera a inicios de la década de 1970.",
+      "Analizar el rol de las Fuerzas Armadas a inicios de la década de 1970."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 15",
+    "indicadores": [
+      "Analiza críticamente distintas interpretaciones historiográficas sobre el golpe de Estado de 1973.",
+      "Compara críticamente distintas interpretaciones historiográficas sobre el golpe de Estado de 1973.",
+      "Analiza críticamente distintas interpretaciones historiográficas sobre el quiebre de la democracia en 1973.",
+      "Compara críticamente distintas interpretaciones historiográficas sobre el quiebre de la democracia en 1973."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 16",
+    "indicadores": [
+      "Durante la dictadura militar, se suprimió el Estado de derecho.",
+      "Durante la dictadura militar, se violaron sistemáticamente los derechos humanos.",
+      "Hubo instituciones civiles y religiosas que procuraron la defensa de las víctimas de violaciones de derechos humanos durante la dictadura militar."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 17",
+    "indicadores": [
+      "Caracterizar el modelo económico neoliberal implementado en Chile durante el régimen militar.",
+      "Analizar la transformación del rol del Estado y la disminución del gasto social bajo el modelo neoliberal.",
+      "Evaluar la supremacía del libre mercado como asignador de recursos en la economía chilena.",
+      "Examinar la apertura comercial y la disponibilidad de bienes durante la implementación del modelo neoliberal.",
+      "Analizar la política de privatizaciones e incentivo a la empresa privada en el contexto del modelo neoliberal.",
+      "Describir el cambio en las relaciones y derechos laborales como parte del modelo neoliberal.",
+      "Evaluar las consecuencias sociales del modelo neoliberal en el corto plazo.",
+      "Evaluar las consecuencias sociales del modelo neoliberal en el largo plazo."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 18",
+    "indicadores": [
+      "Analizar la nueva institucionalidad política creada por la Constitución de 1980.",
+      "Considerar los artículos transitorios de la Constitución de 1980.",
+      "Considerar el cuórum calificado establecido en la Constitución de 1980.",
+      "Considerar la función tutelar de las Fuerzas Armadas en la Constitución de 1980.",
+      "Considerar los senadores designados en la Constitución de 1980.",
+      "Considerar el Consejo de Seguridad del Estado en la Constitución de 1980.",
+      "Evaluar cambios y continuidades entre la institucionalidad de la Constitución de 1980 y la presente."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 19",
+    "indicadores": [
+      "Crisis económica de la década de 1980.",
+      "Surgimiento de protestas sociales.",
+      "Rearticulación del mundo político (partidos y movimientos).",
+      "Rol mediador de la Iglesia Católica.",
+      "Acción de organismos de defensa de los Derechos Humanos.",
+      "Influencia de la comunidad internacional."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 20",
+    "indicadores": [
+      "Análisis de la transición a la democracia, considerando el plebiscito de 1988.",
+      "Estudio de la búsqueda de acuerdos entre el gobierno y la oposición durante la transición.",
+      "Análisis de las reformas constitucionales implementadas en el periodo.",
+      "Evaluación de las tensiones cívico-militares presentes durante la transición.",
+      "Comprensión del consenso generado en torno a la democracia representativa como sistema político.",
+      "Análisis de la reivindicación de los derechos humanos mediante políticas de reparación."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 21",
+    "indicadores": [
+      "Analizar la sociedad chilena posterior a la recuperación de la democracia.",
+      "Considerar la estructura social.",
+      "Considerar la disponibilidad y el acceso a bienes.",
+      "Considerar la infraestructura.",
+      "Considerar los medios y las tecnologías de comunicación.",
+      "Considerar el sistema educacional.",
+      "Considerar el mercado del trabajo.",
+      "Considerar la demanda de derechos de grupos históricamente discriminados, entre otros."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 22",
+    "indicadores": [
+      "Analiza el concepto de Derechos Humanos.",
+      "Considera la característica de universalidad de los Derechos Humanos.",
+      "Considera la característica de indivisibilidad de los Derechos Humanos.",
+      "Considera la característica de interdependencia de los Derechos Humanos.",
+      "Considera la característica de imprescriptibilidad de los Derechos Humanos.",
+      "Reconoce la institucionalidad creada para resguardar los Derechos Humanos a nivel nacional.",
+      "Reconoce la institucionalidad creada para resguardar los Derechos Humanos a nivel internacional.",
+      "Reconoce los derechos vinculados a los grupos de especial protección."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 23",
+    "indicadores": [
+      "Explicar los elementos que constituyen un Estado de derecho, como la Constitución.",
+      "Explicar la división de los poderes del Estado.",
+      "Explicar el respeto a los derechos humanos, entre otros.",
+      "Analizar su importancia para la gobernabilidad.",
+      "Analizar su importancia para la representación.",
+      "Analizar su importancia para la participación ciudadana.",
+      "Analizar su importancia para la convivencia pacífica.",
+      "Debatir sobre su perfeccionamiento.",
+      "Debatir sobre su defensa.",
+      "Debatir sobre los riesgos a los que está expuesto."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 24",
+    "indicadores": [
+      "Reducir la pobreza y la desigualdad.",
+      "Garantizar los derechos de los grupos discriminados.",
+      "Lograr un desarrollo sustentable.",
+      "Perfeccionar el sistema político.",
+      "Fortalecer la relación con los países vecinos.",
+      "Reconocer los deberes del Estado.",
+      "Reconocer la responsabilidad de todos los miembros de la sociedad para avanzar en los desafíos."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Historia, Geografía y Ciencias Sociales",
+    "oa_codigo": "OA 25",
+    "indicadores": [
+      "Reconocer la diversidad inherente a las sociedades como manifestación de la libertad y de la dignidad humana.",
+      "Evaluar las oportunidades y desafíos que un mundo globalizado entrega para evitar toda forma de discriminación.",
+      "Identificar y rechazar la discriminación por raza o etnia.",
+      "Identificar y rechazar la discriminación por nacionalidad.",
+      "Identificar y rechazar la discriminación por situación socioeconómica.",
+      "Identificar y rechazar la discriminación por religión o creencia.",
+      "Identificar y rechazar la discriminación por género.",
+      "Identificar y rechazar la discriminación por orientación sexual.",
+      "Identificar y rechazar la discriminación por discapacidad."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 1",
+    "indicadores": [
+      "Explicar cómo el sistema nervioso coordina las acciones del organismo para adaptarse a estímulos del ambiente.",
+      "Describir cómo el sistema nervioso transmite señales a través de neuronas a lo largo del cuerpo.",
+      "Investigar y comunicar los cuidados del sistema nervioso.",
+      "Investigar y comunicar la importancia de las horas de sueño para el sistema nervioso.",
+      "Investigar y comunicar los efectos del consumo de drogas, café y alcohol en el sistema nervioso.",
+      "Investigar y comunicar la prevención de traumatismos en el sistema nervioso."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 2",
+    "indicadores": [
+      "Crear modelos que expliquen la regulación de la glicemia por medio del control de las hormonas pancreáticas.",
+      "Crear modelos que expliquen los caracteres sexuales y las funciones reproductivas por medio del control de las hormonas sexuales en el organismo."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 3",
+    "indicadores": [
+      "Explicar que la sexualidad humana y la reproducción son aspectos fundamentales de la vida del ser humano.",
+      "Considerar los aspectos biológicos de la sexualidad humana y la reproducción.",
+      "Considerar los aspectos sociales de la sexualidad humana y la reproducción.",
+      "Considerar los aspectos afectivos de la sexualidad humana y la reproducción.",
+      "Considerar los aspectos psicológicos de la sexualidad humana y la reproducción.",
+      "Analizar la responsabilidad individual frente a sí mismo en el contexto de la sexualidad y la reproducción.",
+      "Analizar la responsabilidad individual frente a los demás en el contexto de la sexualidad y la reproducción."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 4",
+    "indicadores": [
+      "Describir la fecundación.",
+      "Describir la implantación.",
+      "Describir el desarrollo del embrión.",
+      "Analizar la responsabilidad de los padres en la nutrición prenatal.",
+      "Analizar la responsabilidad de los padres en la lactancia."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 5",
+    "indicadores": [
+      "Explicar los métodos de regulación de la fertilidad.",
+      "Evaluar los métodos de regulación de la fertilidad.",
+      "Identificar los elementos de una paternidad responsable.",
+      "Identificar los elementos de una maternidad responsable."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 6",
+    "indicadores": [
+      "Investiga y argumenta, basándose en evidencias, que el material genético se transmite de generación en generación en organismos como plantas y animales.",
+      "Compara los procesos de mitosis y meiosis.",
+      "Describe las causas y consecuencias de anomalías en la división celular (tumor, cáncer, trisomía, entre otros).",
+      "Describe las consecuencias de la pérdida de control de la división celular (tumor, cáncer, trisomía, entre otros)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 7",
+    "indicadores": [
+      "Desarrollar una explicación científica basada en evidencias sobre los procesos de herencia genética en plantas y animales.",
+      "Aplicar los principios básicos de la herencia propuestos por Mendel."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 8",
+    "indicadores": [
+      "Investigar las aplicaciones de la manipulación genética en la producción de alimentos.",
+      "Investigar las aplicaciones de la manipulación genética en la producción de detergentes.",
+      "Investigar las aplicaciones de la manipulación genética en la producción de vestuario.",
+      "Investigar las aplicaciones de la manipulación genética en la producción de fármacos u otros productos.",
+      "Explicar las aplicaciones que han surgido a raíz de la manipulación genética para generar alimentos, detergentes, vestuario, fármacos u otros.",
+      "Evaluar las implicancias éticas de la manipulación genética para generar alimentos, detergentes, vestuario, fármacos u otros.",
+      "Evaluar las implicancias sociales de la manipulación genética para generar alimentos, detergentes, vestuario, fármacos u otros."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 9",
+    "indicadores": [
+      "Analizar, sobre la base de la experimentación, el movimiento rectilíneo uniforme de un objeto respecto de un sistema de referencia espacio-temporal.",
+      "Analizar, sobre la base de la experimentación, el movimiento rectilíneo acelerado de un objeto respecto de un sistema de referencia espacio-temporal.",
+      "Considerar variables como la posición en situaciones cotidianas.",
+      "Considerar variables como la velocidad en situaciones cotidianas.",
+      "Considerar variables como la aceleración en situaciones cotidianas."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 10",
+    "indicadores": [
+      "Explicar por medio de investigaciones experimentales los efectos que tiene una fuerza neta sobre un objeto.",
+      "Utilizar las leyes de Newton.",
+      "Utilizar el diagrama de cuerpo libre."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 11",
+    "indicadores": [
+      "Describe el movimiento de un objeto usando la ley de conservación de la energía mecánica.",
+      "Describe el movimiento de un objeto usando los conceptos de trabajo mecánico.",
+      "Describe el movimiento de un objeto usando los conceptos de potencia mecánica."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 12",
+    "indicadores": [
+      "Analiza e interpreta datos de investigaciones sobre colisiones entre objetos.",
+      "Considera la cantidad de movimiento de un cuerpo en función del impulso que adquiere.",
+      "Aplica la ley de conservación de la cantidad de movimiento (momento lineal o momentum)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 13",
+    "indicadores": [
+      "Comprende que el conocimiento del Universo cambia y aumenta a partir de nuevas evidencias.",
+      "Utiliza modelos como el geocéntrico y el heliocéntrico para explicar la evolución de la comprensión del Universo.",
+      "Considera teorías como la del Big Bang para comprender el origen y desarrollo del Universo.",
+      "Demuestra cómo las nuevas evidencias influyen en la modificación y actualización de los modelos y teorías sobre el Universo."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 14",
+    "indicadores": [
+      "Explicación cualitativa del origen de las mareas, utilizando las leyes de Kepler y la ley de gravitación universal de Newton.",
+      "Descripción de la formación y dinámica de estructuras cósmicas naturales (galaxias, cúmulos, etc.) en función de las leyes de Kepler y la ley de gravitación universal de Newton.",
+      "Análisis del movimiento de estructuras artificiales (sondas, satélites, naves espaciales) mediante las leyes de Kepler y la ley de gravitación universal de Newton."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 15",
+    "indicadores": [
+      "Explicar las propiedades de las soluciones a través de modelos.",
+      "Experimentar con ejemplos cercanos para comprender las propiedades de las soluciones.",
+      "Considerar el estado físico de las soluciones.",
+      "Identificar los componentes de las soluciones (soluto y solvente).",
+      "Analizar la cantidad de soluto disuelto en las soluciones (concentración)."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 16",
+    "indicadores": [
+      "Planificar una investigación experimental.",
+      "Conducir una investigación experimental."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 17",
+    "indicadores": [
+      "Crear modelos del carbono.",
+      "Explicar las propiedades del carbono como base."
+    ]
+  },
+  {
+    "nivel": "2° Medio",
+    "asignatura": "Ciencias Naturales",
+    "oa_codigo": "OA 18",
+    "indicadores": [
+      "Desarrolla modelos que expliquen la estereoquímica de compuestos orgánicos como la glucosa.",
+      "Desarrolla modelos que expliquen la isomería de compuestos orgánicos como la glucosa.",
+      "Identifica las propiedades de la glucosa.",
+      "Identifica la utilidad de la glucosa para los seres vivos."
+    ]
+  }
+]

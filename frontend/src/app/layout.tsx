@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter, Merriweather } from "next/font/google";
 import StructuredData from "@/components/StructuredData";
+import { ClientProviders } from "./providers";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
         siteName: "ProfeIC",
         images: [
             {
-                url: "/og-image.png", // Asegúrate de tener esta imagen en public
+                url: "/og-image.png",
                 width: 1200,
                 height: 630,
                 alt: "ProfeIC Dashboard",
@@ -80,7 +81,9 @@ export default function RootLayout({
     return (
         <html lang="es" className={`${inter.variable} ${merriweather.variable}`}>
             <body className="bg-slate-900 text-cream-50 font-sans">
-                {children}
+                <ClientProviders>
+                    {children}
+                </ClientProviders>
                 <StructuredData />
                 <Toaster richColors position="top-center" />
             </body>

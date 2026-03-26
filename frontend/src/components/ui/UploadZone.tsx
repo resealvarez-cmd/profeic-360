@@ -55,7 +55,7 @@ export const UploadZone = ({ onContextLoaded }: UploadZoneProps) => {
         formData.append("file", file);
 
         try {
-            const res = await fetch(`${API_URL} /biblioteca/upload`, {
+            const res = await fetch(`${API_URL}/biblioteca/upload`, {
                 method: "POST",
                 body: formData,
             });

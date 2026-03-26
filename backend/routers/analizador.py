@@ -26,11 +26,12 @@ if not api_key:
     print("⚠️ ERROR: No se encontró GOOGLE_API_KEY en el .env")
 genai.configure(api_key=api_key)
 
-router = APIRouter(prefix="/analizador", tags=["Analizador Cognitivo"])
+router = APIRouter(prefix="/api/v1/analizador", tags=["Analizador Cognitivo"])
 
 class AnalisisRequest(BaseModel):
     objetivo_aprendizaje: str
     texto_evaluacion: str
+    contexto_escenario: str = "practicado" # Default: practicado o inédito
 
 # user_id ya NO va en el body — se extrae del JWT en el servidor
 class GuardarAnalisisRequest(BaseModel):
@@ -39,29 +40,33 @@ class GuardarAnalisisRequest(BaseModel):
     resultado_analisis: dict
 
 
-def build_analysis_prompt(oa: str, evaluacion: str) -> str:
-    return f"""Eres un Coach Pedagógico experto en la Taxonomía DOK de Norman Webb. Tu rol es el de un MENTOR: propositivo, constructivo, nunca un juez.
+def build_analysis_prompt(oa: str, evaluacion: str, contexto_escenario: str) -> str:
+    # Inyección del Contexto: Toma el valor seleccionado y reemplázalo en la llave {texto_nuevo_o_visto_en_clases}
+    texto_nuevo_o_visto_en_clases = ""
+    if contexto_escenario == "inedito":
+        texto_nuevo_o_visto_en_clases = "El docente declara que los escenarios son inéditos, priorizar evaluación como DOK 3 si aplica."
+    else:
+        texto_nuevo_o_visto_en_clases = "El contenido evaluado fue practicado en clases con ejercicios similares."
 
-## MARCO DOK (referencia obligatoria para clasificar)
-- DOK 1: Recordar/reproducir un hecho. Respuesta única directa en el texto o memoria. Ej: "¿Quién es el personaje principal?"
-- DOK 2: Interpretar, comparar, explicar usando un concepto conocido. Ej: "¿Por qué el personaje tomó esa decisión?"
-- DOK 3: Argumentar, evaluar, construir con evidencia propia. Más de una respuesta válida posible. Ej: "Justifica con evidencia del texto si el personaje actuó correctamente."
-- DOK 4: Crear/investigar integrando disciplinas en proyectos extendidos (días/semanas).
+    return f"""Eres un Coach Pedagógico experto en la Taxonomía DOK de Norman Webb. Tu rol es el de un MENTOR: propositivo, constructivo, nunca un juez. Eres un "Buscador de Evidencias" de alta demanda cognitiva.
 
-## REGLAS CLAVE
-1. Clasifica por la DEMANDA COGNITIVA REAL (lo que el estudiante debe hacer mentalmente), nunca por los verbos usados.
-2. Si hay duda entre dos niveles, usa el menor (conservador).
-3. **CRÍTICO**: La comparación es SIEMPRE contra el OA declarado principal, NO contra etiquetas de sección del instrumento (ej: si una sección dice "Habilidad: Extraer información" pero el OA pide "Analizar", la habilidad base sigue siendo "Analizar").
-4. Determina el nivel DOK que el OA exige implícitamente (ej: "Analizar" → DOK 3, "Comprender" → DOK 2, "Identificar" → DOK 1).
-5. ESTADO "Logrado": SOLO si dok_real >= dok_exigido_por_el_OA Y el reactivo genera evidencia directa de que ese OA específico fue alcanzado.
-6. ESTADO "Mejorable": si dok_real < dok_exigido_por_el_OA. Un reactivo DOK 1 o 2 para un OA que exige análisis/argumentación SIEMPRE es "Mejorable", aunque el tema sea correcto.
-7. Tono siempre propositivo: "Para fortalecer este reactivo..." nunca "Error:" o "Incorrecto:".
-8. Cuando el estado sea "Mejorable", la "sugerencia_reingenieria" es OBLIGATORIA: escribe una versión concreta del reactivo que eleve su exigencia cognitiva al DOK que el OA requiere (generalmente DOK 3: argumentar, justificar con evidencia, evaluar una decisión del personaje).
+## MARCO DOK Y PREVENCIÓN DE CAMUFLAJE COGNITIVO
+- DOK 1 y 2: Recordar, reproducir, interpretar o aplicar mecánicamente. 
+  *ATENCIÓN AL CAMUFLAJE*: Si un reactivo tiene una historia larga o un "caso", pero el estudiante solo debe extraer datos para aplicar una fórmula de rutina o recordar un concepto, SIGUE SIENDO DOK 1 o 2. El adorno narrativo no eleva la cognición.
+- DOK 3: Argumentar, evaluar, justificar, tomar decisiones. Busca activamente EVIDENCIAS de estas 3 tipologías para validarlo como DOK 3: 1) Refutar/corregir a un "Tercero Equivocado", 2) Elegir y justificar entre "Múltiples Caminos", 3) Discriminar "Datos Contradictorios/Sobrantes".
+- DOK 4: Crear/investigar integrando disciplinas en proyectos extendidos.
+
+## REGLAS CLAVE DE AUDITORÍA (¡CRÍTICAS!)
+1. CLASIFICACIÓN REAL: Clasifica por la fricción cognitiva real (lo que el estudiante hace mentalmente), NUNCA por los verbos usados en el enunciado.
+2. EL PRINCIPIO DE ANDAMIAJE: Un reactivo DOK 1 o DOK 2 evaluando un OA de alta exigencia (ej. Analizar) NO es automáticamente un error. Considéralo ESTADO "Logrado" si funciona como un paso preparatorio (andamiaje) lógico dentro del instrumento.
+3. DETECCIÓN DE ILUSIÓN DE COMPETENCIA: El estado es "Mejorable" SOLO SI: a) El reactivo es un falso positivo (camuflaje cognitivo), o b) El instrumento EN SU TOTALIDAD carece de reactivos DOK 3, estancando al estudiante en la memorización.
+4. VALIDACIÓN DEL DISEÑO: Si encuentras al menos 2 preguntas que cumplan genuinamente con el estándar DOK 3, tu "diagnostico_global" DEBE iniciar felicitando explícitamente el buen diseño y la superación de la ilusión de competencia.
+5. REINGENIERÍA OBLIGATORIA: Cuando el estado sea "Mejorable", la "sugerencia_reingenieria" DEBE transformar el reactivo utilizando obligatoriamente una de las 3 tipologías DOK 3 mencionadas arriba.
 
 ## INPUTS
-OA declarado: {oa}
-
-Instrumento:
+- OA declarado: {oa}
+- Contexto de Aplicación: {texto_nuevo_o_visto_en_clases}
+- Instrumento a evaluar:
 {evaluacion}
 
 ## RESPONDE SOLO CON UN JSON (sin markdown, sin texto extra):
@@ -72,8 +77,8 @@ Instrumento:
     }},
     "diagnostico_global": "Diagnóstico breve con tono de mentor...",
     "score_coherencia": 0,
-    "feed_forward": "2-3 pasos concretos para mejorar la alineación entre el instrumento y el OA...",
-    "pregunta_cierre": "Una pregunta de coaching poderosa para que el docente reflexione...",
+    "feed_forward": "2-3 pasos concretos para mejorar la alineación...",
+    "pregunta_cierre": "Una pregunta de coaching poderosa...",
     "niveles_data": [
         {{"nivel": "DOK 1", "nombre": "Memoria", "cantidad": 0, "esperado": 15, "color": "#94a3b8"}},
         {{"nivel": "DOK 2", "nombre": "Aplicación", "cantidad": 0, "esperado": 40, "color": "#60a5fa"}},
@@ -83,21 +88,21 @@ Instrumento:
     "items_analizados": [
         {{
             "id": 1,
-            "pregunta_extracto": "Texto corto (máx 80 chars)...",
-            "pregunta_completa": "Texto completo del reactivo...",
-            "habilidad_declarada": "Habilidad que el OA exige para este reactivo, o 'No declarada explícitamente'",
-            "habilidad_real": "Habilidad que el reactivo realmente evidencia (lenguaje simple y directo)",
-            "proceso_mental_estudiante": "Lo que el estudiante hace mentalmente para responder (lenguaje simple)",
+            "pregunta_extracto": "Texto corto...",
+            "pregunta_completa": "Texto completo...",
+            "habilidad_declarada": "Habilidad exigida",
+            "habilidad_real": "Habilidad evidenciada",
+            "proceso_mental_estudiante": "Lo que hace mentalmente...",
             "dok_real": "DOK 1",
-            "estado": "Logrado",
-            "analisis": "Diagnóstico propositivo citando el descriptor DOK...",
-            "sugerencia_reingenieria": "Versión mejorada del reactivo (solo si estado=Mejorable, si no dejar vacío)",
-            "pregunta_reflexion": "Una pregunta de coaching para que el docente reflexione sobre este reactivo"
+            "estado": "Logrado o Mejorable",
+            "analisis": "Diagnóstico propositivo...",
+            "sugerencia_reingenieria": "Versión mejorada usando tipología DOK 3 (solo si Mejorable)",
+            "pregunta_reflexion": "Pregunta de coaching"
         }}
     ],
     "conclusion": {{
-        "texto": "Resumen pedagógico con tono mentor...",
-        "accion": "Acción directa y constructiva para el docente..."
+        "texto": "Resumen pedagógico...",
+        "accion": "Acción directa..."
     }}
 }}"""
 
@@ -107,7 +112,11 @@ async def auditar_instrumento(request: AnalisisRequest):
     try:
         print(f"🧠 Analizando DOK con {MODEL_NAME} (temperatura=0, Webb+Mentoría)...")
 
-        prompt = build_analysis_prompt(request.objetivo_aprendizaje, request.texto_evaluacion)
+        prompt = build_analysis_prompt(
+            oa=request.objetivo_aprendizaje, 
+            evaluacion=request.texto_evaluacion, 
+            contexto_escenario=request.contexto_escenario
+        )
 
         model = genai.GenerativeModel(
             model_name=MODEL_NAME,

@@ -58,3 +58,22 @@ SALIDA JSON EXACTA (SIN SECCIONES ANIDADAS):
 """
 
 DUA_PROMPT = """ESPECIALISTA DUA. Sugiere adecuaciones para {barrera}."""
+
+PME_IMPORT_PROMPT = """
+ACTÚA COMO CONSULTOR ESTRATÉGICO EDUCACIONAL. Analiza el siguiente texto de un Plan de Mejoramiento Educativo (PME).
+TEXTO: {texto_documento}
+
+Extrae y organiza la información en el siguiente formato JSON EXACTO:
+{{
+  "title": "Título del Objetivo Estratégico",
+  "description": "Breve descripción general de la meta",
+  "phases": [
+    {{
+      "title": "Nombre de la Fase (Ej: Diagnóstico, Implementación, Evaluación)",
+      "indicators": [
+        {{ "description": "Descripción del indicador de éxito", "target_value": 100, "metric_type": "percentage" }}
+      ]
+    }}
+  ]
+}}
+"""
