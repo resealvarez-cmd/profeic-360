@@ -63,7 +63,7 @@ export function TeacherProfiler({ teacherId, isOpen, onClose, userRole = 'direct
     setLoading(true);
     setData(null);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       console.log(`[Profiler] Fetching trajectory for ${teacherId} at ${API_URL}`);
       
       // 1. Fetch Trajectory Analysis (IA)
@@ -225,6 +225,31 @@ export function TeacherProfiler({ teacherId, isOpen, onClose, userRole = 'direct
                             <li className="opacity-50 italic list-none">Analizando brechas...</li>
                           )}
                         </ul>
+                      </div>
+                    </div>
+                    
+                    {/* Insights Segmentados */}
+                    <div className="mt-8 grid grid-cols-1 gap-4">
+                      {data.trajectory_analysis?.teacher_view && (
+                        <div className="bg-white/10 p-4 rounded-2xl border border-white/5">
+                          <span className="text-[9px] font-black uppercase text-blue-300 mb-2 block">Autopercepción del Docente</span>
+                          <p className="text-[11px] text-blue-100 italic leading-relaxed">"{data.trajectory_analysis.teacher_view}"</p>
+                        </div>
+                      )}
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        {data.trajectory_analysis?.utp_view && (
+                          <div className="bg-white/10 p-4 rounded-2xl border border-white/5">
+                            <span className="text-[9px] font-black uppercase text-blue-300 mb-2 block">Visión UTP</span>
+                            <p className="text-[11px] text-blue-100 leading-relaxed">{data.trajectory_analysis.utp_view}</p>
+                          </div>
+                        )}
+                        {data.trajectory_analysis?.director_view && (
+                          <div className="bg-white/10 p-4 rounded-2xl border border-white/5">
+                            <span className="text-[9px] font-black uppercase text-blue-300 mb-2 block">Visión Dirección</span>
+                            <p className="text-[11px] text-blue-100 leading-relaxed">{data.trajectory_analysis.director_view}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

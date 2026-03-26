@@ -274,14 +274,21 @@ async def generate_trajectory_report(req: TrajectoryRequest):
         data = await _get_teacher_trajectory_data(req.teacher_id)
         if data["total_cycles"] == 0:
             return {
-                "teacher_view": "Aún no hay suficientes observaciones registradas.",
-                "utp_view": "Datos insuficientes.",
-                "director_view": "Datos insuficientes.",
-                "trend": "stable",
-                "focus_alert": None,
-                "strengths": [],
-                "gaps": [],
-                "suggested_training": []
+                "teacher_name": data["teacher"]["full_name"],
+                "total_cycles": 0,
+                "observers": [],
+                "closure_rate": 0,
+                "depth_index": 0,
+                "trajectory_analysis": {
+                    "teacher_view": "Aún no hay suficientes observaciones registradas.",
+                    "utp_view": "Datos insuficientes.",
+                    "director_view": "Datos insuficientes.",
+                    "trend": "stable",
+                    "summary": "El docente requiere finalizar su primer ciclo de acompañamiento para levantar perfil.",
+                    "strengths": [],
+                    "gaps": [],
+                    "suggested_training": []
+                }
             }
         
         return {

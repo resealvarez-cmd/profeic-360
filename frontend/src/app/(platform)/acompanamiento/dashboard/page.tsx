@@ -9,6 +9,7 @@ import Link from "next/link";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, LineChart, Line, AreaChart, Area } from "recharts";
 import { toast } from "sonner";
 import ProductAnalytics from "@/components/ProductAnalytics";
+import { TeacherProfiler } from "@/components/shared/TeacherProfiler";
 
 export default function Dashboard360() {
     const router = useRouter();
@@ -88,46 +89,13 @@ export default function Dashboard360() {
         }
     };
 
-    const handleViewTeacherDetail = async (teacherId: string) => {
+    const handleViewTeacherDetail = (teacherId: string) => {
         if (!teacherId) {
             toast.error("Este acompañamiento heredado no tiene un ID de docente asignado.");
             return;
         }
-
         setSelectedTeacherId(teacherId);
         setShowTeacherDetailDrawer(true);
-        setLoadingTeacherDetail(true);
-        setTeacherDetailData(null); // Reset prev data
-        try {
-            console.log(`[Dashboard] Fetching trajectory for ${teacherId} at ${API_URL}`);
-            const body = { teacher_id: teacherId };
-            const response = await fetch(`${API_URL}/acompanamiento/trajectory-report`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            console.log(`[Dashboard] AI Status: ${response.status}`);
-
-            const { data: skillsData, error: skillsError } = await supabase.from('teacher_skills').select('*').eq('teacher_id', teacherId);
-            if (skillsError) console.error("[Dashboard] Skills DB Error:", skillsError);
-
-            if (response.ok) {
-                const data = await response.json();
-                setTeacherDetailData({...data, skills: skillsData || []});
-            } else {
-                const errorText = await response.text();
-                console.error(`[Dashboard] IA Error: ${response.status} - ${errorText}`);
-                toast.error("Error al cargar el detalle del docente.");
-                setShowTeacherDetailDrawer(false);
-            }
-        } catch (error: any) {
-            console.error("[Dashboard] Critical Error teacher detail:", error);
-            toast.error(`Error de conexión: ${error.message || 'Se agotó el tiempo de espera'}`);
-            setShowTeacherDetailDrawer(false);
-        } finally {
-            setLoadingTeacherDetail(false);
-        }
     };
 
     const handleDeleteObservation = async (cycleId: string) => {
@@ -1904,6 +1872,18 @@ function DashboardContent({
                     </div>
                 )}
             </div>
+            {/* Teacher Profiler Drawer */}
+            {showTeacherDetailDrawer && selectedTeacherId && (
+                <TeacherProfiler 
+                    teacherId={selectedTeacherId}
+                    isOpen={showTeacherDetailDrawer}
+                    onClose={() => {
+                        setShowTeacherDetailDrawer(false);
+                        setSelectedTeacherId(null);
+                    }}
+                    userRole={userRole || 'director'}
+                />
+            )}
         </div>
     );
 }
