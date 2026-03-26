@@ -33,7 +33,7 @@ export function TeacherProfiler({ teacherId, isOpen, onClose, userRole = 'direct
     if (!teacherId) return;
     setIsExporting(true);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const response = await fetch(`${API_URL}/acompanamiento/export-trajectory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,7 +63,7 @@ export function TeacherProfiler({ teacherId, isOpen, onClose, userRole = 'direct
     setLoading(true);
     setData(null);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       console.log(`[Profiler] Fetching trajectory for ${teacherId} at ${API_URL}`);
       
       // 1. Fetch Trajectory Analysis (IA)

@@ -16,7 +16,7 @@ type FeedCardProps = {
     isCloning: boolean;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function FeedCard({ item, onClone, isCloning }: FeedCardProps) {
     const [liked, setLiked] = useState(false);

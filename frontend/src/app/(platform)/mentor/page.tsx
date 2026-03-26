@@ -87,7 +87,7 @@ export default function MentorPage() {
             const { data: { session } } = await supabase.auth.getSession();
             const token = session?.access_token || "";
 
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const res = await fetch(`${API_URL}/chat-mentor`, {
                 method: "POST",
                 headers: {

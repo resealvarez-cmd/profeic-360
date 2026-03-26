@@ -78,7 +78,7 @@ const DESAFIOS_COMUNES = [
     "Aprendizaje Basado en Proyectos"
 ];
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ProfilePage() {
     const [loading, setLoading] = useState(true);

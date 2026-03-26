@@ -52,7 +52,7 @@ export default function Dashboard360() {
     // DASHBOARD REFINEMENTS
     const [showSuperAdminPanel, setShowSuperAdminPanel] = useState(true);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
     const handleGenerateExecutive = async () => {
         setLoadingExecutive(true);

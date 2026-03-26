@@ -174,7 +174,7 @@ export default function AdminUsersPage() {
                 if (newUser.password && newUser.password.trim() !== "") {
                     // Create directly via backend
                     const { data: { session } } = await supabase.auth.getSession();
-                    const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                    const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
                     const response = await fetch(`${BE_URL}/admin/create-user`, {
                         method: "POST",

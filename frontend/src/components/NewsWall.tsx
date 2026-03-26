@@ -16,7 +16,7 @@ type NewsItem = {
     etiqueta?: string; // Nuevo campo opcional
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const getTagColor = (tag: string) => {
     switch (tag) {
