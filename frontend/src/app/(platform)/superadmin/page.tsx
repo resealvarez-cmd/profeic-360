@@ -671,6 +671,7 @@ export default function SuperAdminDashboard() {
                                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Rol</label>
                                          <select value={inviteRole} onChange={e => setInviteRole(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-[#1B3C73] outline-none">
                                              <option value="teacher">Profesor</option>
+                                             <option value="utp">Coordinador UTP</option>
                                              <option value="director">Director</option>
                                              <option value="admin">Súper Admin</option>
                                          </select>

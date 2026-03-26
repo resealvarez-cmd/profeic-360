@@ -36,7 +36,18 @@ export default function AdminUsersPage() {
     useEffect(() => {
         const checkAuth = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user?.email === 're.se.alvarez@gmail.com') {
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+
+            const { data: authUser } = await supabase
+                .from('authorized_users')
+                .select('role')
+                .eq('email', user.email)
+                .single();
+
+            if (user.email === 're.se.alvarez@gmail.com' || ['admin', 'director', 'utp'].includes(authUser?.role)) {
                 setIsAuthorized(true);
                 fetchUsers();
             } else {
@@ -129,14 +140,15 @@ export default function AdminUsersPage() {
 
         try {
             if (editingUser) {
-                // UPDATE LOGIC
+                // UPSERT LOGIC (Handles both existing authorized users and new ones from profiles)
                 const { error } = await supabase
                     .from('authorized_users')
-                    .update({
+                    .upsert({
+                        email: newUser.email,
                         full_name: newUser.full_name,
-                        role: newUser.role
-                    })
-                    .eq('email', newUser.email);
+                        role: newUser.role,
+                        status: 'active'
+                    }, { onConflict: 'email' });
 
                 if (error) throw error;
 
