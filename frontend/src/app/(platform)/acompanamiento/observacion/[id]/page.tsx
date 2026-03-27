@@ -8,6 +8,7 @@ import { ChevronRight, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { PreObservation } from "@/components/360/PreObservation";
 import { FocusMatrix } from "@/components/360/FocusMatrix";
+import { ConvivenciaMatrix } from "@/components/360/ConvivenciaMatrix";
 import { Reflection } from "@/components/360/Reflection";
 
 export default function ObservationPage({ params }: { params: { id: string } }) {
@@ -338,11 +339,21 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
 
                 {activeStage === 'execution' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <FocusMatrix
-                            onSubmit={(data: any) => handleSave('execution', data)}
-                            lastCommitment={lastCommitment}
-                            teacherFocus={cycle?.teacher_declared_focus}
-                        />
+                        {cycle?.rubric_type === 'convivencia' ? (
+                            <ConvivenciaMatrix
+                                onSubmit={(data: any) => handleSave('execution', data)}
+                                initialData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
+                                lastCommitment={lastCommitment}
+                                teacherFocus={cycle?.teacher_declared_focus}
+                            />
+                        ) : (
+                            <FocusMatrix
+                                onSubmit={(data: any) => handleSave('execution', data)}
+                                initialData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
+                                lastCommitment={lastCommitment}
+                                teacherFocus={cycle?.teacher_declared_focus}
+                            />
+                        )}
                     </div>
                 )}
 

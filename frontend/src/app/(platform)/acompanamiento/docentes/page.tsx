@@ -23,6 +23,9 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
     const [hideNoObservations, setHideNoObservations] = useState(false);
     const [observationStats, setObservationStats] = useState<Record<string, number>>({});
     const [selectedSkill, setSelectedSkill] = useState<string>("all");
+    const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
+    const [selectedRubricType, setSelectedRubricType] = useState<'pedagogica' | 'convivencia'>('pedagogica');
+    const [targetTeacher, setTargetTeacher] = useState<any>(null);
 
     const SKILLS = [
         "Gestión del Clima",
@@ -172,7 +175,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
         }, {})
         : null;
 
-    const handleObserve = async (teacher: any) => {
+    const handleObserve = (teacher: any) => {
         if (!teacher.id) {
             toast.error("Este docente no ha activado su cuenta (Falta UUID). No se puede observar aún.");
             return;
@@ -181,20 +184,28 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             toast.error("Debes iniciar sesión para observar.");
             return;
         }
+        setTargetTeacher(teacher);
+        setIsSelectModalOpen(true);
+    };
+
+    const confirmObserve = async () => {
+        if (!targetTeacher || !currentUserId) return;
 
         try {
             const { data, error } = await supabase
                 .from('observation_cycles')
                 .insert([{
-                    teacher_id: teacher.id,
+                    teacher_id: targetTeacher.id,
                     observer_id: currentUserId,
-                    status: 'in_progress'
+                    status: 'in_progress',
+                    rubric_type: selectedRubricType
                 }])
                 .select()
                 .single();
 
             if (error) throw error;
 
+            setIsSelectModalOpen(false);
             router.push(`/acompanamiento/observacion/${data.id}`);
 
         } catch (err: any) {
@@ -404,6 +415,65 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                             <button onClick={() => setSearch("")} className="mt-4 text-[#C87533] font-black text-xs uppercase tracking-widest hover:text-[#1B3C73] transition-colors">Limpiar Filtros</button>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* INSTRUMENT SELECTION MODAL */}
+            {isSelectModalOpen && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsSelectModalOpen(false)} />
+                    <div className="bg-white rounded-[2.5rem] p-8 max-w-md w-full relative shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="text-center mb-8">
+                            <div className="w-20 h-20 bg-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-4 text-[#C87533] shadow-inner">
+                                <BrainCircuit size={40} />
+                            </div>
+                            <h3 className="text-2xl font-black text-[#1B3C73]">Nueva Observación</h3>
+                            <p className="text-slate-500 text-sm mt-2 font-medium">Selecciona el instrumento para {targetTeacher?.full_name}</p>
+                        </div>
+
+                        <div className="space-y-3 mb-8">
+                            <button
+                                onClick={() => setSelectedRubricType('pedagogica')}
+                                className={`w-full p-5 rounded-2xl border-2 transition-all text-left flex items-start gap-4 ${selectedRubricType === 'pedagogica' ? 'border-[#1B3C73] bg-[#1B3C73]/5' : 'border-slate-100 hover:border-slate-200 bg-white'}`}
+                            >
+                                <div className={`p-2 rounded-xl ${selectedRubricType === 'pedagogica' ? 'bg-[#1B3C73] text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                    <FileText size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-800 text-sm">Acompañamiento Pedagógico</p>
+                                    <p className="text-xs text-slate-500 leading-tight">Enfoque en didáctica, recursos y arquitectura del aprendizaje.</p>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => setSelectedRubricType('convivencia')}
+                                className={`w-full p-5 rounded-2xl border-2 transition-all text-left flex items-start gap-4 ${selectedRubricType === 'convivencia' ? 'border-teal-600 bg-teal-50' : 'border-slate-100 hover:border-slate-200 bg-white'}`}
+                            >
+                                <div className={`p-2 rounded-xl ${selectedRubricType === 'convivencia' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                    <Users size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-800 text-sm">Formación y Convivencia</p>
+                                    <p className="text-xs text-slate-500 leading-tight">Enfoque en clima, resolución de conflictos y socioemocional.</p>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setIsSelectModalOpen(false)}
+                                className="flex-1 py-4 px-6 rounded-2xl bg-slate-100 text-slate-500 font-bold text-sm hover:bg-slate-200 transition-all"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={confirmObserve}
+                                className="flex-[2] py-4 px-6 rounded-2xl bg-[#1B3C73] text-white font-black text-sm uppercase tracking-widest hover:bg-[#2A59A8] transition-all shadow-lg hover:shadow-xl active:scale-95"
+                            >
+                                Iniciar Ciclo
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

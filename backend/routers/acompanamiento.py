@@ -80,13 +80,16 @@ async def generate_flash_feedback(req: FlashFeedbackRequest):
 
         reflection = sanitize_text(req.reflection_text) if req.reflection_text else "El docente no ha registrado reflexión aún."
 
+        # NUEVO: Detección dinámica de pauta
+        pauta_contexto = "Formación y Convivencia Escolar" if "promocion_respeto" in scores else "Desarrollo Pedagógico y Didáctico"
+
         # 3. Prompt Engineering (Master Plan Level 1)
         prompt = f"""
-        ROL: Eres un "Entrenador Pedagógico Constructivista" experto.
+        ROL: Eres un "Entrenador en {pauta_contexto}" experto.
         TAREA: Generar un "Flash Feedback" para el docente {teacher_name}.
         
         CONTEXTO:
-        Se acaba de realizar una observación de aula. 
+        Se acaba de realizar una observación de aula enfocada en {pauta_contexto}. 
         El observador ({observer_name}) tomó estas notas:
         {notes_text}
 
@@ -94,7 +97,7 @@ async def generate_flash_feedback(req: FlashFeedbackRequest):
         "{reflection}"
 
         OBJETIVO:
-        Analiza el contraste entre la evidencia del observador y la percepción del docente.
+        Analiza el contraste entre la evidencia del observador y la percepción del docente en el área de {pauta_contexto}.
         Tu misión es fomentar la metacognición sin juzgar. NO seas genérico.
 
         FORMATO DE RESPUESTA (JSON estricto):
@@ -246,8 +249,13 @@ async def _get_teacher_trajectory_data(teacher_id: str):
         
         history_text += f"\n--- OBS #{i+1} ({cycle_date}) ---\nObservador: {observer}\nPuntajes: {scores}\nTags: {tags}\nNotas: {obs_notes}\nReflexión: {refl}\nCompromiso: {comm}\n"
 
+    # NUEVO: Detección dinámica de pauta predominante en el historial
+    last_cycle_data = obs_map.get(cycles[0]['id'], {}) if cycles else {}
+    last_scores = last_cycle_data.get('scores', {})
+    pauta_contexto = "Formación y Convivencia Escolar" if "promocion_respeto" in last_scores else "Desarrollo Pedagógico y Didáctico"
+
     # AI Prompt
-    prompt = f"ROL: Analista Pedagógico Senior.\nTAREA: Perfilador para {teacher['full_name']}.\nCONTEXTO: 8 Dimensiones de Evaluación ProfeIC.\nHISTORIAL:\n{history_text}\n\nFORMATO JSON (NO USAR COMILLAS TRIPLES): \n{{\n  \"teacher_view\": \"Párrafo positivo para el docente...\",\n  \"utp_view\": \"Análisis técnico...\",\n  \"director_view\": \"Visión estratégica...\",\n  \"trend\": \"ascending\" | \"stable\" | \"descending\",\n  \"summary\": \"{teacher['full_name']} se caracteriza, según sus observadores, como un docente que... Además su autopercepción indica que...\",\n  \"strengths\": [],\n  \"gaps\": [],\n  \"suggested_training\": []\n}}"
+    prompt = f"ROL: Consultor Senior en {pauta_contexto}.\nTAREA: Perfilador para {teacher['full_name']}.\nCONTEXTO: Evaluación de {pauta_contexto}.\nHISTORIAL:\n{history_text}\n\nFORMATO JSON (NO USAR COMILLAS TRIPLES): \n{{\n  \"teacher_view\": \"Párrafo positivo para el docente sobre {pauta_contexto}...\",\n  \"utp_view\": \"Análisis técnico del área...\",\n  \"director_view\": \"Visión estratégica institucional...\",\n  \"trend\": \"ascending\" | \"stable\" | \"descending\",\n  \"summary\": \"{teacher['full_name']} se caracteriza en su gestión de {pauta_contexto} como un docente que...\",\n  \"strengths\": [],\n  \"gaps\": [],\n  \"suggested_training\": []\n}}"
     
     model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
     response = model.generate_content(prompt, request_options={"timeout": 120})
