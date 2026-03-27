@@ -4,16 +4,21 @@ from typing import List, Optional, Dict, Any
 from supabase import create_client, Client
 import os
 from .analytics_service import calculate_global_stats
-
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/telemetry",
     tags=["Telemetry & Analytics"]
 )
 
-# Use a dedicated admin client for analytics to ensure we see all rows (Service Role)
+# --- CONFIGURACIÓN ---
+supabase_url = os.getenv("SUPABASE_URL", "")
+# Standard client for public tracking (Anon Key)
+supabase: Client = create_client(supabase_url, os.getenv("SUPABASE_KEY", ""))
+
+# Admin client for global analytics (Service Role) - Bypasses 1000 row limits
 supabase_admin: Client = create_client(
-    os.getenv("SUPABASE_URL", ""), 
+    supabase_url, 
     os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY", "")
 )
 
@@ -41,18 +46,16 @@ async def track_event(req: TelemetryTrackRequest):
 
 @router.get("/analytics")
 async def get_product_analytics(email: str = Query(...)):
-    # SECURITY: Only re.se.alvarez@gmail.com can call this
     if email != "re.se.alvarez@gmail.com":
         print(f"🚫 Telemetry: Denied access to {email}")
         raise HTTPException(status_code=403, detail="Access denied. Super Admin only.")
     
     print(f"📊 Telemetry: Building analytics for {email} (Forced Admin Mode)")
     try:
-        # We use supabase_admin to ensure we bypass any RLS or 1000-row anon limits
+        # Use supabase_admin to bypass 1000 row cap
         stats = calculate_global_stats(supabase_admin)
-        stats["version"] = "v1.2.4-ProductionAudit"
+        stats["version"] = "v1.2.6-BuildFix"
         
-        from fastapi.responses import JSONResponse
         return JSONResponse(
             content=stats,
             headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
@@ -60,8 +63,4 @@ async def get_product_analytics(email: str = Query(...)):
 
     except Exception as e:
         print(f"❌ Error in analytics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-    except Exception as e:
-        print(f"Error calculating analytics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
