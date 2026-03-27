@@ -10,6 +10,31 @@ import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadius
 import { toast } from "sonner";
 import ProductAnalytics from "@/components/ProductAnalytics";
 import { TeacherProfiler } from "@/components/shared/TeacherProfiler";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const METRICS_MAP: any = {
+    pedagogica: {
+        activacion_cognitiva: "Activación Cognitiva",
+        andamiaje_modelaje: "Andamiaje y Modelaje",
+        rigor_autonomia: "Rigor y Autonomía",
+        clima_contencion: "Clima y Contención",
+        gestion_aula: "Gestión de Aula",
+        recursos_didacticos: "Recursos Didácticos",
+        monitoreo_formativo: "Monitoreo Formativo",
+        calidad_feedback: "Calidad del Feedback"
+    },
+    convivencia: {
+        promocion_respeto: "Promoción del Respeto",
+        diversidad_aula: "Diversidad en el Aula",
+        abordaje_discriminacion: "Abordaje Discriminación",
+        habilidades_convivir: "Habilidades para Convivir",
+        prevencion_normas: "Prevención y Normas",
+        claridad_responsabilidades: "Roles y Responsabilidades",
+        prevencion_distracciones: "Prevención Distracciones",
+        vinculos_contencion: "Vínculos y Contención",
+        practica_habilidades: "Habilidades Sociales"
+    }
+};
 
 export default function Dashboard360() {
     const router = useRouter();
@@ -529,28 +554,85 @@ export default function Dashboard360() {
                                         </div>
                                     </div>
 
-                                    {/* HEATMAP SECTION (Wow Factor) */}
-                                    {metrics.heatmap && Object.keys(metrics.heatmap).length > 0 && (
+                                    {/* HEATMAP SECTION (Refactored) */}
+                                    {metrics.heatmap && (
                                         <div className="mt-8 pt-8 border-t border-slate-100">
-                                            <h4 className="text-[10px] font-black text-slate-400 uppercase mb-6 flex items-center gap-2 tracking-widest">
-                                                <BrainCircuit size={14} className="text-[#A1C969]" /> Pulso Cuantitativo (Heatmap)
-                                            </h4>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                                {Object.entries(metrics.heatmap).sort((a: any, b: any) => b[1] - a[1]).map(([focus, score]: any) => {
-                                                    const bgColor = score >= 3.2 ? 'bg-green-50 border-green-200' : (score >= 2.6 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200');
-                                                    const textColor = score >= 3.2 ? 'text-green-700' : (score >= 2.6 ? 'text-yellow-700' : 'text-red-700');
-                                                    return (
-                                                        <div key={focus} className={`p-4 rounded-2xl border ${bgColor} flex flex-col justify-between h-24 hover:scale-105 transition-transform cursor-default shadow-sm`}>
-                                                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-tight">
-                                                                {focus.replace(/_/g, ' ')}
-                                                            </span>
-                                                            <span className={`text-2xl font-black ${textColor}`}>
-                                                                {score.toFixed(1)}
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
+                                            <details className="group" open>
+                                                <summary className="flex items-center justify-between cursor-pointer list-none">
+                                                    <h4 className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-2 tracking-widest">
+                                                        <BrainCircuit size={14} className="text-[#A1C969]" /> Pulso Cuantitativo (Heatmap)
+                                                    </h4>
+                                                    <span className="transition group-open:rotate-180">
+                                                        <ChevronDown size={14} className="text-slate-400" />
+                                                    </span>
+                                                </summary>
+
+                                                <div className="mt-8">
+                                                    <Tabs defaultValue="pedagogica" className="w-full">
+                                                        <TabsList className="bg-slate-100/50 p-1 rounded-2xl mb-8">
+                                                            <TabsTrigger value="pedagogica" className="rounded-xl px-6 py-2 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                                                                Área Pedagógica
+                                                            </TabsTrigger>
+                                                            <TabsTrigger value="convivencia" className="rounded-xl px-6 py-2 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                                                                Convivencia Escolar
+                                                            </TabsTrigger>
+                                                        </TabsList>
+
+                                                        <TabsContent value="pedagogica">
+                                                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                                                {Object.entries(metrics.heatmap)
+                                                                    .filter(([key]) => METRICS_MAP.pedagogica[key])
+                                                                    .sort((a: any, b: any) => b[1] - a[1])
+                                                                    .map(([focus, score]: any) => {
+                                                                        const bgColor = score >= 3.2 ? 'bg-green-50 border-green-200' : (score >= 2.6 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200');
+                                                                        const textColor = score >= 3.2 ? 'text-green-700' : (score >= 2.6 ? 'text-yellow-700' : 'text-red-700');
+                                                                        return (
+                                                                            <div key={focus} className={`p-5 rounded-[2rem] border-2 ${bgColor} flex flex-col justify-between h-28 hover:shadow-md transition-all cursor-default group/card`}>
+                                                                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight group-hover:text-slate-700 transition-colors">
+                                                                                    {METRICS_MAP.pedagogica[focus]}
+                                                                                </span>
+                                                                                <span className={`text-3xl font-black ${textColor}`}>
+                                                                                    {score.toFixed(1)}
+                                                                                </span>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                            </div>
+                                                        </TabsContent>
+
+                                                        <TabsContent value="convivencia">
+                                                            {Object.keys(metrics.heatmap).some(k => METRICS_MAP.convivencia[k]) ? (
+                                                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                                                    {Object.entries(metrics.heatmap)
+                                                                        .filter(([key]) => METRICS_MAP.convivencia[key])
+                                                                        .sort((a: any, b: any) => b[1] - a[1])
+                                                                        .map(([focus, score]: any) => {
+                                                                            const bgColor = score >= 3.2 ? 'bg-teal-50 border-teal-200' : (score >= 2.6 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200');
+                                                                            const textColor = score >= 3.2 ? 'text-teal-700' : (score >= 2.6 ? 'text-yellow-700' : 'text-red-700');
+                                                                            return (
+                                                                                <div key={focus} className={`p-5 rounded-[2rem] border-2 ${bgColor} flex flex-col justify-between h-28 hover:shadow-md transition-all cursor-default`}>
+                                                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-tight">
+                                                                                        {METRICS_MAP.convivencia[focus]}
+                                                                                    </span>
+                                                                                    <span className={`text-3xl font-black ${textColor}`}>
+                                                                                        {score.toFixed(1)}
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="bg-slate-50 border-2 border-slate-100 rounded-[2.5rem] p-12 text-center animate-in fade-in zoom-in-95 duration-500">
+                                                                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-100">
+                                                                        <Users className="text-slate-300" size={32} />
+                                                                    </div>
+                                                                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Aún no hay mediciones de Convivencia en el periodo seleccionado</p>
+                                                                </div>
+                                                            )}
+                                                        </TabsContent>
+                                                    </Tabs>
+                                                </div>
+                                            </details>
                                         </div>
                                     )}
 
