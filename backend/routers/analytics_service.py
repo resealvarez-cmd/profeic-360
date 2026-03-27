@@ -9,7 +9,8 @@ SAVED_MINUTES_MAP = {
     "analizador": 35,
     "evaluaciones": 60,
     "nee": 50,
-    "mentor": 15
+    "mentor": 15,
+    "simce": 45
 }
 
 LIB_MAP = {
@@ -19,7 +20,8 @@ LIB_MAP = {
     "AUDITORIA": "analizador",
     "LECTURA": "lectura-inteligente",
     "ESTRATEGIA": "nee",
-    "ELEVADOR": "mentor"
+    "ELEVADOR": "mentor",
+    "SIMCE": "simce"
 }
 
 def calculate_global_stats(supabase: Client):
@@ -30,11 +32,20 @@ def calculate_global_stats(supabase: Client):
     def fetch_all_rows(table_name: str, select_query: str = '*'):
         all_rows = []
         page_size = 1000
-        for offset in range(0, 20000, page_size): # Cap at 20k to protect memory
-            res = supabase.table(table_name).select(select_query).range(offset, offset + page_size - 1).execute()
-            data = res.data or []
-            all_rows.extend(data)
-            if len(data) < page_size:
+        # Increased limit from 20k to 100k to support large schools/global stats
+        max_limit = 100000
+        for offset in range(0, max_limit, page_size):
+            try:
+                # Use explicit range to bypass default 1000 rows cap if present
+                res = supabase.table(table_name).select(select_query).range(offset, offset + page_size - 1).execute()
+                data = res.data or []
+                all_rows.extend(data)
+                
+                # If we got less than a full page, it was the last one
+                if len(data) < page_size:
+                    break
+            except Exception as e:
+                print(f"⚠️ Error fetching {table_name} at offset {offset}: {e}")
                 break
         return all_rows
 
@@ -42,7 +53,8 @@ def calculate_global_stats(supabase: Client):
     res_auth = supabase.table('authorized_users').select('email', count='exact').execute()
     total_authorized = res_auth.count or 1
 
-    events = fetch_all_rows('telemetry_events', '*')
+    # Fetching only necessary columns to handle 100k rows without memory issues
+    events = fetch_all_rows('telemetry_events', 'id, event_name, module, email, metadata, created_at')
     
     # Sort events descending by date for recent_events
     events.sort(key=lambda x: x.get('created_at', ''), reverse=True)
@@ -93,11 +105,18 @@ def calculate_global_stats(supabase: Client):
             friction_count += 1
 
         # Hybrid weight for interaction success without saving
-        if 'success' in ev.get('event_name', '').lower() or 'generar' in ev.get('event_name', '').lower():
+        if 'success' in ev.get('event_name', '').lower() or 'generar' in ev.get('event_name', '').lower() or 'export' in ev.get('event_name', '').lower():
             if mod_clean in SAVED_MINUTES_MAP:
-                # Add 20% of the weight for using the tool successfully even if not saved
-                total_saved_minutes += (SAVED_MINUTES_MAP.get(mod_clean, 0) * 0.2)
-                module_usage[mod_clean] = module_usage.get(mod_clean, 0) + 0.2
+                # Add 35% (increased from 20%) weight for using the tool successfully even if not saved
+                # This better reflects real work saved through interaction and temporary content.
+                total_saved_minutes += (SAVED_MINUTES_MAP.get(mod_clean, 0) * 0.35)
+                module_usage[mod_clean] = module_usage.get(mod_clean, 0) + 0.35
+
+    # Filter out page_views from the "Impactful Events" count if desired,
+    # or keep them if they want "Total Raw Events". Since they requested "Total Events",
+    # and "we have many more than 1000", they are likely tracking everything.
+    # We will keep raw count but provide a clean metric.
+    impactful_events = [ev for ev in events if ev.get('event_name') != 'page_view']
 
     # 3. Final Aggregations
     adoption_pct = round((len(unique_active_users) / total_authorized) * 100, 1) if total_authorized > 0 else 0
@@ -139,10 +158,11 @@ def calculate_global_stats(supabase: Client):
             "saved_hours": round(total_saved_minutes / 60, 1),
             "total_resources": len(lib_items),
             "total_events": len(events),
+            "impactful_events_count": len(impactful_events),
             "friction_count": friction_count
         },
         "top_modules": sorted_modules,
         "power_users": top_users,
         "school_stats": school_stats,
-        "recent_events": events[:10]
+        "recent_events": events[:25] # Show more recent events for transparency
     }

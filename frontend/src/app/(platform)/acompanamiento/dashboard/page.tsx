@@ -56,6 +56,7 @@ export default function Dashboard360() {
     const [newCycleTeacherId, setNewCycleTeacherId] = useState("");
     const [newCycleDateTime, setNewCycleDateTime] = useState("");
     const [newCycleSubject, setNewCycleSubject] = useState("");
+    const [newCycleRubricType, setNewCycleRubricType] = useState<'pedagogica' | 'convivencia'>('pedagogica');
 
     // EXECUTIVE REPORT STATE
     const [showExecutiveModal, setShowExecutiveModal] = useState(false);
@@ -318,6 +319,7 @@ export default function Dashboard360() {
                     teacher_id: newCycleTeacherId, 
                     observer_id: user.id, 
                     status: 'planned',
+                    rubric_type: newCycleRubricType,
                     scheduled_at: newCycleDateTime ? new Date(newCycleDateTime).toISOString() : null,
                     subject_context: newCycleSubject || null,
                     teacher_agreed: false
@@ -781,6 +783,25 @@ export default function Dashboard360() {
                                     onChange={(e) => setNewCycleSubject(e.target.value)}
                                     placeholder="Ej: Matemática 2º Medio"
                                 />
+                            </div>
+
+                            {/* RUBRIC SELECTION */}
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-2">Instrumento a Utilizar</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => setNewCycleRubricType('pedagogica')}
+                                        className={`p-3 rounded-xl border text-xs font-bold transition-all ${newCycleRubricType === 'pedagogica' ? 'bg-[#1B3C73] text-white border-[#1B3C73]' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                    >
+                                        Pedagógica
+                                    </button>
+                                    <button
+                                        onClick={() => setNewCycleRubricType('convivencia')}
+                                        className={`p-3 rounded-xl border text-xs font-bold transition-all ${newCycleRubricType === 'convivencia' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                    >
+                                        Convivencia
+                                    </button>
+                                </div>
                             </div>
                             <button
                                 onClick={handleNewCycle}
