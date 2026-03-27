@@ -16,7 +16,7 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const res = await fetch(`${API_URL}/telemetry/analytics?email=${encodeURIComponent(userEmail)}`);
+                const res = await fetch(`${API_URL}/telemetry/analytics?email=${encodeURIComponent(userEmail)}&t=${Date.now()}`);
                 if (res.ok) {
                     const json = await res.json();
                     console.log("📊 Analytics Data:", json);
@@ -150,6 +150,19 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Version and Timestamp */}
+            <div className="flex justify-between items-center px-4">
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronizado con Base de Datos</span>
+                </div>
+                {data.last_updated && (
+                    <span className="text-[9px] font-medium text-slate-300">
+                        Refrescado a las {new Date(data.last_updated).toLocaleTimeString()}
+                    </span>
+                )}
+            </div>
+
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card

@@ -9,8 +9,10 @@ SAVED_MINUTES_MAP = {
     "analizador": 35,
     "evaluaciones": 60,
     "nee": 50,
-    "mentor": 15,
-    "simce": 45
+    "mentor": 25,
+    "simce": 45,
+    "omr": 45,
+    "elevador": 30
 }
 
 LIB_MAP = {
@@ -20,8 +22,9 @@ LIB_MAP = {
     "AUDITORIA": "analizador",
     "LECTURA": "lectura-inteligente",
     "ESTRATEGIA": "nee",
-    "ELEVADOR": "mentor",
-    "SIMCE": "simce"
+    "ELEVADOR": "elevador",
+    "SIMCE": "simce",
+    "OMR": "omr"
 }
 
 def calculate_global_stats(supabase: Client):
@@ -30,28 +33,45 @@ def calculate_global_stats(supabase: Client):
     Ensures consistency between Admin and Telemetry dashboards.
     """
     def fetch_all_rows(table_name: str, select_query: str = '*'):
+        # Get real total to avoid guessing loop ends (Lighter query using limit(0))
+        try:
+            res_meta = supabase.table(table_name).select('id', count='exact').limit(0).execute()
+            total_in_db = res_meta.count or 0
+        except Exception as e:
+            print(f"⚠️ Error getting count for {table_name}: {e}")
+            total_in_db = 1000 # Fallback 
+
         all_rows = []
         page_size = 1000
-        # Increased limit from 20k to 100k to support large schools/global stats
         max_limit = 100000
-        for offset in range(0, max_limit, page_size):
+        
+        # Paginación robusta basada en offset real
+        for offset in range(0, min(total_in_db, max_limit), page_size):
             try:
-                # Use explicit range to bypass default 1000 rows cap if present
                 res = supabase.table(table_name).select(select_query).range(offset, offset + page_size - 1).execute()
                 data = res.data or []
                 all_rows.extend(data)
-                
-                # If we got less than a full page, it was the last one
-                if len(data) < page_size:
-                    break
+                if not data: break
             except Exception as e:
                 print(f"⚠️ Error fetching {table_name} at offset {offset}: {e}")
                 break
         return all_rows
 
-    # 1. Fetch Data
-    res_auth = supabase.table('authorized_users').select('email', count='exact').execute()
-    total_authorized = res_auth.count or 1
+    # 1. Fetch Data with Exact Counts for UI clarity
+    try:
+        res_auth = supabase.table('authorized_users').select('email', count='exact').limit(0).execute()
+        total_authorized = res_auth.count or 1
+        
+        res_evt_count = supabase.table('telemetry_events').select('id', count='exact').limit(0).execute()
+        db_total_events = res_evt_count.count or 0
+        
+        res_lib_count = supabase.table('biblioteca_recursos').select('id', count='exact').limit(0).execute()
+        db_total_resources = res_lib_count.count or 0
+    except Exception as e:
+        print(f"⚠️ Primary counts failed: {e}")
+        total_authorized = 1
+        db_total_events = 0
+        db_total_resources = 0
 
     # Fetching only necessary columns to handle 100k rows without memory issues
     events = fetch_all_rows('telemetry_events', 'id, event_name, module, email, metadata, created_at')
@@ -107,10 +127,9 @@ def calculate_global_stats(supabase: Client):
         # Hybrid weight for interaction success without saving
         if 'success' in ev.get('event_name', '').lower() or 'generar' in ev.get('event_name', '').lower() or 'export' in ev.get('event_name', '').lower():
             if mod_clean in SAVED_MINUTES_MAP:
-                # Add 35% (increased from 20%) weight for using the tool successfully even if not saved
-                # This better reflects real work saved through interaction and temporary content.
-                total_saved_minutes += (SAVED_MINUTES_MAP.get(mod_clean, 0) * 0.35)
-                module_usage[mod_clean] = module_usage.get(mod_clean, 0) + 0.35
+                # Add 40% (increased from 35%) weight for using the tool successfully
+                total_saved_minutes += (SAVED_MINUTES_MAP.get(mod_clean, 0) * 0.40)
+                module_usage[mod_clean] = module_usage.get(mod_clean, 0) + 0.40
 
     # Filter out page_views from the "Impactful Events" count if desired,
     # or keep them if they want "Total Raw Events". Since they requested "Total Events",
@@ -152,17 +171,17 @@ def calculate_global_stats(supabase: Client):
     return {
         "summary": {
             "total_authorized": total_authorized,
-            "active_users": len(unique_active_users),
             "active_users_count": len(unique_active_users),
             "adoption_percent": adoption_pct,
             "saved_hours": round(total_saved_minutes / 60, 1),
-            "total_resources": len(lib_items),
-            "total_events": len(events),
+            "total_resources": db_total_resources,
+            "total_events": db_total_events,
             "impactful_events_count": len(impactful_events),
             "friction_count": friction_count
         },
         "top_modules": sorted_modules,
         "power_users": top_users,
         "school_stats": school_stats,
-        "recent_events": events[:25] # Show more recent events for transparency
+        "recent_events": events[:25],
+        "last_updated": __import__('datetime').datetime.now().isoformat()
     }

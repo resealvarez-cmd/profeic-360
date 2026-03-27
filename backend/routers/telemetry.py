@@ -11,22 +11,11 @@ router = APIRouter(
     tags=["Telemetry & Analytics"]
 )
 
-# --- CONFIGURACIÓN ---
-supabase_url = os.getenv("SUPABASE_URL")
-role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-supabase_key = role_key if role_key and role_key != "false_role_key" else os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(supabase_url, supabase_key)
-
-# --- WEIGHTS FOR SAVED HOURS (Minutes) ---
-SAVED_MINUTES_MAP = {
-    "planificador": 85,
-    "lectura-inteligente": 55,
-    "rubricas": 40,
-    "analizador": 35,
-    "evaluaciones": 60,
-    "nee": 50,
-    "mentor": 15
-}
+# Use a dedicated admin client for analytics to ensure we see all rows (Service Role)
+supabase_admin: Client = create_client(
+    os.getenv("SUPABASE_URL", ""), 
+    os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY", "")
+)
 
 class TelemetryTrackRequest(BaseModel):
     user_id: str
@@ -57,11 +46,17 @@ async def get_product_analytics(email: str = Query(...)):
         print(f"🚫 Telemetry: Denied access to {email}")
         raise HTTPException(status_code=403, detail="Access denied. Super Admin only.")
     
-    print(f"📊 Telemetry: Building analytics for {email} (Centralized)")
+    print(f"📊 Telemetry: Building analytics for {email} (Forced Admin Mode)")
     try:
-        stats = calculate_global_stats(supabase)
-        stats["version"] = "v1.2.1-FinalSync" 
-        return stats
+        # We use supabase_admin to ensure we bypass any RLS or 1000-row anon limits
+        stats = calculate_global_stats(supabase_admin)
+        stats["version"] = "v1.2.4-ProductionAudit"
+        
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            content=stats,
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
+        )
 
     except Exception as e:
         print(f"❌ Error in analytics: {e}")
