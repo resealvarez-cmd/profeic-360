@@ -83,7 +83,12 @@ async def upload_resource(
             except Exception as auth_err:
                 print(f"⚠️ No se pudo validar token en upload: {auth_err}")
         
-        upload_result = storage.upload_file(file, upload_user_id)
+        storage_path = ""
+        try:
+            upload_result = storage.upload_file(file, upload_user_id)
+            storage_path = upload_result.get("full_path", "")
+        except Exception as storage_err:
+            print(f"⚠️ Error al subir a Storage (ignorado para extraer texto): {storage_err}")
         
         # 3. Extraer Texto
         # Necesitamos los bytes de nuevo. storage.upload_file hizo seek(0) al final?
@@ -100,7 +105,7 @@ async def upload_resource(
         # 4. Respuesta
         return {
             "filename": file.filename,
-            "storage_path": upload_result.get("full_path"),
+            "storage_path": storage_path,
             "extracted_text_preview": extracted_text[:200] + "...",
             "full_text": extracted_text, # <--- CRÍTICO: Texto completo para RAG
             "char_count": len(extracted_text)
