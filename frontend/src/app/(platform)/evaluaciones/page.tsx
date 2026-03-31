@@ -8,6 +8,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 import { BotonGuardar } from "@/components/BotonGuardar";
 import { trackEvent } from "@/lib/telemetry";
@@ -117,7 +121,11 @@ export default function GeneradorEvaluaciones() {
     });
 
     const [resultado, setResultado] = useState<any>(null);
-    const [showTeacherGuide, setShowTeacherGuide] = useState(false); // <--- NUEVO STATE
+    const [showTeacherGuide, setShowTeacherGuide] = useState(false);
+    // Base64 file state for Gemini vision (works for scanned PDFs)
+    const [archivoBase64, setArchivoBase64] = useState<string>("");
+    const [archivoMimeType, setArchivoMimeType] = useState<string>("");
+    const [archivoNombre, setArchivoNombre] = useState<string>("");
     const totalPoints = (config.quantities.multiple_choice * config.points.multiple_choice) + (config.quantities.true_false * config.points.true_false) + (config.quantities.short_answer * config.points.short_answer) + (config.quantities.essay * config.points.essay);
 
     useEffect(() => {
@@ -216,8 +224,14 @@ export default function GeneradorEvaluaciones() {
             // Mapeo manual de campos (camelCase -> snake_case) si es necesario
             const payload = {
                 ...config,
-                oaTexts: config.oaTexts, // Incluir descripciones completas para Gemini
+                oaTexts: config.oaTexts,
                 context_text: config.contextText,
+                // Include base64 file for Gemini vision (handles scanned PDFs)
+                ...(archivoBase64 ? {
+                    archivo_base64: archivoBase64,
+                    archivo_mime_type: archivoMimeType || "application/pdf",
+                    archivo_nombre: archivoNombre,
+                } : {}),
             };
 
             // Debug para confirmar
@@ -293,11 +307,17 @@ export default function GeneradorEvaluaciones() {
 
                                 {/* ZONA DE UPLOAD (NUEVO) */}
                                 <div className="mb-8">
-                                    <UploadZone onContextLoaded={(text, filename) => {
-                                        setConfig(prev => ({ ...prev, contextText: text }));
-                                        // Opcional: Podrías autocompletar la asignatura con el nombre del archivo
-                                        if (!config.subject) setConfig(prev => ({ ...prev, subject: filename.replace(".pdf", "") }));
-                                    }} />
+                                    <UploadZone
+                                        onContextLoaded={(text, filename) => {
+                                            setConfig(prev => ({ ...prev, contextText: text }));
+                                            if (!config.subject) setConfig(prev => ({ ...prev, subject: filename.replace(".pdf", "") }));
+                                        }}
+                                        onFileLoaded={(base64, mimeType, filename) => {
+                                            setArchivoBase64(base64);
+                                            setArchivoMimeType(mimeType);
+                                            setArchivoNombre(filename);
+                                        }}
+                                    />
                                 </div>
 
                                 <div className="space-y-4">
@@ -470,7 +490,7 @@ export default function GeneradorEvaluaciones() {
                                                 <span className="font-bold text-slate-900">{i + 1}.</span>
                                                 <div className="flex-1">
                                                     <div className="flex justify-between items-start">
-                                                        <p className="text-slate-800 font-medium text-lg leading-snug">{item.stem}</p>
+                                                        <div className="text-slate-800 font-medium text-lg leading-snug [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{item.stem}</ReactMarkdown></div>
                                                         <span className="text-xs font-bold text-slate-400 ml-4 whitespace-nowrap">({item.points} pts)</span>
                                                     </div>
 
@@ -484,7 +504,7 @@ export default function GeneradorEvaluaciones() {
                                                                 return (
                                                                     <div key={idx} className={cn("flex items-center gap-3 p-2 rounded-lg transition-colors", isCorrect ? "bg-green-100 border border-green-200" : "")}>
                                                                         <div className={cn("w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold", isCorrect ? "bg-green-500 text-white border-green-600" : "border-slate-400 text-slate-500")}>{String.fromCharCode(97 + idx)}</div>
-                                                                        <span className={cn(isCorrect ? "font-bold text-green-800" : "text-slate-700")}>{opt.text || opt}</span>
+                                                                        <div className={cn(isCorrect ? "font-bold text-green-800" : "text-slate-700", "[&>p]:m-0")}><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{opt.text || opt}</ReactMarkdown></div>
                                                                     </div>
                                                                 );
                                                             })}
@@ -514,22 +534,22 @@ export default function GeneradorEvaluaciones() {
                                                                     {guide.correct_answer && (
                                                                         <div>
                                                                             <strong className="text-[#1a2e3b] block text-xs uppercase mb-1">Respuesta Correcta:</strong>
-                                                                            <p className="text-[#1a2e3b] font-medium">{guide.correct_answer}</p>
+                                                                            <div className="text-[#1a2e3b] font-medium [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{guide.correct_answer}</ReactMarkdown></div>
                                                                         </div>
                                                                     )}
                                                                     {guide.explanation && (
                                                                         <div>
                                                                             <strong className="text-[#1a2e3b] block text-xs uppercase mb-1">Justificación:</strong>
-                                                                            <p className="text-slate-600 italic">{guide.explanation}</p>
+                                                                            <div className="text-slate-600 italic [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{guide.explanation}</ReactMarkdown></div>
                                                                         </div>
                                                                     )}
                                                                     {guide.rubric && (
                                                                         <div>
                                                                             <strong className="text-[#1a2e3b] block text-xs uppercase mb-1">Rúbrica Sugerida:</strong>
                                                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
-                                                                                <div className="bg-green-50 p-2 rounded border border-green-100"><span className="text-[10px] font-bold text-green-700 block">LOGRADO</span><p className="text-xs text-green-800 leading-tight">{guide.rubric.logrado}</p></div>
-                                                                                <div className="bg-yellow-50 p-2 rounded border border-yellow-100"><span className="text-[10px] font-bold text-yellow-700 block">MEDIANAMENTE</span><p className="text-xs text-yellow-800 leading-tight">{guide.rubric.medianamente}</p></div>
-                                                                                <div className="bg-red-50 p-2 rounded border border-red-100"><span className="text-[10px] font-bold text-red-700 block">NO LOGRADO</span><p className="text-xs text-red-800 leading-tight">{guide.rubric.no_logrado}</p></div>
+                                                                                <div className="bg-green-50 p-2 rounded border border-green-100"><span className="text-[10px] font-bold text-green-700 block">LOGRADO</span><div className="text-xs text-green-800 leading-tight [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{guide.rubric.logrado}</ReactMarkdown></div></div>
+                                                                                <div className="bg-yellow-50 p-2 rounded border border-yellow-100"><span className="text-[10px] font-bold text-yellow-700 block">MEDIANAMENTE</span><div className="text-xs text-yellow-800 leading-tight [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{guide.rubric.medianamente}</ReactMarkdown></div></div>
+                                                                                <div className="bg-red-50 p-2 rounded border border-red-100"><span className="text-[10px] font-bold text-red-700 block">NO LOGRADO</span><div className="text-xs text-red-800 leading-tight [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{guide.rubric.no_logrado}</ReactMarkdown></div></div>
                                                                             </div>
                                                                         </div>
                                                                     )}

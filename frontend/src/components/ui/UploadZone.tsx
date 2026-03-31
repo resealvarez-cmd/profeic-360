@@ -8,9 +8,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_U
 
 interface UploadZoneProps {
     onContextLoaded: (text: string, filename: string) => void;
+    onFileLoaded?: (base64: string, mimeType: string, filename: string) => void;
 }
 
-export const UploadZone = ({ onContextLoaded }: UploadZoneProps) => {
+export const UploadZone = ({ onContextLoaded, onFileLoaded }: UploadZoneProps) => {
     const [isDragging, setIsDragging] = useState(false);
     const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
     const [fileData, setFileData] = useState<{ filename: string; preview: string; charCount: number } | null>(null);
@@ -51,6 +52,23 @@ export const UploadZone = ({ onContextLoaded }: UploadZoneProps) => {
         setStatus("uploading");
         setErrorMessage("");
 
+        // Convert to base64 BEFORE uploading (used for Gemini vision)
+        let fileBase64 = "";
+        try {
+            fileBase64 = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = reader.result as string;
+                    // Remove data:application/pdf;base64, prefix
+                    resolve(result.split(",")[1]);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        } catch (e) {
+            console.error("Error convirtiendo a base64:", e);
+        }
+
         const formData = new FormData();
         formData.append("file", file);
 
@@ -74,8 +92,12 @@ export const UploadZone = ({ onContextLoaded }: UploadZoneProps) => {
             });
 
             setStatus("success");
-            setStatus("success");
-            onContextLoaded(data.full_text || data.extracted_text_preview, data.filename); // Usamos full_text si existe
+            onContextLoaded(data.full_text || data.extracted_text_preview, data.filename);
+
+            // Also call onFileLoaded with base64 for Gemini vision (works for scanned PDFs)
+            if (onFileLoaded && fileBase64) {
+                onFileLoaded(fileBase64, file.type, file.name);
+            }
 
         } catch (e: any) {
             console.error("Upload error details:", e);

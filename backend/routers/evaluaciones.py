@@ -44,13 +44,16 @@ class AssessmentConfig(BaseModel):
     grade: str
     subject: str
     oaIds: List[Union[str, int]] 
-    oaTexts: Optional[List[str]] = None  # Descripciones completas de los OAs seleccionados
+    oaTexts: Optional[List[str]] = None
     customOa: str
-    context_text: Optional[str] = None # <--- RAG CTX
+    context_text: Optional[str] = None
+    archivo_base64: Optional[str] = None  # Base64 del PDF para Gemini vision
+    archivo_mime_type: Optional[str] = "application/pdf"
+    archivo_nombre: Optional[str] = None
     dokDistribution: DokDistribution
     quantities: Quantities
     points: PointsPerType
-    num_alternatives: Optional[int] = 4  # Default 4
+    num_alternatives: Optional[int] = 4
 
 # --- LIMPIEZA JSON ---
 def limpiar_json(texto):
@@ -191,9 +194,24 @@ Distribución Cognitiva Exigida: DOK 1: {config.dokDistribution.dok1}% | DOK 2: 
 """
 
         model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
+        
+        # If a file was provided, use multimodal content (handles scanned PDFs via Gemini vision)
+        if config.archivo_base64:
+            import base64
+            file_part = {
+                "inline_data": {
+                    "mime_type": config.archivo_mime_type or "application/pdf",
+                    "data": config.archivo_base64
+                }
+            }
+            content = [prompt, file_part]
+            print(f"📄 Usando visión multimodal con archivo: {config.archivo_nombre}")
+        else:
+            content = prompt
+        
         response = await asyncio.to_thread(
             model.generate_content,
-            prompt,
+            content,
             request_options={"timeout": 240}
         )
         resultado = limpiar_json(response.text)
