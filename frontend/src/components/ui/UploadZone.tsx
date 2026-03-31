@@ -16,6 +16,7 @@ export const UploadZone = ({ onContextLoaded, onFileLoaded }: UploadZoneProps) =
     const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
     const [fileData, setFileData] = useState<{ filename: string; preview: string; charCount: number } | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
+    const [isScannedPdf, setIsScannedPdf] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -91,8 +92,15 @@ export const UploadZone = ({ onContextLoaded, onFileLoaded }: UploadZoneProps) =
                 charCount: data.char_count
             });
 
+            const scanned = (data.char_count || 0) === 0;
+            setIsScannedPdf(scanned);
+
             setStatus("success");
             onContextLoaded(data.full_text || data.extracted_text_preview, data.filename);
+
+            if (scanned) {
+                toast.warning("PDF escaneado detectado. La IA intentará leerlo por visión, pero se recomienda usar la versión digital del documento para mejores resultados.");
+            }
 
             // Also call onFileLoaded with base64 for Gemini vision (works for scanned PDFs)
             if (onFileLoaded && fileBase64) {
@@ -228,12 +236,31 @@ export const UploadZone = ({ onContextLoaded, onFileLoaded }: UploadZoneProps) =
                                         <p className="text-[10px] text-slate-400 font-medium">{fileData.charCount} caracteres leídos</p>
                                     </div>
                                 </div>
-                                <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide flex items-center gap-1">
-                                    <CheckCircle size={12} /> Listo para usar
-                                </div>
+                                {isScannedPdf ? (
+                                    <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide flex items-center gap-1">
+                                        <XCircle size={12} /> PDF Escaneado
+                                    </div>
+                                ) : (
+                                    <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide flex items-center gap-1">
+                                        <CheckCircle size={12} /> Listo para usar
+                                    </div>
+                                )}
                             </div>
 
+                            {/* Alerta PDF Escaneado */}
+                            {isScannedPdf && (
+                                <div className="mx-4 mt-3 mb-1 flex gap-3 items-start bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                                    <span className="text-lg">⚠️</span>
+                                    <div>
+                                        <p className="font-bold mb-0.5">PDF escaneado detectado</p>
+                                        <p>No se pudo extraer texto de este archivo porque es una imagen escaneada. La IA intentará leerlo con visión, pero los resultados pueden ser limitados.</p>
+                                        <p className="mt-1 font-semibold">💡 Para mejores resultados, usa la versión digital (texto seleccionable) del documento.</p>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Preview del Texto */}
+                            {!isScannedPdf && (
                             <div className="p-5 bg-slate-50/30">
                                 <p className="text-[10px] uppercase font-bold text-slate-400 mb-2 flex items-center gap-2">
                                     <File size={12} /> Previsualización del contenido
@@ -245,6 +272,7 @@ export const UploadZone = ({ onContextLoaded, onFileLoaded }: UploadZoneProps) =
                                     La IA usará este texto base para generar tu evaluación.
                                 </p>
                             </div>
+                            )}
                         </div>
                     </motion.div>
                 )}
