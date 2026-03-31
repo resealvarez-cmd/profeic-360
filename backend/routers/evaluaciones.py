@@ -6,6 +6,7 @@ import json
 import re
 import os
 import httpx
+import asyncio
 
 router = APIRouter()
 
@@ -190,7 +191,11 @@ Distribución Cognitiva Exigida: DOK 1: {config.dokDistribution.dok1}% | DOK 2: 
 """
 
         model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
-        response = model.generate_content(prompt)
+        response = await asyncio.to_thread(
+            model.generate_content,
+            prompt,
+            request_options={"timeout": 240}
+        )
         resultado = limpiar_json(response.text)
 
         if not resultado:

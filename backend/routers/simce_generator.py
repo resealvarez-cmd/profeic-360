@@ -114,6 +114,18 @@ class SimceGenerateRequest(BaseModel):
         default_factory=list,
         description="Lista de IDs de OAs elegidos en el wizard (solo si modo=formativo).",
     )
+    archivo_base64: str | None = Field(
+        default=None,
+        description="Archivo subido por el usuario en formato base64 sin prefijo URI.",
+    )
+    archivo_mime_type: str | None = Field(
+        default=None,
+        description="Mime type del archivo subido (e.g. 'image/png', 'application/pdf').",
+    )
+    archivo_nombre: str | None = Field(
+        default=None,
+        description="Nombre original del archivo subido.",
+    )
 
     @field_validator("cantidad_preguntas")
     @classmethod
@@ -287,11 +299,18 @@ def _build_system_prompt(
         else "MODO: Ensayo Formativo Libre — el énfasis es pedagógico y formativo."
     )
 
-    estimulo_instruccion: str = f"""
+    estimulo_instruccion: str = ""
+    if estimulo_text:
+        estimulo_instruccion = f"""
 ESTÍMULO DE LECTURA (OBLIGATORIO):
 Utiliza el siguiente texto base para construir todas las preguntas. Es vital que el nivel de dificultad sea apropiado.
 TEXTO:
-{estimulo_text}""" if estimulo_text else ""
+{estimulo_text}"""
+    elif request.archivo_base64:
+        estimulo_instruccion = f"""
+ESTÍMULO ADJUNTO (OBLIGATORIO):
+Utiliza la imagen/documento que se adjunta a este prompt para construir todas las preguntas. 
+Es vital que el nivel de dificultad sea apropiado."""
 
     psico_instruccion: str = f"""OBLIGATORIO: Construye los 3 distractores (alternativas incorrectas) utilizando EXCLUSIVAMENTE las reglas de error cognitivo de esta matriz oficial: {matriz_text}. En tu JSON de respuesta, añade el campo 'explicacion_correcta' y en cada distractor añade el campo 'tipo_error_oficial' que indique qué regla de la matriz usaste.""" if matriz_text else "5. La justificación debe explicar por qué la respuesta es correcta Y por qué cada distractor es incorrecto."
 
@@ -344,7 +363,7 @@ Devuelve ÚNICAMENTE un JSON válido (sin markdown, sin bloques de código, sin 
 }}"""
 
 
-async def _call_llm(prompt: str) -> dict[str, Any] | None:
+async def _call_llm(prompt: str, file_part: dict | None = None) -> dict[str, Any] | None:
     """
     Llamada asíncrona a Gemini usando el SDK google-generativeai.
     Ejecuta en un thread pool para no bloquear FastAPI.
@@ -359,10 +378,14 @@ async def _call_llm(prompt: str) -> dict[str, Any] | None:
             },
         )
 
+        contents = [prompt]
+        if file_part:
+            contents.append(file_part)
+
         # Generación en thread para prevenir bloqueo
         response = await asyncio.to_thread(
             model.generate_content,
-            prompt,
+            contents,
             request_options={"timeout": 240}
         )
 
@@ -472,9 +495,16 @@ async def generate_simce_instrument(
                 start_number=start_num
             )
             
+            file_part = None
+            if request.archivo_base64 and request.archivo_mime_type:
+                file_part = {
+                    "mime_type": request.archivo_mime_type,
+                    "data": request.archivo_base64
+                }
+
             try:
                 logger.info("🤖 Iniciando chunk %d (%d preguntas)...", start_num, sb.total_preguntas)
-                resultado = await _call_llm(prompt) 
+                resultado = await _call_llm(prompt, file_part=file_part) 
                 
                 # Validación estricta anti-caídas
                 if not resultado or not isinstance(resultado, dict):

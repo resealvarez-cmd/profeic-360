@@ -9,7 +9,7 @@ load_dotenv()
 class StorageService:
     def __init__(self):
         self.url = os.getenv("SUPABASE_URL")
-        self.key = os.getenv("SUPABASE_KEY")
+        self.key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
         self.bucket = "biblioteca_contexto"
         
         if not self.url or not self.key:

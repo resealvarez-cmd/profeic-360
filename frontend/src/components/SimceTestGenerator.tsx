@@ -9,6 +9,10 @@ import {
     ChevronDown, ChevronUp,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -160,6 +164,21 @@ async function downloadBlob(
     a.click();
     URL.revokeObjectURL(href);
 }
+
+const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result as string;
+            // The result includes the data URI prefix: "data:image/png;base64,..."
+            // We just need the base64 part
+            const base64 = result.split(',')[1];
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 
@@ -389,7 +408,7 @@ function PreguntaCard({
                 <span className="text-xs font-semibold text-[#C87533] bg-[#C87533]/10 px-2 py-0.5 rounded-full flex-shrink-0">
                     {pregunta.habilidad_medida}
                 </span>
-                <span className="text-sm text-slate-700 flex-1 truncate">{pregunta.enunciado}</span>
+                <div className="text-sm text-slate-700 flex-1 truncate [&>p]:m-0 [&>p]:truncate"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{pregunta.enunciado}</ReactMarkdown></div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                     <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 w-5 h-5 flex items-center justify-center rounded-full">{pregunta.correcta}</span>
                     {open ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
@@ -449,12 +468,12 @@ function PreguntaCard({
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            <p className="text-sm text-slate-800 leading-relaxed font-medium">{pregunta.enunciado}</p>
+                            <div className="text-sm text-slate-800 leading-relaxed font-medium [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{pregunta.enunciado}</ReactMarkdown></div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {["A", "B", "C", "D"].map(letra => (
                                     <div key={letra} className={`flex items-start gap-2 px-3 py-2 rounded-lg border text-xs ${letra === pregunta.correcta ? "bg-emerald-50 border-emerald-200" : altColors[letra]}`}>
                                         <span className={`font-bold w-5 flex-shrink-0 ${letra === pregunta.correcta ? "text-emerald-700" : "text-slate-500"}`}>{letra})</span>
-                                        <span className={`${letra === pregunta.correcta ? "text-emerald-800 font-semibold" : "text-slate-700"} leading-snug`}>{pregunta.alternativas[letra]}</span>
+                                        <div className={`${letra === pregunta.correcta ? "text-emerald-800 font-semibold" : "text-slate-700"} leading-snug [&>p]:m-0`}><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{pregunta.alternativas[letra]}</ReactMarkdown></div>
                                         {letra === pregunta.correcta && <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0 mt-0.5" />}
                                     </div>
                                 ))}
@@ -462,7 +481,7 @@ function PreguntaCard({
                             {pregunta.justificacion && (
                                 <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                                     <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-1">Justificación Pedagógica</p>
-                                    <p className="text-xs text-amber-800 leading-relaxed">{pregunta.justificacion}</p>
+                                    <div className="text-xs text-amber-800 leading-relaxed [&>p]:m-0"><ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{pregunta.justificacion}</ReactMarkdown></div>
                                 </div>
                             )}
                             <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 text-xs text-[#1B3C73] hover:text-[#C87533] font-semibold transition-colors">
@@ -507,6 +526,16 @@ function Step3({ data }: { data: FormData }) {
             const token = await getAuthToken();
             if (!token) throw new Error("No autenticado. Inicia sesión e intenta de nuevo.");
 
+            let archivo_base64: string | undefined = undefined;
+            let archivo_mime_type: string | undefined = undefined;
+            let archivo_nombre: string | undefined = undefined;
+
+            if (data.stimulusMode === "upload" && data.uploadedFile) {
+                archivo_base64 = await fileToBase64(data.uploadedFile);
+                archivo_mime_type = data.uploadedFile.type;
+                archivo_nombre = data.uploadedFile.name;
+            }
+
             const res = await fetch(`${API_BASE}/api/v1/simce/generate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -517,6 +546,9 @@ function Step3({ data }: { data: FormData }) {
                     cantidad_preguntas: data.cantidad,
                     modo: data.modo,
                     oas_seleccionados: data.oasSeleccionados,
+                    archivo_base64,
+                    archivo_mime_type,
+                    archivo_nombre,
                 }),
             });
 
