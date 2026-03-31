@@ -11,6 +11,9 @@ WORKDIR /app
 # 1. Instalamos utilidades base del sistema operativo (previenen errores de compilación con librerías pesadas como Pandas o Docx)
 RUN apt-get update && apt-get install -y \
     gcc \
+    libzbar0 \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Copiamos los requerimientos primero para aprovechar el caché de Docker
