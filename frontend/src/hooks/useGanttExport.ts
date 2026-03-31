@@ -123,10 +123,27 @@ export async function exportGanttPDF(config: ExportConfig): Promise<void> {
   doc.setFillColor(15, 23, 42); // slate-900
   doc.rect(0, 0, pageW, 22, "F");
 
+  // Attempt to load and embed ProfeIC logo
+  try {
+    const res = await fetch("/logo_profeic.png");
+    if (res.ok) {
+        const blob = await res.blob();
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve) => {
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+        });
+        doc.addImage(base64, 'PNG', margin, 4, 14, 14);
+    }
+  } catch (e) {
+    console.warn("No se pudo cargar el logo institucional para el PDF", e);
+  }
+
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(255, 255, 255);
-  doc.text("MEJORANDO JUNTOS — ROADMAP ESTRATÉGICO", margin, 13);
+  // Shift text slightly to right to accommodate logo
+  doc.text("MEJORANDO JUNTOS — ROADMAP ESTRATÉGICO", margin + 18, 13);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);

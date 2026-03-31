@@ -11,6 +11,7 @@ import httpx
 from docx import Document
 from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Inches
 
 router = APIRouter()
 
@@ -190,9 +191,36 @@ async def download_nee_docx(data: DownloadRequest):
     try:
         doc = Document()
         
+        # Logo y Título
+        t = doc.add_table(rows=1, cols=2)
+        t.autofit = False
+        t.columns[0].width = Inches(1.2)
+        t.columns[1].width = Inches(5.3)
+        
+        # Logo
+        cell_logo = t.cell(0, 0)
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        logo_path = os.path.join(base, "assets", "logo_profeic.svg.png")
+        p_logo = cell_logo.paragraphs[0]
+        run_logo = p_logo.add_run()
+        if os.path.exists(logo_path):
+            try:
+                run_logo.add_picture(logo_path, width=Inches(1.0))
+            except Exception:
+                run_logo.add_text("ProfeIC")
+        else:
+            run_logo.add_text("ProfeIC")
+
         # Título
-        title = doc.add_heading('Asistente de Inclusión & DUA', 0)
-        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cell_info = t.cell(0, 1)
+        p_info = cell_info.paragraphs[0]
+        p_info.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        r1 = p_info.add_run("PROFE IC\n")
+        r1.bold = True
+        r1.font.size = Pt(12)
+        r1.font.color.rgb = RGBColor(43, 84, 110)
+        p_info.add_run("Asistente de Inclusión & DUA\n").font.size = Pt(10)
+        doc.add_paragraph()
 
         # Datos del Estudiante
         doc.add_heading('1. Contexto del Estudiante', level=1)

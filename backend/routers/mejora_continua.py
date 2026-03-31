@@ -541,7 +541,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import (
-    SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
+    SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable, Image
 )
 from reportlab.platypus import KeepTogether
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
@@ -601,12 +601,22 @@ async def exportar_gantt_pdf(req: GanttExportRequest):
         elements = []
 
         # ── Header band (simulated with a single-cell table) ─────────────────────
+        import os
+        logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "logo_profeic.svg.png")
+        logo_flowable = ""
+        if os.path.exists(logo_path):
+            try:
+                logo_flowable = Image(logo_path, width=15*mm, height=15*mm)
+            except Exception:
+                pass
+
         header_data = [[
+            logo_flowable if logo_flowable else "",
             Paragraph(f'<font size="16"><b>ROADMAP ESTRATÉGICO PME 2026</b></font>', ParagraphStyle("h", fontName="Helvetica-Bold", fontSize=16, textColor=colors.white)),
             Paragraph(f'<font size="7">Filtro: {req.filter_goal_label}  •  Líder: {req.filter_leader_label}<br/>{len(req.rows)} fases activas</font>',
                       ParagraphStyle("sub_h", fontName="Helvetica", fontSize=7, textColor=SLATE_400, alignment=TA_RIGHT))
         ]]
-        header_tbl = Table(header_data, colWidths=[page_w * 0.55 - margin, page_w * 0.45 - margin])
+        header_tbl = Table(header_data, colWidths=[20 * mm, page_w * 0.55 - margin - 20 * mm, page_w * 0.45 - margin])
         header_tbl.setStyle(TableStyle([
             ("BACKGROUND",   (0, 0), (-1, -1), SLATE),
             ("TOPPADDING",   (0, 0), (-1, -1), 8),
