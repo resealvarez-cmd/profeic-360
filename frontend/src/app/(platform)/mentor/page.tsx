@@ -5,6 +5,9 @@ import {
     BookHeart, GraduationCap, Scale, MessageSquare, User
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/telemetry";
 
@@ -87,7 +90,7 @@ export default function MentorPage() {
             const { data: { session } } = await supabase.auth.getSession();
             const token = session?.access_token || "";
 
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const res = await fetch(`${API_URL}/chat-mentor`, {
                 method: "POST",
                 headers: {
@@ -193,7 +196,6 @@ export default function MentorPage() {
                                 </div>
                             )}
 
-                            {/* Globo de Texto */}
                             <div className={cn(
                                 "relative px-6 py-4 max-w-2xl shadow-sm text-[15px] leading-7",
                                 msg.role === "user"
@@ -201,7 +203,7 @@ export default function MentorPage() {
                                     : "bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-tl-sm" // Blanco limpio
                             )}>
                                 <div className={cn("prose prose-sm max-w-none", msg.role === "user" ? "prose-invert" : "prose-slate")}>
-                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{msg.content}</ReactMarkdown>
                                 </div>
                             </div>
 

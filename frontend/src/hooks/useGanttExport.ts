@@ -248,8 +248,7 @@ export async function exportGanttPDFBackend(config: ExportConfig): Promise<void>
   const { goals, profiles, filterGoal, filterLeader } = config;
   const rows = buildRows(config);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 
-    (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:8000` : "http://127.0.0.1:8000");
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
   const res = await fetch(`${API_URL}/api/v1/mejora-continua/exportar-gantt-pdf`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

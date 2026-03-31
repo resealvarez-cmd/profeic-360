@@ -59,7 +59,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
     const fetchDocs = async () => {
         setLoadingDocs(true);
         try {
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const session = await supabase.auth.getSession();
             const token = session.data.session?.access_token;
             if (!token) return;
@@ -90,7 +90,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
         const toastId = toast.loading("Procesando y vectorizando documento...");
 
         try {
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const session = await supabase.auth.getSession();
             const token = session.data.session?.access_token;
             if (!token) throw new Error("No hay sesión");
@@ -126,7 +126,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
 
         const toastId = toast.loading("Eliminando documento...");
         try {
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const session = await supabase.auth.getSession();
             const token = session.data.session?.access_token;
             if (!token) throw new Error("No hay sesión");
@@ -367,7 +367,7 @@ export default function SuperAdminDashboard() {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return;
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const response = await fetch(`${BE_URL}/admin/stats`, {
                 headers: { "Authorization": `Bearer ${session.access_token}` }
             });
@@ -417,7 +417,7 @@ export default function SuperAdminDashboard() {
         setAssigningMap(prev => ({ ...prev, [userId]: true }));
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const response = await fetch(`${BE_URL}/admin/profile-plan`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session?.access_token}` },
@@ -451,7 +451,7 @@ export default function SuperAdminDashboard() {
     const handleUpdateSchoolPlan = async (schoolId: string, newPlan: string) => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const response = await fetch(`${BE_URL}/admin/school-plan`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session?.access_token}` },
@@ -470,7 +470,7 @@ export default function SuperAdminDashboard() {
         setIsInviting(true);
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            const BE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const BE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const isIndividual = inviteSchoolId === "independiente";
             const response = await fetch(`${BE_URL}/admin/invite`, {
                 method: "POST",

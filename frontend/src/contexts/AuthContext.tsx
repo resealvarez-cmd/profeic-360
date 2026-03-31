@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         // Schools for leadership
-        if (["admin", "sostenedor", "director", "utp"].includes(userRole)) {
+        if (userRole && ["admin", "sostenedor", "director", "utp"].includes(userRole)) {
           const { data: sData } = await supabase.from("schools").select("*");
           if (sData) {
             setSchools(sData);

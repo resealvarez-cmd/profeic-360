@@ -4,7 +4,7 @@ import { UploadCloud, FileText, CheckCircle, XCircle, Loader2, File } from "luci
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface UploadZoneProps {
     onContextLoaded: (text: string, filename: string) => void;

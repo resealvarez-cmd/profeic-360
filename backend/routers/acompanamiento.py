@@ -263,7 +263,9 @@ async def _get_teacher_trajectory_data(teacher_id: str):
     try:
         clean_text = response.text.replace("```json", "").replace("```", "").strip()
         analysis = json.loads(clean_text)
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("No se pudo parsear JSON de trayectoria: %s", str(e))
         analysis = {"summary": f"{teacher['full_name']} se encuentra en monitoreo activo por el equipo técnico pedagógico.", "strengths":[], "gaps":[], "teacher_view":"", "utp_view":"", "director_view":"", "suggested_training":[]}
 
     return {

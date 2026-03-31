@@ -7,7 +7,7 @@ import {
     BarChart3, UserCheck, Activity, Globe, Trophy, Info, Building
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ProductAnalytics({ userEmail, isCompact = false }: { userEmail: string, isCompact?: boolean }) {
     const [data, setData] = useState<any>(null);

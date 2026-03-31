@@ -399,7 +399,7 @@ type LibraryItem = {
     is_public?: boolean; // Added for Community Phase
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Tipos para filtrar, incluyendo "TODOS"
 const FILTER_TYPES = [
@@ -510,7 +510,7 @@ export default function BibliotecaPage() {
         if (e) e.stopPropagation(); // Evita abrir el modal
         setDownloading(true);
         try {
-            const CURRENT_API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const CURRENT_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const endpoint = `${CURRENT_API_URL}/export/prepare-generic`;
             const payload = {
                 titulo_unidad: item.titulo,
@@ -571,7 +571,7 @@ export default function BibliotecaPage() {
                     contenido: doc!.contenido || {}
                 }));
 
-            const CURRENT_API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const CURRENT_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const endpoint = `${CURRENT_API_URL}/export/prepare-paquete`;
             const payload = { documentos };
 

@@ -119,11 +119,13 @@ const HoldingDashboard: React.FC = () => {
     setComparing(true);
     try {
       // Preparar datos para la IA
+      const { data: fullGoals } = await supabase.from('strategic_goals').select('id, title, status, school_id, implementation_phases');
+      
       const payload = schools.map(s => {
-          const schoolGoals = goals?.filter(g => g.school_id === s.id) || [];
+          const schoolGoals = fullGoals?.filter((g: any) => g.school_id === s.id) || [];
           return {
               school_name: s.name,
-              goals: schoolGoals.map(g => ({
+              goals: schoolGoals.map((g: any) => ({
                   title: g.title,
                   phases: g.implementation_phases?.map((p: any) => ({
                       title: p.title,

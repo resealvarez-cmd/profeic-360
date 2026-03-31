@@ -160,6 +160,8 @@ def limpiar_latex_para_word(texto: str) -> str:
         r'\\rightarrow': '→', r'\\leftarrow': '←', r'\\Rightarrow': '⇒',
         r'\\angle': '∠', r'\\triangle': '△', r'\\degree': '°',
         r'\\%': '%',
+        r'\\sin': 'sin', r'\\cos': 'cos', r'\\tan': 'tan',
+        r'\\log': 'log', r'\\ln': 'ln', r'\\exp': 'exp',
     }
     for latex, unicode_char in replacements.items():
         texto = re.sub(latex, unicode_char, texto)
@@ -168,8 +170,8 @@ def limpiar_latex_para_word(texto: str) -> str:
     texto = re.sub(r'\$\$([^$]*)\$\$', r'\1', texto)
     texto = re.sub(r'\$([^$]*)\$', r'\1', texto)
     
-    # 7. Limpiar backslashes residuales (comandos LaTeX no reconocidos)
-    texto = re.sub(r'\\[a-zA-Z]+', '', texto)
+    # 7. Limpiar backslashes residuales (mantener el texto del comando LaTeX no reconocido)
+    texto = re.sub(r'\\([a-zA-Z]+)', r'\1 ', texto)
     texto = texto.replace('\\', '')
     
     # 8. Limpiar llaves sobrantes

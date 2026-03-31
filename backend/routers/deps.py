@@ -9,8 +9,11 @@ Uso:
         ...
 """
 import os
+import logging
 from fastapi import HTTPException, Header
 from supabase import create_client
+
+logger = logging.getLogger(__name__)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY") or os.getenv("SUPABASE_KEY", "")
@@ -38,10 +41,10 @@ async def get_current_user_id(authorization: str = Header(...)) -> str:
         return user_response.user.id
 
     except HTTPException as e:
-        print(f"Auth DEBUG: HTTPException {e.status_code} - {e.detail}")
+        logger.debug("Auth: HTTPException %s - %s", e.status_code, e.detail)
         raise
     except Exception as e:
-        print(f"Auth DEBUG: Error validando token: {str(e)}")
+        logger.debug("Auth: Error validando token: %s", str(e))
         raise HTTPException(status_code=401, detail=f"Error validando token: {str(e)}")
 
 

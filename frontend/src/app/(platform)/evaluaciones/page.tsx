@@ -21,7 +21,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 // --- CONSTANTES ---
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const MENSAJES_CARGA = [
     "Analizando los Objetivos de Aprendizaje...",

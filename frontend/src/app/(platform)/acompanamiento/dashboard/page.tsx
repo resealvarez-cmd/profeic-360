@@ -79,7 +79,7 @@ export default function Dashboard360() {
     // DASHBOARD REFINEMENTS
     const [showSuperAdminPanel, setShowSuperAdminPanel] = useState(true);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
     const handleGenerateExecutive = async () => {
         setLoadingExecutive(true);
@@ -196,7 +196,7 @@ export default function Dashboard360() {
 
                 // --- MULTI-TENANCY FILTERING ---
                 let currentSchoolId = null;
-                const { data: myProfile } = await supabase.from('profiles').select('school_id').eq('id', user.id).maybeSingle();
+                const { data: myProfile } = await supabase.from('profiles').select('school_id').eq('id', user?.id || "").maybeSingle();
                 currentSchoolId = myProfile?.school_id;
 
                 console.log("DASHBOARD_FETCH: School ID:", currentSchoolId);
@@ -239,7 +239,7 @@ export default function Dashboard360() {
                 let cyclesQuery = supabase.from('observation_cycles').select('*').order('created_at', { ascending: false });
                 
                 if (currentRole === 'teacher') {
-                    cyclesQuery = cyclesQuery.eq('teacher_id', user.id);
+                    cyclesQuery = cyclesQuery.eq('teacher_id', user?.id || "");
                 } else if (currentSchoolId && schoolUserIds.length > 0) {
                     cyclesQuery = cyclesQuery.in('teacher_id', schoolUserIds);
                 }
@@ -734,6 +734,7 @@ export default function Dashboard360() {
                 teacherDetailData={teacherDetailData}
                 loadingTeacherDetail={loadingTeacherDetail}
                 selectedTeacherId={selectedTeacherId}
+                setSelectedTeacherId={setSelectedTeacherId}
                 showSuperAdminPanel={showSuperAdminPanel}
                 setShowSuperAdminPanel={setShowSuperAdminPanel}
                 handleDeleteObservation={handleDeleteObservation}
@@ -1069,7 +1070,7 @@ function DashboardContent({
     handleGenerateExecutive, loadingExecutive, handleNewCycle,
     showInsightDrawer, setShowInsightDrawer, showExecutiveModal, setShowExecutiveModal, executiveData, SuperAdminWidget, usersMap,
     latestInsight, setShowConfigModal, handleViewTeacherDetail,
-    showTeacherDetailDrawer, setShowTeacherDetailDrawer, teacherDetailData, loadingTeacherDetail, selectedTeacherId,
+    showTeacherDetailDrawer, setShowTeacherDetailDrawer, teacherDetailData, loadingTeacherDetail, selectedTeacherId, setSelectedTeacherId,
     showSuperAdminPanel, setShowSuperAdminPanel, handleDeleteObservation, setShowNewCycleModal
 }: any) {
     const router = useRouter();

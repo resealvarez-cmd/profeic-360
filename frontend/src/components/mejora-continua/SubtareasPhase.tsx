@@ -31,6 +31,7 @@ export default function SubtareasPhase({ phaseId, profiles }: Props) {
   const [newDueDate, setNewDueDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     fetchTasks();

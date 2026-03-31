@@ -179,6 +179,8 @@ const LandingPage = () => {
             </section>
 
             {/* NUEVA SECCIÓN: VIDEO TESTIMONIAL */}
+            {/* 🔧 Pendiente: Reemplazar con ID real de YouTube para activar esta sección */}
+            {false && (
             <section className="py-24 bg-slate-50 relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-8">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -206,13 +208,14 @@ const LandingPage = () => {
                             <div className="absolute -inset-4 bg-gradient-to-r from-[#1B3C73] to-[#C87533] opacity-20 blur-2xl rounded-[3rem]" />
                             <VideoModal
                                 thumbnailUrl="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80"
-                                videoId="TU_VIDEO_ID_AQUI" // TODO: Reemplazar con ID real de YouTube
+                                videoId="REEMPLAZAR_CON_ID_YOUTUBE"
                                 title="Mira ProfeIC en Acción"
                             />
                         </div>
                     </div>
                 </div>
             </section>
+            )}
 
             {/* Acompañamiento 360 */}
             <section className="py-32 bg-[#1B3C73] text-white">
