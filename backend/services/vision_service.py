@@ -1,25 +1,26 @@
 import logging
 import ctypes
 import os
-import cv2
-import numpy as np
 import json
 from typing import List, Tuple, Dict, Any, Optional
-from imutils.perspective import four_point_transform
 
 logger = logging.getLogger(__name__)
 
+# --- Importaciones opcionales de visión (pueden fallar en Cloud Run) ---
+try:
+    import cv2
+    import numpy as np
+    from imutils.perspective import four_point_transform
+    CV2_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"OpenCV/numpy/imutils no disponible: {e}. OMR deshabilitado.")
+    CV2_AVAILABLE = False
+
 # Ayuda para encontrar zbar en Apple Silicon / Homebrew
 try:
-    import ctypes
-    import os
     brew_lib_path = "/opt/homebrew/lib"
     if os.path.exists(brew_lib_path):
         os.environ["PATH"] = f"{brew_lib_path}:{os.environ.get('PATH', '')}"
-        # Intentar cargar para validar
-        # ctypes.CDLL(os.path.join(brew_lib_path, "libzbar.dylib"))
-    elif os.path.exists("/usr/local/lib/libzbar.dylib"):
-        pass # Ya está en ruta estándar
 except Exception as e:
     logger.warning(f"No se pudo pre-cargar libzbar: {e}")
 
@@ -41,6 +42,9 @@ class OMRVisionService:
         Basado en el generador de PDF (omr_template_service.py).
         Resolución Objetivo: 1700 x 2200 (LETTER 200 DPI).
         """
+        if not CV2_AVAILABLE:
+            raise ValueError("OMR no disponible: OpenCV no está instalado en el servidor.")
+        
         logger.info(f"--- NUEVO PROCESO OMR --- Bytes recibidos: {len(image_bytes)}")
         
         # --- 1. NORMALIZACIÓN DE ENTRADA (SOPORTE HEIC) ---
