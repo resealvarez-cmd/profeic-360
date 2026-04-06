@@ -136,7 +136,8 @@ const HoldingDashboard: React.FC = () => {
           };
       });
 
-      const response = await fetch('/api/v1/mejora-continua/comparativa-holding', {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${baseUrl}/api/v1/mejora-continua/comparativa-holding`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ schools_data: payload })
