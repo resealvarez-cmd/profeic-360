@@ -417,7 +417,7 @@ async def generate_executive_report(req: ExecutiveRequest):
     try:
         # 1. Build Query for Completed Cycles with Teacher Data AND Observer Data explicitly for DOCX
         query = supabase.table('observation_cycles')\
-            .select('id, created_at, status, teacher:teacher_id(full_name, department, years_experience, age, school_id), observer:observer_id(full_name)')\
+            .select('id, created_at, status, rubric_type, teacher:teacher_id(full_name, department, years_experience, age, school_id), observer:observer_id(full_name)')\
             .eq('status', 'completed')
         
         author_school_id = None
@@ -669,22 +669,25 @@ async def generate_executive_report(req: ExecutiveRequest):
         is_mock = False
         if len(filtered_cycles) < 5:
             is_mock = True
+            # Hybrid Mock: Mix of pedagogical and coexistence metrics for demonstration
             heatmap = {
+                # Pedagogical
                 "ambiente_aula": 3.8,
                 "cierre_clase": 2.1,
                 "activacion_conocimientos": 2.5,
-                "monitoreo_practica": 3.1,
                 "retroalimentacion": 2.2,
                 "rigor_cognitivo": 2.8,
-                "uso_tiempo": 3.5
+                # Coexistence
+                "promocion_respeto": 3.9,
+                "diversidad_aula": 3.2,
+                "prevencion_normas": 3.7,
+                "habilidades_convivir": 2.5
             }
             sample_notes = """
             [CIERRE_CLASE - Low] El docente finaliza la clase abruptamente al sonar el timbre. No hay espacio para síntesis ni ticket de salida. Los estudiantes se retiran sin consolidar el objetivo.
             [RETROALIMENTACION - Low] La retroalimentación se limita a "bien" o "mal". No se observan preguntas de andamiaje que hagan al estudiante reflexionar sobre su error.
-            [ACTIVACION_CONOCIMIENTOS - Low] La activación fue una pregunta abierta ("¿qué vimos ayer?") respondida por solo 2 estudiantes. No se verificó que el resto conectara con el nuevo aprendizaje.
-            [AMBIENTE_AULA - High] Excelente manejo conductual. Rutinas establecidas. Los estudiantes entran y saben exactamente qué hacer. Clima de respeto absoluto.
-            [USO_TIEMPO - High] Transiciones rápidas y eficientes. El 90% del bloque se dedica a instrucción efectiva.
-            [RIGOR_COGNITIVO - Low] Las preguntas son literales ("¿cuál es el resultado de x?"). Falta elevar el DOK a análisis o evaluación.
+            [PROMOCION_RESPETO - High] El clima de convivencia es ejemplar. El docente utiliza refuerzo positivo constante y los estudiantes muestran un trato respetuoso entre pares.
+            [HABILIDADES_CONVIVIR - Low] Falta mediación en conflictos menores observados durante el trabajo grupal. Se recomienda fortalecer estrategias de resolución pacífica.
             """
             depth_index = 85.5
             alert_rigor = "Alta confiabilidad (Datos Extendidos Simulados para Demostración)"

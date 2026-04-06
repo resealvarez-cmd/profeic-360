@@ -11,7 +11,6 @@ import io
 import os
 import re
 import json
-import json
 import traceback
 import base64
 import uuid
@@ -41,6 +40,36 @@ def get_safe_headers(filename: str) -> dict:
     return {
         "Content-Disposition": f"attachment; filename=\"{safe_ascii}\"; filename*=UTF-8''{safe_utf8}"
     }
+
+METRICS_MAP = {
+    "pedagogica": {
+        "activacion_cognitiva": "Activación Cognitiva",
+        "andamiaje_modelaje": "Andamiaje y Modelaje",
+        "rigor_autonomia": "Rigor y Autonomía",
+        "clima_contencion": "Clima y Contención",
+        "gestion_aula": "Gestión de Aula",
+        "recursos_didacticos": "Recursos Didácticos",
+        "monitoreo_formativo": "Monitoreo Formativo",
+        "calidad_feedback": "Calidad del Feedback",
+        "ambiente_aula": "Ambiente de Aula",
+        "cierre_clase": "Cierre de Clase",
+        "activacion_conocimientos": "Activación de Conocimientos",
+        "retroalimentacion": "Retroalimentación",
+        "rigor_cognitivo": "Rigor Cognitivo",
+        "uso_tiempo": "Uso del Tiempo"
+    },
+    "convivencia": {
+        "promocion_respeto": "Promoción del Respeto",
+        "diversidad_aula": "Diversidad en el Aula",
+        "abordaje_discriminacion": "Abordaje Discriminación",
+        "habilidades_convivir": "Habilidades para Convivir",
+        "prevencion_normas": "Prevención y Normas",
+        "claridad_responsabilidades": "Roles y Responsabilidades",
+        "prevencion_distracciones": "Prevención Distracciones",
+        "vinculos_contencion": "Vínculos y Contención",
+        "practica_habilidades": "Habilidades Sociales"
+    }
+}
 
 # ==========================================
 # 1. MODELOS DE DATOS
@@ -897,31 +926,49 @@ def renderizar_reporte_ejecutivo(doc, data):
         doc.add_heading("III. Pulso Cuantitativo (Heatmap)", level=2)
         doc.add_paragraph("El siguiente mapa de calor muestra el promedio institucional (en escala 1 a 4) para las distintas dimensiones observadas.")
         
-        table = doc.add_table(rows=1, cols=2)
-        table.style = 'Table Grid'
-        table.autofit = False
-        table.columns[0].width = Inches(4.0)
-        table.columns[1].width = Inches(1.5)
+        # Categorize metrics
+        ped_metrics = {}
+        conv_metrics = {}
+        other_metrics = {}
         
-        hdr_cells = table.rows[0].cells
-        style_header_cell(hdr_cells[0], "Dimensión Pedagógica", "1B3C73", "FFFFFF")
-        style_header_cell(hdr_cells[1], "Puntaje (1-4)", "1B3C73", "FFFFFF")
-        
-        # Sort heatmap by value (descending) to show strengths first
-        sorted_heatmap = sorted(data.heatmap.items(), key=lambda x: x[1], reverse=True)
-        
-        for k, v in sorted_heatmap:
-            row_cells = table.add_row().cells
-            row_cells[0].text = k.replace("_", " ").title()
-            row_cells[0].paragraphs[0].runs[0].bold = True
+        for k, v in data.heatmap.items():
+            if k in METRICS_MAP["pedagogica"]:
+                ped_metrics[METRICS_MAP["pedagogica"][k]] = v
+            elif k in METRICS_MAP["convivencia"]:
+                conv_metrics[METRICS_MAP["convivencia"][k]] = v
+            else:
+                other_metrics[k.replace("_", " ").title()] = v
+
+        def add_metrics_table(doc, title, metrics_dict):
+            if not metrics_dict: return
+            doc.add_heading(title, level=3)
+            table = doc.add_table(rows=1, cols=2)
+            table.style = 'Table Grid'
+            table.autofit = False
+            table.columns[0].width = Inches(4.0)
+            table.columns[1].width = Inches(1.5)
             
-            row_cells[1].text = f"{v:.1f}"
-            row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            row_cells[1].paragraphs[0].runs[0].bold = True
+            hdr_cells = table.rows[0].cells
+            style_header_cell(hdr_cells[0], "Dimensión", "1B3C73", "FFFFFF")
+            style_header_cell(hdr_cells[1], "Puntaje (1-4)", "1B3C73", "FFFFFF")
             
-            # Apply color to the score cell
-            bg_color = get_color_for_score(v)
-            set_cell_background(row_cells[1], bg_color)
+            sorted_m = sorted(metrics_dict.items(), key=lambda x: x[1], reverse=True)
+            for k_m, v_m in sorted_m:
+                row_cells = table.add_row().cells
+                row_cells[0].text = k_m
+                row_cells[0].paragraphs[0].runs[0].bold = True
+                
+                row_cells[1].text = f"{v_m:.1f}"
+                row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                row_cells[1].paragraphs[0].runs[0].bold = True
+                
+                bg_color = get_color_for_score(v_m)
+                set_cell_background(row_cells[1], bg_color)
+            doc.add_paragraph()
+
+        add_metrics_table(doc, "Gestión Pedagógica", ped_metrics)
+        add_metrics_table(doc, "Formación y Convivencia", conv_metrics)
+        add_metrics_table(doc, "Otras Dimensiones", other_metrics)
             
     doc.add_page_break()
 
