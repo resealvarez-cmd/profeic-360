@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Send, Target, CheckCircle2, Mic, Square, Trash2, Play, Pause, Loader2 } from "lucide-react";
 import { TrajectoryWidget } from "./TrajectoryWidget";
 
-const FOCUS_TAGS = [
+const CURRICULAR_TAGS = [
     { id: 'paso1_activacion', label: '1. Activación de Conocimientos' },
     { id: 'paso2_desafio', label: '2. Desafío Cognitivo' },
     { id: 'paso3_modelamiento', label: '3. Modelamiento Experto' },
@@ -14,7 +14,17 @@ const FOCUS_TAGS = [
     { id: 'paso7_extension', label: '7. Desafío de Extensión' }
 ];
 
-export function PreObservation({ onSubmit, initialData = {}, lastCommitment }: any) {
+const CONVIVENCIA_TAGS = [
+    { id: 'conv1_clima', label: '1. Clima de Aula y Normas' },
+    { id: 'conv2_contencion', label: '2. Contención y Regulación Emocional' },
+    { id: 'conv3_conflictos', label: '3. Resolución de Conflictos' },
+    { id: 'conv4_participacion', label: '4. Participación Equitativa e Inclusión' },
+    { id: 'conv5_refuerzo', label: '5. Refuerzo Positivo y Motivación' },
+    { id: 'conv6_colaborativo', label: '6. Trabajo Colaborativo' }
+];
+
+export function PreObservation({ onSubmit, initialData = {}, lastCommitment, rubricType = 'curricular' }: any) {
+    const activeTags = rubricType === 'convivencia' ? CONVIVENCIA_TAGS : CURRICULAR_TAGS;
     const [selectedTags, setSelectedTags] = useState<string[]>(initialData.selected_tags || []);
     const [contextNote, setContextNote] = useState(initialData.context_note || "");
     const [isRecording, setIsRecording] = useState(false);
@@ -79,7 +89,7 @@ export function PreObservation({ onSubmit, initialData = {}, lastCommitment }: a
                     Acuerdo de Acompañamiento
                 </h2>
                 <p className="mt-2 text-sm text-slate-500 font-medium">
-                    Declara tu FOCO DE OBSERVACIÓN seleccionando hasta 2 de los Pasos del Aprendizaje Profundo donde te gustaría recibir mayor retroalimentación.
+                    Declara tu FOCO DE OBSERVACIÓN seleccionando hasta 2 de {rubricType === 'convivencia' ? 'las Dimensiones de Convivencia Educativa' : 'los Pasos del Aprendizaje Profundo'} donde te gustaría recibir mayor retroalimentación.
                 </p>
             </div>
 
@@ -89,7 +99,7 @@ export function PreObservation({ onSubmit, initialData = {}, lastCommitment }: a
                         1. Foco Principal (Selecciona hasta 2)
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {FOCUS_TAGS.map((tag) => {
+                        {activeTags.map((tag) => {
                             const isSelected = selectedTags.includes(tag.id);
                             return (
                                 <button
@@ -120,7 +130,11 @@ export function PreObservation({ onSubmit, initialData = {}, lastCommitment }: a
                     <label className="block text-sm font-black text-[#2b546e] mb-2 uppercase tracking-wider">
                         2. Contexto Adicional (Opcional)
                     </label>
-                    <span className="block text-xs font-normal text-slate-400 mb-3">¿Algo más que el acompañante deba saber? (Ej: Curso muy agitado después de recreo)</span>
+                    <span className="block text-xs font-normal text-slate-400 mb-3">
+                        {rubricType === 'convivencia' 
+                            ? '¿Existe alguna dinámica de grupo, situación conflictiva reciente o caso particular que deba conocer antes de entrar al aula?'
+                            : '¿Algo más que el acompañante deba saber? (Ej: Curso muy agitado después de recreo)'}
+                    </span>
                     <div className="flex flex-col gap-4">
                         <textarea
                             value={contextNote}

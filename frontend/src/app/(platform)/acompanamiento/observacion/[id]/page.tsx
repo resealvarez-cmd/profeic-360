@@ -333,6 +333,7 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
                         <PreObservation
                             onSubmit={(data: any) => handleSave('pre', data)}
                             lastCommitment={lastCommitment}
+                            rubricType={cycle?.rubric_type || 'curricular'}
                         />
                     </div>
                 )}
