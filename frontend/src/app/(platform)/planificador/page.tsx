@@ -370,7 +370,8 @@ export default function PlanificadorWizard() {
                 nivel: nivel,
                 asignatura: asignaturaActiva,
                 oas: mochila.map(m => `${m.codigo}: ${m.descripcion}`),
-                clases: resultado.planificacion_clases
+                clases: resultado.planificacion_clases,
+                dua: duaResult
             };
 
             const response = await fetch(`${API_URL}/export/planificacion-docx`, {

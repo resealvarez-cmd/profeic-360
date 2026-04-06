@@ -63,6 +63,7 @@ class PlanExportRequest(BaseModel):
     asignatura: str
     oas: List[str]
     clases: List[Dict[str, Any]]
+    dua: Optional[Dict[str, str]] = None
 
 class AssessmentItem(BaseModel):
     type: str
@@ -272,6 +273,37 @@ def renderizar_planificacion(doc, data):
         doc.add_paragraph()
         tr = doc.add_table(rows=1, cols=1); tr.style = 'Table Grid'
         tr.cell(0,0).text = f"Recursos: {limpiar_latex_para_word(clase.get('recurso_practica', ''))}\nTicket: {limpiar_latex_para_word(clase.get('ticket_salida', ''))}"
+
+    # --- NUEVA SECCIÓN: DUA ---
+    dua = data.get('dua')
+    if dua and isinstance(dua, dict):
+        doc.add_page_break()
+        h_dua = doc.add_heading("III. ADECUACIONES DUA (DISEÑO UNIVERSAL DE APRENDIZAJE)", level=1)
+        h_dua.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in h_dua.runs:
+            run.font.color.rgb = RGBColor(200, 117, 51) # Color Naranja ProfeIC
+
+        doc.add_paragraph("Basado en el contexto del aula, se sugieren las siguientes estrategias para diversificar la enseñanza y eliminar barreras de aprendizaje.")
+
+        # 1. Visual
+        if dua.get('visual_espacial'):
+            h_v = doc.add_heading("A. Estrategia Visual / Espacial", level=2)
+            h_v.paragraphs[0].runs[0].font.size = Pt(12)
+            doc.add_paragraph(limpiar_latex_para_word(dua.get('visual_espacial')))
+
+        # 2. Kinestesica
+        if dua.get('kinestesica'):
+            h_k = doc.add_heading("B. Estrategia Kinestésica / Corporal", level=2)
+            h_k.paragraphs[0].runs[0].font.size = Pt(12)
+            doc.add_paragraph(limpiar_latex_para_word(dua.get('kinestesica')))
+
+        # 3. Focalizada
+        if dua.get('focalizada'):
+            h_f = doc.add_heading("C. Estrategia Focalizada / NEE", level=2)
+            h_f.paragraphs[0].runs[0].font.size = Pt(12)
+            doc.add_paragraph(limpiar_latex_para_word(dua.get('focalizada')))
+
+        doc.add_paragraph("\n*Este bloque ha sido generado por el Asistente de Inclusión de ProfeIC.*")
 
 def renderizar_rubrica(doc, data):
     """Motor Visual para Rúbricas"""

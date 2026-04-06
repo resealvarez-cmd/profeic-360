@@ -420,6 +420,7 @@ async def generate_executive_report(req: ExecutiveRequest):
             .select('id, created_at, status, teacher:teacher_id(full_name, department, years_experience, age, school_id), observer:observer_id(full_name)')\
             .eq('status', 'completed')
         
+        author_school_id = None
         # Apply Optional School Filtering (Tenant Safety)
         if req.author_id:
             # Look up author's school_id
@@ -573,6 +574,93 @@ async def generate_executive_report(req: ExecutiveRequest):
              "departments": department_counts
         }
 
+        # ── REAL TEACHER ROSTER COUNT (for coverage) ──────────────────────────
+        # Mirror the logic from /executive-metrics: intersect profiles bound to
+        # the school with the valid teacher/utp roles from authorized_users.
+        try:
+            auth_res2 = supabase.table('authorized_users').select('email, role').execute()
+            valid_teacher_emails2 = set(
+                r['email'] for r in (auth_res2.data or [])
+                if r.get('role') in ['teacher', 'utp']
+            )
+
+            if req.author_id and author_school_id:
+                roster_res = supabase.table('profiles')\
+                    .select('id, email')\
+                    .eq('school_id', author_school_id)\
+                    .execute()
+            else:
+                roster_res = supabase.table('profiles').select('id, email').execute()
+
+            total_teachers_real = len(
+                [p for p in (roster_res.data or []) if p.get('email') in valid_teacher_emails2]
+            )
+        except Exception:
+            # Fallback: use unique teachers observed if roster query fails
+            total_teachers_real = len(unique_teachers) if unique_teachers else len(filtered_cycles)
+
+        observed_teachers_count = len(unique_teachers)
+        coverage_percent = round(
+            (observed_teachers_count / total_teachers_real * 100), 1
+        ) if total_teachers_real > 0 else 0.0
+
+        # ── TOP TEACHERS (avg score across all their completed cycles) ─────────
+        teacher_scores_map: Dict[str, Dict] = {}
+        for c in filtered_cycles:
+            teach_id_key = None
+            # Try to get teacher_id from the re-fetched full_cycles_res data
+            teach_name_val = c.get('teacher', {}).get('full_name', 'Docente Desconocido') if c.get('teacher') else 'Docente Desconocido'
+            # We need teacher_id; fetch from the extended query done above
+            content_tt = obs_map.get(c['id'], {})
+            scores_tt = content_tt.get('scores', {})
+            if scores_tt:
+                avg_tt = sum(v for v in scores_tt.values() if isinstance(v, (int, float))) / len(scores_tt)
+                # Use teacher name as key to avoid needing teacher_id re-lookup
+                key_tt = teach_name_val
+                if key_tt not in teacher_scores_map:
+                    teacher_scores_map[key_tt] = {"name": teach_name_val, "scores": []}
+                teacher_scores_map[key_tt]["scores"].append(avg_tt)
+
+        top_teachers_list = []
+        for tname, tdata in teacher_scores_map.items():
+            avg_final = sum(tdata["scores"]) / len(tdata["scores"])
+            top_teachers_list.append({"name": tdata["name"], "score": round(avg_final, 1)})
+        top_teachers_list.sort(key=lambda x: x["score"], reverse=True)
+        top_3_teachers = top_teachers_list[:3]
+
+        # ── TOP OBSERVERS (by completed cycles count) ─────────────────────────
+        observer_cycle_counts: Dict[str, Dict] = {}
+        try:
+            # Build observer_id -> name map from profiles for the unique observer IDs
+            observer_id_to_name: Dict[str, str] = {}
+            if unique_observers:
+                obs_profiles_res = supabase.table('profiles')\
+                    .select('id, full_name')\
+                    .in_('id', list(unique_observers))\
+                    .execute()
+                for op in (obs_profiles_res.data or []):
+                    if op.get('full_name'):
+                        observer_id_to_name[op['id']] = op['full_name']
+
+            # Count completed cycles per observer using the full_cycles_res data
+            for fc in full_cycles_res.data:
+                obs_id_fc = fc.get('observer_id')
+                if obs_id_fc:
+                    if obs_id_fc not in observer_cycle_counts:
+                        obs_name_fc = observer_id_to_name.get(obs_id_fc, 'Evaluador Desconocido')
+                        observer_cycle_counts[obs_id_fc] = {"name": obs_name_fc, "count": 0}
+                    observer_cycle_counts[obs_id_fc]["count"] += 1
+        except Exception:
+            pass
+
+        # Build top observers sorted by count desc
+        top_observers_list = [
+            {"name": v["name"], "cycles_completed": v["count"]}
+            for v in observer_cycle_counts.values()
+        ]
+        top_observers_list.sort(key=lambda x: x["cycles_completed"], reverse=True)
+        top_3_observers = top_observers_list[:3]
+
         # 5. Master Prompt Engineering & Data Enrichment (Strategic Brain)
         
         # --- DATA ENRICHMENT FOR SMALL DATASETS ---
@@ -715,16 +803,19 @@ async def generate_executive_report(req: ExecutiveRequest):
             "metrics": {
                 "total_observations": len(filtered_cycles),
                 "heatmap": heatmap,
-                "structural": {},
+                "structural": structural_metrics,
                 "global_metrics": {
-                    "total_teachers": 0,
-                    "observed_teachers": 0,
-                    "coverage_percent": 0.0,
+                    "total_teachers": total_teachers_real,
+                    "observed_teachers": observed_teachers_count,
+                    "coverage_percent": coverage_percent,
                     "total_completed": len(filtered_cycles),
                     "total_in_progress": 0,
                     "total_planned": 0
                 },
-                "highlights": {"top_teachers": [], "top_observers": []},
+                "highlights": {
+                    "top_teachers": top_3_teachers,
+                    "top_observers": top_3_observers
+                },
                 "matriz": matriz
             },
             "analysis": ai_result
