@@ -726,12 +726,13 @@ async def generate_executive_report(req: ExecutiveRequest):
         2. "top_3_gaps": Lista las 3 brechas más críticas detectadas en la data. Empieza con una frase fuerte, ej: "Ausencia de Cierre Pedagógico: No se evidencia consolidación del aprendizaje al final del bloque..."
         
         3. "recommended_training": Escribe una Matriz Estratégica ("Llegar e Implementar") que ataque las brechas.
-           Transforma las recomendaciones en un ARRAY DE OBJETOS con 4 claves exactas:
+           Transforma las recomendaciones en un ARRAY DE OBJETOS con 5 claves exactas:
+           - "area": Categoría ('pedagogica' o 'convivencia').
            - "foco": Título de la iniciativa (ej: "Clínicas de Cierre").
            - "objetivo": Qué métrica o habilidad exacta vamos a mover.
            - "metodologia": Desglose paso a paso de la ejecución empírica.
            - "kpi": Indicador de impacto a corto plazo.
-           ¡Genera exactamente 3 iniciativas de altísimo impacto!
+           ¡Genera exactamente 3-4 iniciativas de altísimo impacto cubriendo ambas áreas si hay data mixta!
 
         4. "rigor_audit": Reflejar los datos de auditoría provistos.
 
@@ -741,6 +742,7 @@ async def generate_executive_report(req: ExecutiveRequest):
             "top_3_gaps": ["Brecha 1 con detalle", "Brecha 2 con detalle", "Brecha 3 con detalle"],
             "recommended_training": [
                 {{
+                    "area": "pedagogica",
                     "foco": "...",
                     "objetivo": "...",
                     "metodologia": "...",

@@ -975,54 +975,51 @@ def renderizar_reporte_ejecutivo(doc, data):
     # --- PÁGINA X: MATRIZ DE ACCIÓN ---
     doc.add_page_break()
     doc.add_heading("IV. Matriz de Acción Estratégica", level=2)
+    doc.add_paragraph("Basado en el análisis de IA, se proponen las siguientes líneas de acción prioritarias para el fortalecimiento institucional.")
     
-    # Brechas
-    p_brechas = doc.add_paragraph()
-    p_brechas.add_run("Principales Brechas Detectadas").bold = True
-    for i, gap in enumerate(data.top_3_gaps):
-        gap_str = gap.get("descripcion", gap.get("gap", str(gap))) if isinstance(gap, dict) else str(gap)
-        doc.add_paragraph(f"{gap_str}", style='List Number')
-        
-    doc.add_paragraph()
-    
-    # Matriz de Capacitación
-    p_cap = doc.add_paragraph()
-    p_cap.add_run("Plan de Intervención Recomendado").bold = True
-    
+    # Group Training by Area
     training_list = data.recommended_training
+    ped_train = []
+    conv_train = []
     
-    if isinstance(training_list, list) and len(training_list) > 0:
+    if isinstance(training_list, list):
+        for item in training_list:
+            if not isinstance(item, dict): continue
+            area = item.get("area", "").lower()
+            if "conv" in area:
+                conv_train.append(item)
+            else:
+                ped_train.append(item)
+
+    def add_intervention_table(doc, title, items):
+        if not items: return
+        doc.add_heading(title, level=3)
         t_action = doc.add_table(rows=1, cols=4)
         t_action.style = 'Table Grid'
         t_action.autofit = False
+        t_action.columns[0].width = Inches(1.6)
+        t_action.columns[1].width = Inches(1.4)
+        t_action.columns[2].width = Inches(2.0)
+        t_action.columns[3].width = Inches(1.0)
         
-        # Set column widths roughly
-        t_action.columns[0].width = Inches(1.5)
-        t_action.columns[1].width = Inches(1.5)
-        t_action.columns[2].width = Inches(2.2)
-        t_action.columns[3].width = Inches(1.3)
+        h = t_action.rows[0].cells
+        style_header_cell(h[0], "Foco de Mejora", "1B3C73", "FFFFFF")
+        style_header_cell(h[1], "Objetivo", "1B3C73", "FFFFFF")
+        style_header_cell(h[2], "Metodología", "1B3C73", "FFFFFF")
+        style_header_cell(h[3], "KPI / Meta", "1B3C73", "FFFFFF")
         
-        style_header_cell(t_action.cell(0,0), "Iniciativa (Foco)", "C87533", "FFFFFF")
-        style_header_cell(t_action.cell(0,1), "Objetivo Esperado", "C87533", "FFFFFF")
-        style_header_cell(t_action.cell(0,2), "Metodología de Implem.", "C87533", "FFFFFF")
-        style_header_cell(t_action.cell(0,3), "KPI de Éxito", "C87533", "FFFFFF")
-        
-        for item in training_list:
-            if not isinstance(item, dict): continue
+        for item in items:
             row = t_action.add_row().cells
-            
-            row[0].text = item.get("foco", "")
+            row[0].text = item.get("foco", "N/A")
             row[0].paragraphs[0].runs[0].bold = True
-            
-            row[1].text = item.get("objetivo", "")
-            row[2].text = item.get("metodologia", "")
-            
-            row[3].text = item.get("kpi", "")
+            row[1].text = item.get("objetivo", "N/A")
+            row[2].text = item.get("metodologia", "N/A")
+            row[3].text = item.get("kpi", "N/A")
             row[3].paragraphs[0].runs[0].italic = True
-    else:
-        p_train = doc.add_paragraph(str(training_list))
-        if p_train.runs:
-            p_train.runs[0].italic = True
+        doc.add_paragraph()
+
+    add_intervention_table(doc, "Plan de Intervención Pedagógica", ped_train)
+    add_intervention_table(doc, "Plan de Formación y Convivencia", conv_train)
 
     # --- PÁGINA X: ANEXOS Y CUADRO DE HONOR ---
     if data.highlights or data.rigor_audit:
@@ -1030,33 +1027,48 @@ def renderizar_reporte_ejecutivo(doc, data):
         doc.add_heading("V. Anexos y Destacados", level=2)
 
     if data.highlights:
-        # Cuadro de Honor
+        # Honor Roll Header
+        doc.add_heading("Cuadro de Honor y Liderazgo Institucional", level=3)
+        doc.add_paragraph("Reconocimiento a los perfiles con mayor impacto y mejora en este período.")
+        
         t_honor = doc.add_table(rows=1, cols=2)
         t_honor.autofit = False
         t_honor.columns[0].width = Inches(3.0)
         t_honor.columns[1].width = Inches(3.0)
-        c_left, c_right = t_honor.rows[0].cells
         
-        # Left: Top Teachers
-        style_header_cell(c_left, "CUADRO DE HONOR: DOCENTES CON MAYOR MEJORA", "A1C969", "FFFFFF")
+        h_row = t_honor.rows[0].cells
+        style_header_cell(h_row[0], "DOCENTES (MAYOR MEJORA)", "7EB13C", "FFFFFF")
+        style_header_cell(h_row[1], "EVALUADORES DESTACADOS", "2A59A8", "FFFFFF")
+        
         top_t = data.highlights.get('top_teachers', [])
-        if top_t:
-            for t in top_t:
-                c_left.add_paragraph(f"• {t.get('name')} (+{t.get('score')} pts)")
-        else:
-            p_empty1 = c_left.add_paragraph("No hay datos en este período.")
-            if p_empty1.runs: p_empty1.runs[0].italic = True
-            
-        # Right: Top Observers
-        style_header_cell(c_right, "LIDERAZGO PEDAGÓGICO: ACOMPAÑANTES DESTACADOS", "2A59A8", "FFFFFF")
         top_o = data.highlights.get('top_observers', [])
-        if top_o:
-            for o in top_o:
-                c_right.add_paragraph(f"• {o.get('name')} (KPI: {o.get('kpi_score')})")
+        
+        max_len = max(len(top_t), len(top_o))
+        if max_len == 0:
+            row = t_honor.add_row().cells
+            row[0].text = "Pendiente de datos"
+            row[1].text = "Pendiente de datos"
         else:
-            p_empty2 = c_right.add_paragraph("No hay datos en este período.")
-            if p_empty2.runs: p_empty2.runs[0].italic = True
-            
+            for i in range(max_len):
+                row = t_honor.add_row().cells
+                # Teacher
+                if i < len(top_t):
+                    t = top_t[i]
+                    p = row[0].paragraphs[0]
+                    p.add_run(f"🏆 {t.get('name')} ").bold = True
+                    p.add_run(f"(+{t.get('score')} pts)").font.size = Pt(9)
+                else:
+                    row[0].text = "-"
+                
+                # Observer
+                if i < len(top_o):
+                    o = top_o[i]
+                    p = row[1].paragraphs[0]
+                    p.add_run(f"⭐ {o.get('name')} ").bold = True
+                    p.add_run(f"(KPI: {o.get('kpi_score')})").font.size = Pt(9)
+                else:
+                    row[1].text = "-"
+        
         doc.add_paragraph()
 
     # Auditoría Final
