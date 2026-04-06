@@ -1309,7 +1309,10 @@ function DashboardContent({
                                                         recommended_training: analysisData.recommended_training || "",
                                                         rigor_audit: metricsData.rigor_audit || null,
                                                         heatmap: metricsData.heatmap || null,
-                                                        global_metrics: metricsData.global_metrics || null,
+                                                        global_metrics: {
+                                                            ...(metricsData.global_metrics || {}),
+                                                            structural: metricsData.structural || null
+                                                        },
                                                         highlights: metricsData.highlights || null,
                                                         matriz: metricsData.matriz || null
                                                     };

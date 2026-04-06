@@ -655,10 +655,10 @@ async def generate_executive_report(req: ExecutiveRequest):
 
         # Build top observers sorted by count desc
         top_observers_list = [
-            {"name": v["name"], "cycles_completed": v["count"]}
+            {"name": v["name"], "kpi_score": v["count"]}
             for v in observer_cycle_counts.values()
         ]
-        top_observers_list.sort(key=lambda x: x["cycles_completed"], reverse=True)
+        top_observers_list.sort(key=lambda x: x["kpi_score"], reverse=True)
         top_3_observers = top_observers_list[:3]
 
         # 5. Master Prompt Engineering & Data Enrichment (Strategic Brain)
