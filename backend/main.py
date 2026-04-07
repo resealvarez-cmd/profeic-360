@@ -46,7 +46,8 @@ from routers import (
     omr_vision,
     enrollment,
     teachers,
-    mejora_continua
+    mejora_continua,
+    pme
 )
 from simce_router import router as simce_router
 
@@ -94,6 +95,7 @@ app.include_router(omr_vision.router)
 app.include_router(enrollment.router)
 app.include_router(teachers.router)
 app.include_router(mejora_continua.router)
+app.include_router(pme.router)
 app.include_router(simce_router) # Nuevo router híbrido
 
 

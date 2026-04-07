@@ -16,20 +16,18 @@ export default function CopilotoMejoraModal() {
   const [isSaving, setIsSaving] = useState(false);
   const [propuesta, setPropuesta] = useState<any | null>(null);
   const [profiles, setProfiles] = useState<any[]>([]);
-
+  
   // Novedades PME
   const [pmeActions, setPmeActions] = useState<any[]>([]);
   const [selectedPmeAction, setSelectedPmeAction] = useState<string>("");
 
-  // Fetch data
+  // Fetch profiles and PME actions
   useEffect(() => {
     async function loadData() {
       const { data: authUsers } = await supabase.from('authorized_users').select('email').in('role', ['admin', 'director', 'utp']);
       const emails = authUsers?.map(u => u.email) || [];
       const { data: profilesData } = await supabase.from('profiles').select('id, full_name, email').in('email', emails).order('full_name');
-      if (profilesData) {
-        setProfiles(profilesData);
-      }
+      if (profilesData) setProfiles(profilesData);
 
       // Fetch PME actions
       const { data: pmeData } = await supabase.from('pme_actions').select('id, title, dimension').order('title');
@@ -71,7 +69,7 @@ export default function CopilotoMejoraModal() {
           description: propuesta.description,
           status: "active",
           academic_year: new Date().getFullYear(),
-          pme_action_link: selectedPmeAction || null, // Vínculo oficial
+          pme_action_link: selectedPmeAction || null,
         })
         .select()
         .single();
@@ -170,6 +168,33 @@ export default function CopilotoMejoraModal() {
                     />
                 </div>
 
+                <div className="space-y-3">
+                    <Label className="text-xs font-bold text-slate-500 ml-1">🔗 Vincular a una Acción del PME Institucional (Opcional)</Label>
+                    <div className="flex items-center gap-3">
+                        <select 
+                            className="flex-1 h-11 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
+                            value={selectedPmeAction}
+                            onChange={(e) => setSelectedPmeAction(e.target.value)}
+                        >
+                            <option value="">-- Sin Vincular --</option>
+                            {pmeActions.map((action: any) => (
+                                <option key={action.id} value={action.id}>{action.title} ({action.dimension || 'Sin dimensión'})</option>
+                            ))}
+                        </select>
+                        <div className="shrink-0">
+                            {!selectedPmeAction ? (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                                    Gestión Interna
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm">
+                                    <Sparkles className="w-3 h-3 mr-1" /> PME Oficial
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 <Button 
                     onClick={handleEstructurar} 
                     className="w-full h-14 bg-slate-900 hover:bg-blue-600 text-white font-black text-xs uppercase tracking-widest rounded-3xl transition-all shadow-xl disabled:opacity-50"
@@ -182,26 +207,26 @@ export default function CopilotoMejoraModal() {
             ) : (
               <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <section className="space-y-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600 border-l-4 border-blue-600 pl-3">Meta Propuesta</h3>
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600 border-l-4 border-blue-600 pl-3">Meta Propuesta</h3>
+                        <div className="shrink-0">
+                            {!selectedPmeAction ? (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-wider">
+                                    Gestión Interna
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm uppercase tracking-wider">
+                                    <Sparkles className="w-3 h-3 mr-1" /> PME Oficial
+                                </span>
+                            )}
+                        </div>
+                    </div>
                     <div className="space-y-3 bg-slate-50 p-6 rounded-[32px] border border-slate-100 shadow-sm">
                         <Input 
                             value={propuesta.title} 
                             onChange={(e) => setPropuesta({...propuesta, title: e.target.value})}
                             className="font-black text-xl text-slate-900 border-transparent bg-transparent focus:bg-white px-0 focus:px-4 h-auto py-2"
                         />
-                        <div className="py-3 border-y border-slate-200/50 my-2">
-                             <Label className="text-[10px] font-black uppercase text-blue-600 mb-2 block">🔗 Vinculación Oficial PME</Label>
-                             <select 
-                                className="w-full h-10 bg-white border border-slate-200 rounded-xl px-4 text-xs font-bold text-slate-900 shadow-inner"
-                                value={selectedPmeAction}
-                                onChange={(e) => setSelectedPmeAction(e.target.value)}
-                             >
-                                <option value="">-- Sin Vincular --</option>
-                                {pmeActions.map((action: any) => (
-                                    <option key={action.id} value={action.id}>{action.title} ({action.dimension})</option>
-                                ))}
-                             </select>
-                        </div>
                         <Textarea 
                             value={propuesta.description}
                             onChange={(e) => setPropuesta({...propuesta, description: e.target.value})}

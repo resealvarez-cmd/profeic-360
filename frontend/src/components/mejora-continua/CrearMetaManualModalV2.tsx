@@ -49,7 +49,7 @@ export default function CrearMetaManualModal() {
         setProfiles(profilesData);
       }
       
-      // Fetch PME actions (Novedad Puente)
+      // Fetch PME actions
       const { data: pmeData } = await supabase.from('pme_actions').select('id, title, dimension').order('title');
       if (pmeData) setPmeActions(pmeData);
     }
@@ -148,7 +148,7 @@ export default function CrearMetaManualModal() {
           description: goal.description,
           status: "active",
           academic_year: new Date().getFullYear(),
-          pme_action_link: selectedPmeAction || null, // Vínculo oficial
+          pme_action_link: selectedPmeAction || null,
         })
         .select()
         .single();

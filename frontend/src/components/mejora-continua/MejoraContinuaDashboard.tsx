@@ -389,9 +389,19 @@ export default function MejoraContinuaDashboard() {
                                           </div>
                                   ) : (
                                       <div className="flex-1 min-w-0">
-                                          <h4 className="text-base font-bold text-slate-800 truncate">{goal.title}</h4>
+                                          <div className="flex items-center gap-2 mb-1">
+                                            <h4 className="text-base font-bold text-slate-800 truncate">{goal.title}</h4>
+                                            {goal.pme_action_link && (
+                                              <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 text-blue-700 border border-blue-200 uppercase tracking-widest">
+                                                🔗 PME {goal.pme_actions?.dimension}
+                                              </span>
+                                            )}
+                                          </div>
                                           {!expandedGoals[goal.id] && (
-                                              <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{goal.description || 'Sin descripción'}</p>
+                                              <p className="text-[11px] text-slate-500 font-medium truncate">
+                                                {goal.pme_action_link && <span className="text-blue-600/70 font-bold mr-1">[{goal.pme_actions?.title}]</span>}
+                                                {goal.description || 'Sin descripción'}
+                                              </p>
                                           )}
                                       </div>
                                   )}

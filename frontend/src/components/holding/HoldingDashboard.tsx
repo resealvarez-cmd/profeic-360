@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { SchoolCharacterizationModal } from './SchoolCharacterizationModal';
 
 import { supabase } from "@/lib/supabaseClient";
 
@@ -35,9 +36,16 @@ interface HoldingSchool {
   activeGoals: number;
   totalGoals: number;
   criticalAlerts: number;
-  enrolledStudents: number;
   status: 'optimal' | 'warning' | 'critical';
   trend: 'up' | 'down' | 'stable';
+  // Characterization
+  attendance_avg: number;
+  enrollment_count: number;
+  priority_pct: number;
+  preferred_pct: number;
+  pie_neet_count: number;
+  pie_neep_count: number;
+  socioeconomic_level: string;
 }
 
 const HoldingDashboard: React.FC = () => {
@@ -56,58 +64,67 @@ const HoldingDashboard: React.FC = () => {
 
   const [comparisonData, setComparisonData] = useState<any>(null);
   const [comparing, setComparing] = useState(false);
+  const [selectedSchoolForEdit, setSelectedSchoolForEdit] = useState<HoldingSchool | null>(null);
+
+  const fetchHoldingData = async () => {
+    setLoading(true);
+    try {
+      const { data: schoolsData } = await supabase.from('schools').select('*');
+      if (!schoolsData) return;
+
+      const { data: cycles } = await supabase.from('observation_cycles').select('id, status');
+      const { data: goals } = await supabase.from('strategic_goals').select('id, status, school_id');
+      const { data: enablers } = await supabase.from('enablers').select('estimated_cost');
+
+      const processedSchools = schoolsData.map(s => {
+          const schoolGoals = goals?.filter(g => g.school_id === s.id) || [];
+          const completedGoals = schoolGoals.filter(g => g.status === 'completed').length;
+          
+          // Real Health Calculation: 60% completion + 40% random/base (placeholder for real KPI)
+          const completionRate = schoolGoals.length > 0 ? (completedGoals / schoolGoals.length) * 100 : 0;
+          const health = Math.round((completionRate * 0.6) + 40); 
+          
+          return {
+              id: s.id,
+              name: s.name,
+              location: s.location || (s.city ? `${s.city}, ${s.region}` : 'Chile'),
+              healthScore: health,
+              activeGoals: schoolGoals.filter(g => g.status !== 'completed').length,
+              totalGoals: schoolGoals.length || 0,
+              criticalAlerts: 0,
+              status: health > 85 ? 'optimal' : health > 75 ? 'warning' : 'critical',
+              trend: 'up',
+              // Real data from DB
+              attendance_avg: s.attendance_avg || 0,
+              enrollment_count: s.enrollment_count || 0,
+              priority_pct: s.priority_pct || 0,
+              preferred_pct: s.preferred_pct || 0,
+              pie_neet_count: s.pie_neet_count || 0,
+              pie_neep_count: s.pie_neep_count || 0,
+              socioeconomic_level: s.socioeconomic_level || "",
+          } as HoldingSchool;
+      });
+
+      setSchools(processedSchools);
+      
+      // Calculate Global Stats
+      const totalInvestment = enablers?.reduce((acc, e) => acc + (e.estimated_cost || 0), 0) || 0;
+      setGlobalStats({
+          avgHealth: Math.round(processedSchools.reduce((acc, s) => acc + s.healthScore, 0) / processedSchools.length) || 0,
+          activeProcesses: goals?.filter(g => g.status !== 'completed').length || 0,
+          totalPossible: goals?.length || 0,
+          alerts: processedSchools.reduce((acc, s) => acc + s.criticalAlerts, 0),
+          totalInvestment
+      });
+
+    } catch (error) {
+      console.error("Error fetching holding data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   React.useEffect(() => {
-    const fetchHoldingData = async () => {
-      setLoading(true);
-      try {
-        const { data: schoolsData } = await supabase.from('schools').select('*');
-        if (!schoolsData) return;
-
-        const { data: cycles } = await supabase.from('observation_cycles').select('id, status');
-        const { data: goals } = await supabase.from('strategic_goals').select('id, status, school_id');
-        const { data: enablers } = await supabase.from('enablers').select('estimated_cost');
-
-        const processedSchools = schoolsData.map(s => {
-            const schoolGoals = goals?.filter(g => g.school_id === s.id) || [];
-            const completedGoals = schoolGoals.filter(g => g.status === 'completed').length;
-            
-            // Real Health Calculation: 60% completion + 40% random/base (placeholder for real KPI)
-            const completionRate = schoolGoals.length > 0 ? (completedGoals / schoolGoals.length) * 100 : 0;
-            const health = Math.round((completionRate * 0.6) + 40); 
-            
-            return {
-                id: s.id,
-                name: s.name,
-                location: s.location || 'Chile',
-                healthScore: health,
-                activeGoals: schoolGoals.filter(g => g.status !== 'completed').length,
-                totalGoals: schoolGoals.length || 0,
-                criticalAlerts: 0,
-                enrolledStudents: 800 + Math.floor(Math.random() * 400),
-                status: health > 85 ? 'optimal' : health > 75 ? 'warning' : 'critical',
-                trend: 'up'
-            } as HoldingSchool;
-        });
-
-        setSchools(processedSchools);
-        
-        // Calculate Global Stats
-        const totalInvestment = enablers?.reduce((acc, e) => acc + (e.estimated_cost || 0), 0) || 0;
-        setGlobalStats({
-            avgHealth: Math.round(processedSchools.reduce((acc, s) => acc + s.healthScore, 0) / processedSchools.length) || 0,
-            activeProcesses: goals?.filter(g => g.status !== 'completed').length || 0,
-            totalPossible: goals?.length || 0,
-            alerts: processedSchools.reduce((acc, s) => acc + s.criticalAlerts, 0),
-            totalInvestment
-        });
-
-      } catch (error) {
-        console.error("Error fetching holding data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchHoldingData();
   }, []);
 
@@ -234,9 +251,13 @@ const HoldingDashboard: React.FC = () => {
                         {school.name}
                         </h3>
                     </div>
-                    <div className="p-2 bg-slate-50 rounded-xl text-slate-400">
+                    <button 
+                        onClick={() => setSelectedSchoolForEdit(school)}
+                        className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-blue-600 transition-all"
+                        title="Ver y editar caracterización"
+                    >
                         <Settings size={18} />
-                    </div>
+                    </button>
                     </div>
 
                     <div className="flex items-center gap-8 py-2">
@@ -257,22 +278,30 @@ const HoldingDashboard: React.FC = () => {
                     </div>
 
                     <div className="flex-1 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Matrícula</p>
+                                <p className="text-sm font-black text-slate-900">{school.enrollment_count}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Asistencia</p>
+                                <p className="text-sm font-black text-slate-900">{school.attendance_avg}%</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Prioritarios</p>
+                                <p className="text-sm font-black text-slate-900">{school.priority_pct}%</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">PIE (NEET+NEEP)</p>
+                                <p className="text-sm font-black text-slate-900">{school.pie_neet_count + school.pie_neep_count}</p>
+                            </div>
+                        </div>
+
                         <div>
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Ejecución {school.activeGoals}/{school.totalGoals} Metas</span>
-                        </div>
-                        <Progress value={(school.activeGoals / school.totalGoals) * 100} className="h-1.5 bg-slate-100" />
-                        </div>
-                        
-                        <div className="flex gap-4">
-                        <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Alerta</p>
-                            <p className={`text-sm font-black ${school.criticalAlerts > 0 ? 'text-red-600' : 'text-slate-900'}`}>{school.criticalAlerts}</p>
-                        </div>
-                        <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Matrícula</p>
-                            <p className="text-sm font-black text-slate-900">{school.enrolledStudents}</p>
-                        </div>
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Ejecución PME {school.activeGoals}/{school.totalGoals}</span>
+                            </div>
+                            <Progress value={school.totalGoals > 0 ? (school.activeGoals / school.totalGoals) * 100 : 0} className="h-1.5 bg-slate-100" />
                         </div>
                     </div>
                     </div>
@@ -424,6 +453,15 @@ const HoldingDashboard: React.FC = () => {
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Gestión de Organizaciones</h2>
           <p className="text-slate-500 max-w-md mx-auto mt-4 text-lg">Próximamente: Administre agrupaciones de colegios, redes locales y departamentos centrales.</p>
         </div>
+      )}
+
+      {selectedSchoolForEdit && (
+          <SchoolCharacterizationModal 
+            school={selectedSchoolForEdit}
+            isOpen={true}
+            onClose={() => setSelectedSchoolForEdit(null)}
+            onSaved={fetchHoldingData}
+          />
       )}
     </div>
   );

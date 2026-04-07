@@ -21,6 +21,8 @@ import { TrackerCobertura } from "@/components/dashboard/TrackerCobertura";
 import { OnboardingTour } from "@/components/dashboard/OnboardingTour";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { SchoolCharacterizationModal } from "@/components/holding/SchoolCharacterizationModal";
+import { Building2 } from "lucide-react";
 
 // ADMIN_EMAILS removed in favor of DB check
 
@@ -116,6 +118,8 @@ export default function Dashboard() {
 
     const [loading, setLoading] = useState(true);
     const [showTour, setShowTour] = useState(false);
+    const [currentSchool, setCurrentSchool] = useState<any>(null);
+    const [showSchoolModal, setShowSchoolModal] = useState(false);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -137,11 +141,20 @@ export default function Dashboard() {
                     .order('event_date', { ascending: true })
                     .limit(4);
                 setEvents(evts || []);
+
+                // Current School Data (for characterization)
+                if (isDirectivo || isSostenedor || isSuperAdmin) {
+                    const { data: profile } = await supabase.from('profiles').select('school_id').eq('id', userId).single();
+                    if (profile?.school_id) {
+                        const { data: school } = await supabase.from('schools').select('*').eq('id', profile.school_id).single();
+                        setCurrentSchool(school);
+                    }
+                }
             }
             setLoading(false);
         };
         fetchDashboardData();
-    }, [userId]);
+    }, [userId, isDirectivo, isSostenedor, isSuperAdmin]);
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
@@ -341,36 +354,25 @@ export default function Dashboard() {
                                 </h3>
                                 <div className="space-y-4">
                                     {events.length === 0 ? (
-                                        /* EMPTY STATE */
                                         <div className="text-center py-6">
                                             <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                                 <CalendarDaysIcon className="text-slate-300" size={24} />
                                             </div>
                                             <p className="text-slate-500 font-medium text-sm">No hay eventos programados</p>
-                                            <p className="text-xs text-slate-400">Tu agenda está despejada.</p>
                                         </div>
                                     ) : (
-                                        /* EVENTS LIST */
                                         <div className="space-y-3">
                                             {events.map((event) => {
                                                 const date = new Date(event.event_date);
                                                 return (
                                                     <div key={event.id} className="flex gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group">
-                                                        <div className="flex flex-col items-center justify-center w-12 h-12 bg-orange-50 rounded-xl text-orange-600 flex-shrink-0 group-hover:scale-105 transition-transform">
+                                                        <div className="flex flex-col items-center justify-center w-12 h-12 bg-orange-50 rounded-xl text-orange-600 flex-shrink-0">
                                                             <span className="text-xs font-bold uppercase">{date.toLocaleDateString('es-CL', { month: 'short' })}</span>
                                                             <span className="text-lg font-black leading-none">{date.getDate()}</span>
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <h4 className="font-bold text-[#1a2e3b] text-sm truncate">{event.title}</h4>
-                                                            <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                                                                <span>{date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })} hrs</span>
-                                                                {event.type && (
-                                                                    <>
-                                                                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                                                        <span className="truncate">{event.type}</span>
-                                                                    </>
-                                                                )}
-                                                            </div>
+                                                            <p className="text-[10px] text-slate-500">{date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })} hrs</p>
                                                         </div>
                                                     </div>
                                                 );
@@ -379,12 +381,59 @@ export default function Dashboard() {
                                     )}
                                 </div>
                             </div>
+
+                            {/* SCHOOL PROFILE WIDGET (For Directors) */}
+                            {isDirectivo && currentSchool && (
+                                <div className="bg-[#1B3C73] p-6 rounded-[2rem] text-white shadow-xl shadow-blue-900/20 group hover:-translate-y-1 transition-all duration-300">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="p-2 bg-white/10 rounded-xl">
+                                            <Building2 size={20} className="text-blue-200" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-sm tracking-tight">Ficha Institucional</h3>
+                                            <p className="text-[10px] text-blue-200 uppercase font-black tracking-widest">{currentSchool.name}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4 mb-6">
+                                        <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
+                                            <p className="text-[9px] font-black text-blue-200 uppercase tracking-widest mb-1">Matrícula</p>
+                                            <p className="text-xl font-black">{currentSchool.enrollment_count || 0}</p>
+                                        </div>
+                                        <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
+                                            <p className="text-[9px] font-black text-blue-200 uppercase tracking-widest mb-1">Asistencia</p>
+                                            <p className="text-xl font-black">{currentSchool.attendance_avg || 0}%</p>
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setShowSchoolModal(true)}
+                                        className="w-full py-3 bg-white text-[#1B3C73] rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition-colors shadow-lg"
+                                    >
+                                        Actualizar Caracterización
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
             </main>
+
             {/* ONBOARDING TOUR */}
             {showTour && <OnboardingTour onComplete={completeTour} />}
+
+            {/* SCHOOL CHARACTERIZATION MODAL */}
+            {showSchoolModal && currentSchool && (
+                <SchoolCharacterizationModal 
+                    school={currentSchool}
+                    isOpen={showSchoolModal}
+                    onClose={() => setShowSchoolModal(false)}
+                    onSaved={async () => {
+                        const { data } = await supabase.from('schools').select('*').eq('id', currentSchool.id).single();
+                        if (data) setCurrentSchool(data);
+                    }}
+                />
+            )}
         </div>
     );
 }

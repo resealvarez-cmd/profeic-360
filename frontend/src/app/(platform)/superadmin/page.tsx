@@ -30,6 +30,14 @@ interface School {
     sello_institucional?: string;
     valores?: string;
     proyecto_educativo?: string;
+    // Characterization
+    attendance_avg?: number;
+    enrollment_count?: number;
+    priority_pct?: number;
+    preferred_pct?: number;
+    pie_neet_count?: number;
+    pie_neep_count?: number;
+    socioeconomic_level?: string;
 }
 
 interface UserProfile {
@@ -46,6 +54,13 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
         sello_institucional: school.sello_institucional || "",
         valores: school.valores || "",
         proyecto_educativo: school.proyecto_educativo || "",
+        attendance_avg: school.attendance_avg || 0,
+        enrollment_count: school.enrollment_count || 0,
+        priority_pct: school.priority_pct || 0,
+        preferred_pct: school.preferred_pct || 0,
+        pie_neet_count: school.pie_neet_count || 0,
+        pie_neep_count: school.pie_neep_count || 0,
+        socioeconomic_level: school.socioeconomic_level || "",
     });
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState<"profile" | "docs">("profile");
@@ -156,6 +171,13 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                     sello_institucional: form.sello_institucional.trim() || null,
                     valores: form.valores.trim() || null,
                     proyecto_educativo: form.proyecto_educativo.trim() || null,
+                    attendance_avg: form.attendance_avg,
+                    enrollment_count: form.enrollment_count,
+                    priority_pct: form.priority_pct,
+                    preferred_pct: form.preferred_pct,
+                    pie_neet_count: form.pie_neet_count,
+                    pie_neep_count: form.pie_neep_count,
+                    socioeconomic_level: form.socioeconomic_level,
                 })
                 .eq("id", school.id);
 
@@ -205,8 +227,14 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                     >
                         📚 Base de Conocimientos (RAG)
                     </button>
+                    <button
+                        onClick={() => setActiveTab("characterization" as any)}
+                        className={`pb-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === ("characterization" as any) ? "border-teal-500 text-teal-600" : "border-transparent text-slate-400 hover:text-slate-600"
+                            }`}
+                    >
+                        📊 Caracterización
+                    </button>
                 </div>
-
                 {activeTab === "profile" ? (
                     <>
                         {/* Info banner */}
@@ -279,7 +307,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                             </button>
                         </div>
                     </>
-                ) : (
+                ) : activeTab === "docs" ? (
                     <div className="p-6 space-y-6">
                         <div className="bg-slate-50 border border-slate-100 p-5 rounded-2xl">
                             <h3 className="text-slate-800 font-bold text-sm mb-3">Subir Nuevo Documento (PDF)</h3>
@@ -323,6 +351,94 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                     </button>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                ) : (
+                    /* TAB: CARACTERIZACIÓN */
+                    <div className="p-8 space-y-8 max-h-[60vh] overflow-y-auto">
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Matrícula Total</label>
+                                    <input 
+                                        type="number" 
+                                        value={form.enrollment_count}
+                                        onChange={e => setForm({...form, enrollment_count: parseInt(e.target.value) || 0})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Asistencia</label>
+                                    <input 
+                                        type="number" 
+                                        step="0.1"
+                                        value={form.attendance_avg}
+                                        onChange={e => setForm({...form, attendance_avg: parseFloat(e.target.value) || 0})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Prioritarios</label>
+                                    <input 
+                                        type="number" 
+                                        step="0.1"
+                                        value={form.priority_pct}
+                                        onChange={e => setForm({...form, priority_pct: parseFloat(e.target.value) || 0})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Preferentes</label>
+                                    <input 
+                                        type="number" 
+                                        step="0.1"
+                                        value={form.preferred_pct}
+                                        onChange={e => setForm({...form, preferred_pct: parseFloat(e.target.value) || 0})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estudiantes NEET (PIE)</label>
+                                    <input 
+                                        type="number" 
+                                        value={form.pie_neet_count}
+                                        onChange={e => setForm({...form, pie_neet_count: parseInt(e.target.value) || 0})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estudiantes NEEP (PIE)</label>
+                                    <input 
+                                        type="number" 
+                                        value={form.pie_neep_count}
+                                        onChange={e => setForm({...form, pie_neep_count: parseInt(e.target.value) || 0})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    />
+                                </div>
+                                <div className="col-span-2 space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nivel Socioeconómico</label>
+                                    <select 
+                                        value={form.socioeconomic_level}
+                                        onChange={e => setForm({...form, socioeconomic_level: e.target.value})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                    >
+                                        <option value="">Seleccione...</option>
+                                        <option value="Bajo">Bajo</option>
+                                        <option value="Medio-Bajo">Medio-Bajo</option>
+                                        <option value="Medio">Medio</option>
+                                        <option value="Medio-Alto">Medio-Alto</option>
+                                        <option value="Alto">Alto</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                            <button onClick={onClose} className="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-500 font-bold text-sm hover:bg-slate-200 transition-colors">Cerrar</button>
+                            <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-xl bg-teal-600 text-white font-bold text-sm hover:bg-teal-700 transition-colors flex items-center gap-2">
+                                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                Guardar Caracterización
+                            </button>
                         </div>
                     </div>
                 )}
