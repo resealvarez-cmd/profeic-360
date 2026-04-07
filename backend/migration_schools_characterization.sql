@@ -3,7 +3,9 @@ ALTER TABLE public.schools
 ADD COLUMN IF NOT EXISTS attendance_avg numeric DEFAULT 0,
 ADD COLUMN IF NOT EXISTS enrollment_count integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS priority_pct numeric DEFAULT 0,
+ADD COLUMN IF NOT EXISTS priority_count integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS preferred_pct numeric DEFAULT 0,
+ADD COLUMN IF NOT EXISTS preferred_count integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS pie_neet_count integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS pie_neep_count integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS socioeconomic_level text;

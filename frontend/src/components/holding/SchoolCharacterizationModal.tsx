@@ -24,7 +24,9 @@ interface SchoolCharacterization {
     attendance_avg: number;
     enrollment_count: number;
     priority_pct: number;
+    priority_count: number;
     preferred_pct: number;
+    preferred_count: number;
     pie_neet_count: number;
     pie_neep_count: number;
     socioeconomic_level: string;
@@ -47,7 +49,9 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
         attendance_avg: school.attendance_avg || 0,
         enrollment_count: school.enrollment_count || 0,
         priority_pct: school.priority_pct || 0,
+        priority_count: school.priority_count || 0,
         preferred_pct: school.preferred_pct || 0,
+        preferred_count: school.preferred_count || 0,
         pie_neet_count: school.pie_neet_count || 0,
         pie_neep_count: school.pie_neep_count || 0,
         socioeconomic_level: school.socioeconomic_level || "",
@@ -58,6 +62,19 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
     const pieCount = (form.pie_neet_count || 0) + (form.pie_neep_count || 0);
     const piePct = form.enrollment_count ? ((pieCount / form.enrollment_count) * 100).toFixed(1) : "0";
 
+    // Auto-calculate percentages for Vulnerability
+    useEffect(() => {
+        if (form.enrollment_count && form.enrollment_count > 0) {
+            const pPct = ((form.priority_count || 0) / form.enrollment_count) * 100;
+            const prePct = ((form.preferred_count || 0) / form.enrollment_count) * 100;
+            setForm(prev => ({ 
+                ...prev, 
+                priority_pct: parseFloat(pPct.toFixed(1)),
+                preferred_pct: parseFloat(prePct.toFixed(1))
+            }));
+        }
+    }, [form.priority_count, form.preferred_count, form.enrollment_count]);
+
     const handleSave = async () => {
         setSaving(true);
         try {
@@ -67,7 +84,9 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                     attendance_avg: form.attendance_avg,
                     enrollment_count: form.enrollment_count,
                     priority_pct: form.priority_pct,
+                    priority_count: form.priority_count,
                     preferred_pct: form.preferred_pct,
+                    preferred_count: form.preferred_count,
                     pie_neet_count: form.pie_neet_count,
                     pie_neep_count: form.pie_neep_count,
                     socioeconomic_level: form.socioeconomic_level,
@@ -140,30 +159,28 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                         </h3>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold text-slate-700">% Alumnos Prioritarios (SEP)</Label>
-                                <div className="relative">
-                                    <Input 
-                                        type="number" 
-                                        step="0.1"
-                                        value={form.priority_pct}
-                                        onChange={e => setForm({...form, priority_pct: parseFloat(e.target.value) || 0})}
-                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8 text-slate-900"
-                                    />
-                                    <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <div className="flex justify-between items-end">
+                                    <Label className="text-xs font-bold text-slate-700">Can. Prioritarios (SEP)</Label>
+                                    <span className="text-[10px] font-black text-blue-600">{form.priority_pct}%</span>
                                 </div>
+                                <Input 
+                                    type="number" 
+                                    value={form.priority_count}
+                                    onChange={e => setForm({...form, priority_count: parseInt(e.target.value) || 0})}
+                                    className="rounded-xl bg-slate-50 border-slate-200 text-slate-900"
+                                />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold text-slate-700">% Alumnos Preferentes</Label>
-                                <div className="relative">
-                                    <Input 
-                                        type="number" 
-                                        step="0.1"
-                                        value={form.preferred_pct}
-                                        onChange={e => setForm({...form, preferred_pct: parseFloat(e.target.value) || 0})}
-                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8 text-slate-900"
-                                    />
-                                    <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <div className="flex justify-between items-end">
+                                    <Label className="text-xs font-bold text-slate-700">Can. Preferentes</Label>
+                                    <span className="text-[10px] font-black text-blue-600">{form.preferred_pct}%</span>
                                 </div>
+                                <Input 
+                                    type="number" 
+                                    value={form.preferred_count}
+                                    onChange={e => setForm({...form, preferred_count: parseInt(e.target.value) || 0})}
+                                    className="rounded-xl bg-slate-50 border-slate-200 text-slate-900"
+                                />
                             </div>
                             <div className="col-span-2 space-y-2">
                                 <Label className="text-xs font-bold text-slate-700">Nivel Socioeconómico</Label>

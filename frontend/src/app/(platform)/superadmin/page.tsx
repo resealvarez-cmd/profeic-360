@@ -34,7 +34,9 @@ interface School {
     attendance_avg?: number;
     enrollment_count?: number;
     priority_pct?: number;
+    priority_count?: number;
     preferred_pct?: number;
+    preferred_count?: number;
     pie_neet_count?: number;
     pie_neep_count?: number;
     socioeconomic_level?: string;
@@ -57,7 +59,9 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
         attendance_avg: school.attendance_avg || 0,
         enrollment_count: school.enrollment_count || 0,
         priority_pct: school.priority_pct || 0,
+        priority_count: school.priority_count || 0,
         preferred_pct: school.preferred_pct || 0,
+        preferred_count: school.preferred_count || 0,
         pie_neet_count: school.pie_neet_count || 0,
         pie_neep_count: school.pie_neep_count || 0,
         socioeconomic_level: school.socioeconomic_level || "",
@@ -174,7 +178,9 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                     attendance_avg: form.attendance_avg,
                     enrollment_count: form.enrollment_count,
                     priority_pct: form.priority_pct,
+                    priority_count: form.priority_count,
                     preferred_pct: form.preferred_pct,
+                    preferred_count: form.preferred_count,
                     pie_neet_count: form.pie_neet_count,
                     pie_neep_count: form.pie_neep_count,
                     socioeconomic_level: form.socioeconomic_level,
@@ -357,16 +363,16 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                     /* TAB: CARACTERIZACIÓN */
                     <div className="p-8 space-y-8 max-h-[60vh] overflow-y-auto">
                         <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Matrícula Total</label>
-                                    <input 
-                                        type="number" 
-                                        value={form.enrollment_count}
-                                        onChange={e => setForm({...form, enrollment_count: parseInt(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
-                                    />
-                                </div>
+                            <div className="space-y-2 px-6 pt-6">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Matrícula Total establecimiento</label>
+                                <input 
+                                    type="number" 
+                                    value={form.enrollment_count}
+                                    onChange={e => setForm({...form, enrollment_count: parseInt(e.target.value) || 0})}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 font-black focus:ring-2 focus:ring-teal-500 outline-none"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 px-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Asistencia</label>
                                     <input 
@@ -378,22 +384,34 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Prioritarios</label>
+                                    <div className="flex justify-between items-end mb-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cant. Prioritarios (SEP)</label>
+                                        <span className="text-[10px] font-black text-teal-600">{form.priority_pct}%</span>
+                                    </div>
                                     <input 
                                         type="number" 
-                                        step="0.1"
-                                        value={form.priority_pct}
-                                        onChange={e => setForm({...form, priority_pct: parseFloat(e.target.value) || 0})}
+                                        value={form.priority_count}
+                                        onChange={e => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            const pct = form.enrollment_count ? parseFloat(((val / form.enrollment_count) * 100).toFixed(1)) : 0;
+                                            setForm({...form, priority_count: val, priority_pct: pct});
+                                        }}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">% Preferentes</label>
+                                    <div className="flex justify-between items-end mb-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cant. Preferentes</label>
+                                        <span className="text-[10px] font-black text-teal-600">{form.preferred_pct}%</span>
+                                    </div>
                                     <input 
                                         type="number" 
-                                        step="0.1"
-                                        value={form.preferred_pct}
-                                        onChange={e => setForm({...form, preferred_pct: parseFloat(e.target.value) || 0})}
+                                        value={form.preferred_count}
+                                        onChange={e => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            const pct = form.enrollment_count ? parseFloat(((val / form.enrollment_count) * 100).toFixed(1)) : 0;
+                                            setForm({...form, preferred_count: val, preferred_pct: pct});
+                                        }}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
