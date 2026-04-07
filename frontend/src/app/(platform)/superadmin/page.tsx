@@ -364,7 +364,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                         type="number" 
                                         value={form.enrollment_count}
                                         onChange={e => setForm({...form, enrollment_count: parseInt(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -374,7 +374,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                         step="0.1"
                                         value={form.attendance_avg}
                                         onChange={e => setForm({...form, attendance_avg: parseFloat(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -384,7 +384,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                         step="0.1"
                                         value={form.priority_pct}
                                         onChange={e => setForm({...form, priority_pct: parseFloat(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -394,7 +394,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                         step="0.1"
                                         value={form.preferred_pct}
                                         onChange={e => setForm({...form, preferred_pct: parseFloat(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -403,7 +403,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                         type="number" 
                                         value={form.pie_neet_count}
                                         onChange={e => setForm({...form, pie_neet_count: parseInt(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -412,7 +412,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                         type="number" 
                                         value={form.pie_neep_count}
                                         onChange={e => setForm({...form, pie_neep_count: parseInt(e.target.value) || 0})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     />
                                 </div>
                                 <div className="col-span-2 space-y-2">
@@ -420,7 +420,7 @@ function SchoolEditModal({ school, onClose, onSaved }: { school: School; onClose
                                     <select 
                                         value={form.socioeconomic_level}
                                         onChange={e => setForm({...form, socioeconomic_level: e.target.value})}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-teal-500 outline-none"
                                     >
                                         <option value="">Seleccione...</option>
                                         <option value="Bajo">Bajo</option>

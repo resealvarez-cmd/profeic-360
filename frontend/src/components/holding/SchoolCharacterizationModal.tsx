@@ -114,7 +114,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                     type="number" 
                                     value={form.enrollment_count}
                                     onChange={e => setForm({...form, enrollment_count: parseInt(e.target.value) || 0})}
-                                    className="rounded-xl bg-slate-50 border-slate-200"
+                                    className="rounded-xl bg-slate-50 border-slate-200 text-slate-900"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -125,7 +125,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                         step="0.1"
                                         value={form.attendance_avg}
                                         onChange={e => setForm({...form, attendance_avg: parseFloat(e.target.value) || 0})}
-                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8"
+                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8 text-slate-900"
                                     />
                                     <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 </div>
@@ -147,7 +147,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                         step="0.1"
                                         value={form.priority_pct}
                                         onChange={e => setForm({...form, priority_pct: parseFloat(e.target.value) || 0})}
-                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8"
+                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8 text-slate-900"
                                     />
                                     <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 </div>
@@ -160,7 +160,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                         step="0.1"
                                         value={form.preferred_pct}
                                         onChange={e => setForm({...form, preferred_pct: parseFloat(e.target.value) || 0})}
-                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8"
+                                        className="rounded-xl bg-slate-50 border-slate-200 pr-8 text-slate-900"
                                     />
                                     <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 </div>
@@ -170,7 +170,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                 <select 
                                     value={form.socioeconomic_level}
                                     onChange={e => setForm({...form, socioeconomic_level: e.target.value})}
-                                    className="w-full h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none"
                                 >
                                     <option value="">Seleccione nivel...</option>
                                     <option value="Bajo">Bajo</option>
@@ -200,7 +200,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                     type="number" 
                                     value={form.pie_neet_count}
                                     onChange={e => setForm({...form, pie_neet_count: parseInt(e.target.value) || 0})}
-                                    className="rounded-xl bg-slate-50 border-slate-200"
+                                    className="rounded-xl bg-slate-50 border-slate-200 text-slate-900"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -209,7 +209,7 @@ export const SchoolCharacterizationModal: React.FC<Props> = ({
                                     type="number" 
                                     value={form.pie_neep_count}
                                     onChange={e => setForm({...form, pie_neep_count: parseInt(e.target.value) || 0})}
-                                    className="rounded-xl bg-slate-50 border-slate-200"
+                                    className="rounded-xl bg-slate-50 border-slate-200 text-slate-900"
                                 />
                             </div>
                         </div>
