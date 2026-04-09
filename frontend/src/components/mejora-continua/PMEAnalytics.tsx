@@ -9,11 +9,12 @@ import { Activity, BarChart3, PieChart as PieIcon, ShieldCheck, DollarSign, Laye
 interface PMEAnalyticsProps {
   goals: StrategicGoal[];
   profiles: any[];
+  pmeMap?: Record<string, any>;
 }
 
 const COLORS = ['#1B3C73', '#C87533', '#10b981', '#f59e0b', '#8b5cf6', '#3b82f6'];
 
-export default function PMEAnalytics({ goals, profiles }: PMEAnalyticsProps) {
+export default function PMEAnalytics({ goals, profiles, pmeMap }: PMEAnalyticsProps) {
   if (!goals || goals.length === 0) return null;
 
   // 1. Calcular estado general de indicadores
@@ -32,10 +33,18 @@ export default function PMEAnalytics({ goals, profiles }: PMEAnalyticsProps) {
   };
 
   goals.forEach(g => {
+    // Dimensión principal de la meta (desde el link oficial)
+    const officialDim = g.pme_action_link && pmeMap && pmeMap[g.pme_action_link] 
+        ? pmeMap[g.pme_action_link].dimension 
+        : null;
+
     g.implementation_phases?.forEach(p => {
-      // Extraer dimensión del título [Dimensión]
-      const match = p.title.match(/\[(.*?)\]/);
-      const dim = match ? match[1] : "Otras";
+      // Intentar extraer del título como fallback o usar la oficial
+      let dim = officialDim;
+      if (!dim) {
+          const match = p.title.match(/\[(.*?)\]/);
+          dim = match ? match[1] : "Otras";
+      }
       
       if (!dimensionData[dim]) {
           dimensionData[dim] = { name: dim.split(' ')[0], cost: 0, count: 0, progress: 0 };
@@ -115,9 +124,12 @@ export default function PMEAnalytics({ goals, profiles }: PMEAnalyticsProps) {
               </div>
           </div>
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Alertas</span>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Misiones Críticas</span>
               <div className="flex items-end gap-2">
-                  <span className="text-3xl font-black text-rose-600">{criticos}</span>
+                  <span className="text-3xl font-black text-amber-600">
+                    {pmeMap ? Object.values(pmeMap).filter((a: any) => a.is_critical).length : 0}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 mb-1">Bajo Gestión</span>
               </div>
           </div>
       </div>

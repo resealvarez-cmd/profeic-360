@@ -175,11 +175,23 @@ async def _get_teacher_trajectory_data(teacher_id: str):
     teacher_res = supabase.table('profiles').select('*').eq('id', teacher_id).execute()
     teacher = teacher_res.data[0] if teacher_res.data else None
     if not teacher:
-        teacher = {"full_name": "Docente (Perfil Pendiente de Activación)"}
+        # Fallback: try authorized_users by matching profile id via email lookup
+        try:
+            # Look up by profile id -> email match
+            prof_fallback = supabase.table('profiles').select('email').eq('id', teacher_id).maybeSingle().execute()
+            email_fb = prof_fallback.data.get('email') if prof_fallback.data else None
+            if email_fb:
+                auth_fb = supabase.table('authorized_users').select('full_name').eq('email', email_fb).maybeSingle().execute()
+                name_fb = auth_fb.data.get('full_name') if auth_fb.data else None
+            else:
+                name_fb = None
+        except Exception:
+            name_fb = None
+        teacher = {"full_name": name_fb or "Docente (Perfil Pendiente de Activación)", "id": teacher_id}
 
     # 2. Fetch ALL Completed Cycles
     all_cycles_res = supabase.table('observation_cycles')\
-        .select('id, created_at, observer:observer_id(full_name)')\
+        .select('id, created_at, status, observer:observer_id(full_name)')\
         .eq('teacher_id', teacher_id)\
         .eq('status', 'completed')\
         .order('created_at', desc=True)\
@@ -189,6 +201,16 @@ async def _get_teacher_trajectory_data(teacher_id: str):
     total_cycles = len(all_cycles)
     observers = list(set([c.get('observer', {}).get('full_name') for c in all_cycles if c.get('observer')]))
     cycles = all_cycles[:3]
+
+    # 2b. Also fetch ALL cycles (any status) for the teacher to show wider history
+    all_status_res = supabase.table('observation_cycles')\
+        .select('id, created_at, status, observer:observer_id(full_name)')\
+        .eq('teacher_id', teacher_id)\
+        .order('created_at', desc=True)\
+        .execute()
+    all_status_cycles = all_status_res.data or []
+    total_started_all = len(all_status_cycles)
+    print(f"[TRAJECTORY] teacher_id={teacher_id} | completed={total_cycles} | total_all={total_started_all}")
 
     # 3. Calculate KPIs
     total_started_res = supabase.table('observation_cycles')\
@@ -201,7 +223,7 @@ async def _get_teacher_trajectory_data(teacher_id: str):
     all_cycle_ids = [c['id'] for c in all_cycles]
     execution_data_res = supabase.table('observation_data')\
         .select('content')\
-        .in_('cycle_id', all_cycle_ids)\
+        .in_('cycle_id', all_cycle_ids if all_cycle_ids else ['00000000-0000-0000-0000-000000000000'])\
         .eq('stage', 'execution')\
         .execute()
     
@@ -218,20 +240,36 @@ async def _get_teacher_trajectory_data(teacher_id: str):
     # 4. Fetch Details for Analysis
     cycle_ids = [c['id'] for c in cycles]
     if not cycle_ids:
+        # Return with info about in-progress cycles too
+        in_progress = [c for c in all_status_cycles if c['status'] in ['in_progress', 'planned']]
+        observers_all = list(set([c.get('observer', {}).get('full_name') for c in all_status_cycles if c.get('observer')]))
         return {
             "teacher": teacher,
             "total_cycles": 0,
-            "observers": [],
+            "total_started": total_started_all,
+            "in_progress_cycles": len(in_progress),
+            "observers": observers_all,
             "closure_rate": 0,
             "depth_index": 0,
             "analysis": None
         }
 
+    all_cycle_ids_ever = [c['id'] for c in all_status_cycles]
+
     all_obs_res = supabase.table('observation_data').select('cycle_id, content').in_('cycle_id', cycle_ids).eq('stage', 'execution').execute()
     obs_map = {item['cycle_id']: item['content'] for item in all_obs_res.data} if all_obs_res.data else {}
 
-    all_comm_res = supabase.table('commitments').select('cycle_id, description, status').in_('cycle_id', cycle_ids).execute()
-    comm_map = {item['cycle_id']: item['description'] for item in all_comm_res.data} if all_comm_res.data else {}
+    all_teacher_commitments = []
+    if all_cycle_ids_ever:
+        commitments_res = supabase.table('commitments').select('id, description, status, cycle_id, created_at').in_('cycle_id', all_cycle_ids_ever).execute()
+        all_teacher_commitments = commitments_res.data or []
+
+    comm_map = {}
+    for cm_item in all_teacher_commitments:
+        cid = cm_item['cycle_id']
+        if cid in cycle_ids:
+            existing = comm_map.get(cid, "")
+            comm_map[cid] = f"{existing} | {cm_item['description']}" if existing else cm_item['description']
     
     all_refl_res = supabase.table('observation_data').select('cycle_id, content').in_('cycle_id', cycle_ids).eq('stage', 'reflection').execute()
     refl_map = {item['cycle_id']: item['content'] for item in all_refl_res.data} if all_refl_res.data else {}
@@ -249,13 +287,38 @@ async def _get_teacher_trajectory_data(teacher_id: str):
         
         history_text += f"\n--- OBS #{i+1} ({cycle_date}) ---\nObservador: {observer}\nPuntajes: {scores}\nTags: {tags}\nNotas: {obs_notes}\nReflexión: {refl}\nCompromiso: {comm}\n"
 
-    # NUEVO: Detección dinámica de pauta predominante en el historial
-    last_cycle_data = obs_map.get(cycles[0]['id'], {}) if cycles else {}
-    last_scores = last_cycle_data.get('scores', {})
-    pauta_contexto = "Formación y Convivencia Escolar" if "promocion_respeto" in last_scores else "Desarrollo Pedagógico y Didáctico"
+    # NUEVO: Detección dinámica de áreas predominantes en TODO el historial
+    has_curricular = False
+    has_convivencia = False
+    for content_dict in obs_map.values():
+        score_keys = content_dict.get('scores', {})
+        if "promocion_respeto" in score_keys or "habilidades_convivir" in score_keys:
+            has_convivencia = True
+        if "monitoreo_aula" in score_keys or "calidad_retroalimentacion" in score_keys:
+            has_curricular = True
 
     # AI Prompt
-    prompt = f"ROL: Consultor Senior en {pauta_contexto}.\nTAREA: Perfilador para {teacher['full_name']}.\nCONTEXTO: Evaluación de {pauta_contexto}.\nHISTORIAL:\n{history_text}\n\nFORMATO JSON (NO USAR COMILLAS TRIPLES): \n{{\n  \"teacher_view\": \"Párrafo positivo para el docente sobre {pauta_contexto}...\",\n  \"utp_view\": \"Análisis técnico del área...\",\n  \"director_view\": \"Visión estratégica institucional...\",\n  \"trend\": \"ascending\" | \"stable\" | \"descending\",\n  \"summary\": \"{teacher['full_name']} se caracteriza en su gestión de {pauta_contexto} como un docente que...\",\n  \"strengths\": [],\n  \"gaps\": [],\n  \"suggested_training\": []\n}}"
+    prompt = f"""ROL: Consultor Senior en Desarrollo Institucional Docente.
+TAREA: Perfilador para {teacher['full_name']}.
+HISTORIAL DE ACOMPAÑAMIENTOS:
+{history_text}
+
+MANDATOS:
+1. "teacher_view": Debe reflejar **estrictamente la autopercepción del docente (lo que opina de sí mismo)**, basándote en las reflexiones que haya escrito. Si no hay reflexiones, indica que no hay autopercepción registrada.
+2. "curricular_view": Análisis exhaustivo del desempeño pedagógico y didáctico del docente. Sólo integra información si se aplicaron pautas curriculares. Si no hay observaciones en esta área, responde EXACTAMENTE: "Sin observaciones registradas en esta área."
+3. "convivencia_view": Análisis exhaustivo del clima de aula, vínculos y desarrollo socioemocional. Sólo integra información si se aplicaron pautas de convivencia. Si no hay observaciones en esta área, responde EXACTAMENTE: "Sin observaciones registradas en esta área."
+
+FORMATO JSON ESPERADO (NO USAR COMILLAS TRIPLES, SÓLO JSON VÁLIDO): 
+{{
+  "teacher_view": "Autopercepción del docente basada en sus reflexiones...",
+  "curricular_view": "Análisis del área curricular o mensaje de vacío...",
+  "convivencia_view": "Análisis del área de formación y convivencia o mensaje de vacío...",
+  "trend": "ascending" | "stable" | "descending",
+  "summary": "{teacher['full_name']} se caracteriza por...",
+  "strengths": ["...", "..."],
+  "gaps": ["...", "..."],
+  "suggested_training": ["...", "..."]
+}}"""
     
     model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
     response = model.generate_content(prompt, request_options={"timeout": 120})
@@ -266,7 +329,17 @@ async def _get_teacher_trajectory_data(teacher_id: str):
     except Exception as e:
         import logging
         logging.getLogger(__name__).warning("No se pudo parsear JSON de trayectoria: %s", str(e))
-        analysis = {"summary": f"{teacher['full_name']} se encuentra en monitoreo activo por el equipo técnico pedagógico.", "strengths":[], "gaps":[], "teacher_view":"", "utp_view":"", "director_view":"", "suggested_training":[]}
+        analysis = {
+            "summary": f"{teacher['full_name']} se encuentra en monitoreo por el equipo pedagógico.",
+            "strengths": [], "gaps": [], 
+            "teacher_view": "", "curricular_view": "", "convivencia_view": "", "suggested_training": []
+        }
+        
+    # FORZAR CONTROL DE ALUCINACIONES DE LA IA SI NO HAY DATOS DE UN ÁREA
+    if not has_curricular:
+        analysis["curricular_view"] = "Sin observaciones registradas en esta área."
+    if not has_convivencia:
+        analysis["convivencia_view"] = "Sin observaciones registradas en esta área."
 
     return {
         "teacher": teacher,
@@ -275,39 +348,46 @@ async def _get_teacher_trajectory_data(teacher_id: str):
         "closure_rate": closure_rate,
         "depth_index": depth_index,
         "analysis": analysis,
-        "raw_history": cycles 
+        "raw_history": all_status_cycles,
+        "commitments": all_teacher_commitments
     }
 
 @router.post("/acompanamiento/trajectory-report")
 async def generate_trajectory_report(req: TrajectoryRequest):
     try:
         data = await _get_teacher_trajectory_data(req.teacher_id)
+        teacher_obj = data.get("teacher") or {}
+        teacher_name = teacher_obj.get("full_name") or "Docente"
         if data["total_cycles"] == 0:
             return {
-                "teacher_name": data["teacher"]["full_name"],
+                "teacher_name": teacher_name,
                 "total_cycles": 0,
                 "observers": [],
                 "closure_rate": 0,
                 "depth_index": 0,
                 "trajectory_analysis": {
                     "teacher_view": "Aún no hay suficientes observaciones registradas.",
-                    "utp_view": "Datos insuficientes.",
-                    "director_view": "Datos insuficientes.",
+                    "curricular_view": "Sin observaciones registradas en esta área.",
+                    "convivencia_view": "Sin observaciones registradas en esta área.",
                     "trend": "stable",
                     "summary": "El docente requiere finalizar su primer ciclo de acompañamiento para levantar perfil.",
                     "strengths": [],
                     "gaps": [],
                     "suggested_training": []
-                }
+                },
+                "raw_history": data.get("raw_history", []),
+                "commitments": data.get("commitments", [])
             }
         
         return {
-            "teacher_name": data["teacher"]["full_name"],
+            "teacher_name": teacher_name,
             "total_cycles": data["total_cycles"],
             "observers": data["observers"],
             "closure_rate": data["closure_rate"],
             "depth_index": data["depth_index"],
-            "trajectory_analysis": data["analysis"]
+            "trajectory_analysis": data["analysis"],
+            "raw_history": data.get("raw_history", []),
+            "commitments": data.get("commitments", [])
         }
     except Exception as e:
         print(f"Error Trajectory: {e}")
@@ -317,83 +397,128 @@ async def generate_trajectory_report(req: TrajectoryRequest):
 async def export_teacher_trajectory(req: TrajectoryRequest):
     try:
         data = await _get_teacher_trajectory_data(req.teacher_id)
-        teacher = data["teacher"]
-        analysis = data["analysis"]
-        
-        if not analysis:
-            raise HTTPException(status_code=400, detail="No hay datos suficientes para exportar el informe.")
+        teacher = data.get("teacher") or {}
+        analysis = data.get("analysis") or {
+            "teacher_view": "Aún no hay suficientes observaciones registradas.",
+            "curricular_view": "Sin observaciones registradas en esta área.",
+            "convivencia_view": "Sin observaciones registradas en esta área.",
+            "trend": "stable",
+            "summary": "El docente aún no cuenta con la suficiente evidencia registrada para que la Inteligencia Artificial construya un perfil de competencias definitivo.",
+            "strengths": ["Análisis pendiente."],
+            "gaps": ["Análisis pendiente."],
+            "suggested_training": ["Análisis pendiente."]
+        }
 
         doc = Document()
+
+        # Branding: ProfeIC Header
+        header_para = doc.add_paragraph()
+        header_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        header_run = header_para.add_run("Profe IC")
+        header_run.bold = True
+        header_run.font.size = Pt(24)
+        header_run.font.color.rgb = RGBColor(27, 60, 115)  # #1B3C73 (Corporate Blue)
+
+        doc.add_paragraph(f"Expediente emitido el {time.strftime('%d/%m/%Y')}", style='Intense Quote').alignment = WD_ALIGN_PARAGRAPH.RIGHT
         
-        # Branding Header
-        header = doc.add_heading(f"PERFILADOR DOCENTE 360° - {teacher['full_name']}", 0)
-        header.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
-        doc.add_paragraph(f"Fecha de Reporte: {time.strftime('%d/%m/%Y')}")
-        doc.add_paragraph().add_run("Generado con Inteligencia Aumentada por ProfeIC").italic = True
+        title = doc.add_heading(f"PERFILADOR DOCENTE 360°\n{teacher.get('full_name', 'Docente')}", 0)
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
         # Section 1: Metadata
-        doc.add_heading("I. ESTADO GENERAL DE ACOMPAÑAMIENTO", level=1)
-        table = doc.add_table(rows=2, cols=2)
-        table.style = 'Table Grid'
-        table.cell(0,0).text = "Ciclos Finalizados"; table.cell(0,1).text = "Tasa de Cierre"
-        table.cell(1,0).text = str(data["total_cycles"]); table.cell(1,1).text = f"{data['closure_rate']}%"
+        doc.add_heading("I. MÉTRICAS EJECUTIVAS ACOMPAÑAMIENTO", level=1)
         
-        doc.add_paragraph(f"\nObservadores principales: {', '.join(data['observers']) if data['observers'] else 'N/A'}")
-        p_kpi = doc.add_paragraph()
-        p_kpi.add_run(f"Índice de Profundidad Didáctica (KPI): {data['depth_index']}%").bold = True
+        # Professional Table
+        table = doc.add_table(rows=2, cols=3)
+        try:
+            table.style = 'Light Shading Accent 1' # Try a nice blue style
+        except:
+            table.style = 'Table Grid'
+            
+        hdr_cells = table.rows[0].cells
+        hdr_cells[0].text = "Total Ciclos"
+        hdr_cells[1].text = "Tasa Cierre"
+        hdr_cells[2].text = "KPI Profundidad"
+        
+        for cell in hdr_cells:
+            cell.paragraphs[0].runs[0].bold = True
+            
+        row_cells = table.rows[1].cells
+        row_cells[0].text = str(data.get("total_cycles", 0))
+        row_cells[1].text = f"{data.get('closure_rate', 0)}%"
+        row_cells[2].text = f"{data.get('depth_index', 0)}%"
+        
+        obs_p = doc.add_paragraph(f"\nObservadores principales: ")
+        obs_p.add_run(', '.join(data.get('observers', [])) if data.get('observers') else 'N/A').bold = True
         
         # Section 2: AI Summary
-        doc.add_heading("II. RESUMEN EJECUTIVO (IA)", level=1)
-        p = doc.add_paragraph(analysis.get('summary', ''))
-        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        doc.add_heading("II. SÍNTESIS TRAYECTORIA (IA)", level=1)
+        p_summary = doc.add_paragraph(analysis.get('summary', ''))
+        p_summary.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         
         # Section 3: Views
-        doc.add_heading("III. ANÁLISIS SEGMENTADO", level=1)
-        doc.add_heading("Perspectiva Docente", level=2)
-        doc.add_paragraph(analysis.get('teacher_view', ''))
+        doc.add_heading("III. ANÁLISIS SEGMENTADO POR ÁREA", level=1)
         
-        doc.add_heading("Análisis Técnico (UTP)", level=2)
-        doc.add_paragraph(analysis.get('utp_view', ''))
+        doc.add_heading("Autopercepción del Docente", level=2)
+        p_t = doc.add_paragraph(analysis.get('teacher_view', ''))
+        p_t.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_t.style = 'Quote'
         
-        doc.add_heading("Visión Estratégica (Director)", level=2)
-        doc.add_paragraph(analysis.get('director_view', ''))
+        doc.add_heading("Área Curricular y Didáctica", level=2)
+        c_view = str(analysis.get('curricular_view', 'Sin observaciones registradas en esta área.'))
+        p_c = doc.add_paragraph(c_view.replace('\\n', '\n'))
+        p_c.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        
+        doc.add_heading("Área Formación y Convivencia Escolar", level=2)
+        f_view = str(analysis.get('convivencia_view', 'Sin observaciones registradas en esta área.'))
+        p_f = doc.add_paragraph(f_view.replace('\\n', '\n'))
+        p_f.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         
         # Section 4: Strengths & Gaps
         doc.add_page_break()
-        doc.add_heading("IV. MAPA DE COMPETENCIAS", level=1)
+        doc.add_heading("IV. MAPA DE COMPETENCIAS OBSERVADAS", level=1)
         
         strengths = analysis.get('strengths', [])
         gaps = analysis.get('gaps', [])
 
         table_comp = doc.add_table(rows=1, cols=2)
+        try:
+            table_comp.style = 'Light Grid'
+        except:
+            table_comp.style = 'Table Grid'
+            
         col1, col2 = table_comp.rows[0].cells
         
-        p1 = col1.add_paragraph("FORTALEZAS DESTACADAS")
-        p1.runs[0].bold = True
+        p1 = col1.add_paragraph("FORTALEZAS IDENTIFICADAS")
+        if p1.runs: p1.runs[0].bold = True
         for s in strengths:
-            col1.add_paragraph(f"✓ {s}", style='List Bullet')
+            para = col1.add_paragraph(f"✓ {s}")
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             
         p2 = col2.add_paragraph("OPORTUNIDADES DE MEJORA")
-        p2.runs[0].bold = True
+        if p2.runs: p2.runs[0].bold = True
         for g in gaps:
-            col2.add_paragraph(f"→ {g}", style='List Bullet')
+            para = col2.add_paragraph(f"→ {g}")
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             
         # Section 5: Training
-        doc.add_heading("V. PLAN DE FORMACIÓN SUGERIDO", level=1)
+        doc.add_heading("V. PLAN DE RETROALIMENTACIÓN RECOMENDADO", level=1)
         training = analysis.get('suggested_training', [])
-        for t in training:
-            p = doc.add_paragraph(style='List Bullet')
-            p.add_run(t).bold = True
+        if training:
+            for t in training:
+                p_tr = doc.add_paragraph(style='List Bullet')
+                p_tr.add_run(t).bold = True
+                p_tr.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        else:
+            doc.add_paragraph("No existen sugerencias de formación registradas.")
 
         # Footer
-        doc.add_paragraph("\n\nConfidencial - Propiedad de la Institución Educativa y ProfeIC.")
+        doc.add_paragraph("\n\n---\nEste reporte es generado de forma automatizada por la Inteligencia Aumentada de la plataforma ProfeIC basándose en cruces de datos empíricos. Documento de uso interno y confidencial.\nwww.profeic.cl")
         
         file_stream = io.BytesIO()
         doc.save(file_stream)
         file_stream.seek(0)
         
-        filename = f"Perfil_{teacher['full_name'].replace(' ', '_')}.docx"
+        filename = f"Expediente_{teacher.get('full_name', 'Docente').replace(' ', '_')}.docx"
         return StreamingResponse(
             file_stream,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -581,7 +706,7 @@ async def generate_executive_report(req: ExecutiveRequest):
             auth_res2 = supabase.table('authorized_users').select('email, role').execute()
             valid_teacher_emails2 = set(
                 r['email'] for r in (auth_res2.data or [])
-                if r.get('role') in ['teacher', 'utp']
+                if r.get('role') in ['profesor', 'gestion', 'directivo', 'director', 'teacher', 'utp']
             )
 
             if req.author_id and author_school_id:
@@ -850,7 +975,7 @@ async def get_executive_metrics(req: MetricsRequest):
         # Step A: Get all valid teacher/utp emails globally
         auth_res = supabase.table('authorized_users').select('email, full_name, role').execute()
         all_auth_users = {item['email']: item for item in (auth_res.data or [])}
-        valid_teacher_emails = set(r['email'] for r in (auth_res.data or []) if r.get('role') in ['teacher', 'utp'])
+        valid_teacher_emails = set(r['email'] for r in (auth_res.data or []) if r.get('role') in ['profesor', 'gestion', 'directivo', 'director', 'teacher', 'utp'])
         
         # Step B: Get profiles bound securely to the Tenant
         if author_school_id:
@@ -898,7 +1023,7 @@ async def get_executive_metrics(req: MetricsRequest):
         
         # 2. Fetch related observation cycles
         cycles_res = supabase.table('observation_cycles')\
-            .select('id, teacher_id, observer_id, status, created_at, observer:observer_id(full_name), teacher:teacher_id(full_name, school_id)')\
+            .select('id, teacher_id, observer_id, status, created_at, rubric_type, observer:observer_id(full_name), teacher:teacher_id(full_name, school_id)')\
             .execute()
 
         all_cycles = []
@@ -1040,13 +1165,17 @@ async def get_executive_metrics(req: MetricsRequest):
             if c['status'] == 'completed':
                 teach_id = c['teacher_id']
                 teach_name = c.get('teacher', {}).get('full_name', 'Desconocido')
+                rubric = c.get('rubric_type') or 'pedagogica'
                 content = obs_map.get(c['id'], {})
                 scores = content.get('scores', {})
                 if scores:
                     avg_score = sum(scores.values()) / len(scores)
                     if teach_id not in teacher_scores:
-                        teacher_scores[teach_id] = {"name": teach_name, "scores": []}
+                        teacher_scores[teach_id] = {"name": teach_name, "scores": [], "rubric_type": rubric}
                     teacher_scores[teach_id]["scores"].append(avg_score)
+                    # Keep the last rubric_type seen (or 'mixed' if different)
+                    if teacher_scores[teach_id]["rubric_type"] != rubric:
+                        teacher_scores[teach_id]["rubric_type"] = "mixed"
                     
         # Calculate Global Heatmap
         heatmap = {}
@@ -1057,7 +1186,7 @@ async def get_executive_metrics(req: MetricsRequest):
         top_teachers = []
         for tid, data in teacher_scores.items():
             avg = sum(data["scores"]) / len(data["scores"])
-            top_teachers.append({"name": data["name"], "score": round(avg, 1)})
+            top_teachers.append({"name": data["name"], "score": round(avg, 1), "rubric_type": data.get("rubric_type", "pedagogica")})
             
         top_teachers.sort(key=lambda x: x["score"], reverse=True)
         top_3_teachers = top_teachers[:3]

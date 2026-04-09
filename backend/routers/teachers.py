@@ -33,7 +33,7 @@ async def get_teachers(user_id: str = Depends(get_current_user_id)):
         teachers_res = supabase.table("profiles")\
             .select("id, full_name, email")\
             .eq("school_id", school_id)\
-            .eq("role", "teacher")\
+            .in_("role", ["profesor", "teacher"])\
             .execute()
             
         return teachers_res.data or []

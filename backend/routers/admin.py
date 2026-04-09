@@ -31,7 +31,7 @@ from typing import Optional
 # === MODELOS ===
 class InviteRequest(BaseModel):
     email: str
-    role: str = "teacher"  # o admin, director, utp
+    role: str = "profesor"  # o admin, director, directivo, gestion, profesor
     school_id: Optional[str] = None
     individual_plan_active: bool = False
 
@@ -48,7 +48,7 @@ class CreateUserRequest(BaseModel):
     email: str
     password: str
     full_name: str
-    role: str = "teacher"
+    role: str = "profesor"
     school_id: Optional[str] = None
     individual_plan_active: bool = False
 

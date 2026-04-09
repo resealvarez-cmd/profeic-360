@@ -17,6 +17,7 @@ router = APIRouter(prefix="/api/v1/mejora-continua", tags=["Mejora Continua"])
 
 class CopilotoRequest(BaseModel):
     desafio: str
+    school_id: str | None = None
 
 @router.post("/copiloto")
 async def estructurar_problema_ia(req: CopilotoRequest):
@@ -29,31 +30,51 @@ async def estructurar_problema_ia(req: CopilotoRequest):
             generation_config={"response_mime_type": "application/json"}
         )
         
-        system_instruction = """Eres un 'Consultor Estratégico en Gestión Escolar'. Tu objetivo es estructurar el desafío ingresado en un Plan de Mejora Continua. Debes generar exactamente 3 fases lógicas.
+        # Contexto Institucional
+        contexto_colegio = ""
+        if req.school_id:
+            try:
+                from app.db.supabase import supabase as db_supabase
+                school_resp = db_supabase.table("schools").select("*").eq("id", req.school_id).maybe_single().execute()
+                if school_resp.data:
+                    s = school_resp.data
+                    contexto_colegio = f"""
+DATOS DEL COLEGIO:
+- Nombre: {s.get('name')}
+- Vulnerabilidad (Prioritarios): {s.get('priority_pct')}%
+- Alumnos PIE: {s.get('pie_neet_count', 0) + s.get('pie_neep_count', 0)} alumnos.
+- Asistencia Promedio: {s.get('attendance_avg')}%
+- Nivel Socioeconómico: {s.get('socioeconomic_level')}
+"""
+            except Exception as e_ctx:
+                print(f"⚠️ Error cargando contexto colegio en Copiloto: {e_ctx}")
+
+        system_instruction = f"""Eres un 'Consultor Estratégico en Gestión Escolar'. Tu objetivo es estructurar el desafío ingresado en un Plan de Mejora Continua. Debes generar exactamente 3 fases lógicas.
+{contexto_colegio}
 Debes retornar estrictamente un JSON con esta estructura (nada más):
-{
+{{
   "title": "Título formal de la meta estratégica",
   "description": "Breve descripción",
   "phases": [
-    {
+    {{
       "title": "Nombre de la fase",
       "indicators": [
-        {
+        {{
           "description": "Indicador SMART", 
           "target_value": 85, 
           "metric_type": "percentage", 
           "data_source": "radar_360"
-        }
+        }}
       ],
       "enablers": [
-        {
+        {{
           "description": "Recurso necesario", 
           "resource_type": "training"
-        }
+        }}
       ]
-    }
+    }}
   ]
-}
+}}
 Reglas estrictas para los valores de ciertos campos:
 - `metric_type` DEBE SER SOLAMENTE 'percentage', 'average_score', o 'count'.
 - `data_source` DEBE SER SOLAMENTE 'manual' o 'radar_360'.

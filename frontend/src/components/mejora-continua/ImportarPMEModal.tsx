@@ -75,6 +75,11 @@ export default function ImportarPMEModal() {
     if (!propuesta) return;
     setIsSaving(true);
     try {
+      // 0. Get schoolId from profile
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data: pData } = await supabase.from('profiles').select('school_id').eq('id', session?.user.id).single();
+      const schoolIdAttr = pData?.school_id;
+
       // 1. Insert Strategic Goal
       const { data: goalData, error: goalError } = await supabase
         .from("strategic_goals")
@@ -83,6 +88,7 @@ export default function ImportarPMEModal() {
           description: propuesta.description,
           status: "active",
           academic_year: new Date().getFullYear(),
+          school_id: schoolIdAttr
         })
         .select()
         .single();

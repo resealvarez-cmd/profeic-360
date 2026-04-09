@@ -113,6 +113,8 @@ export default function UnifiedSidebar() {
     schoolPlan,
     isSuperAdmin,
     isDirectivo,
+    isGestion,
+    isLiderazgo,
     isSostenedor,
     logout,
   } = useAuth();
@@ -140,7 +142,7 @@ export default function UnifiedSidebar() {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-in-out border-r border-white/10 print:hidden overflow-x-hidden",
-          isDirectivo ? "bg-[#1B3C73]" : "bg-slate-900",
+          isLiderazgo ? "bg-[#1B3C73]" : "bg-slate-900",
           show ? "w-64" : "w-20",
           !isMobileOpen ? "hidden md:flex" : "flex w-64 shadow-2xl"
         )}
@@ -163,7 +165,7 @@ export default function UnifiedSidebar() {
               <div className="flex flex-col min-w-0">
                 <span className="font-bold text-white text-sm truncate">{userName || "Usuario"}</span>
                 <span className="text-[10px] font-black text-orange-300 uppercase tracking-widest leading-none">
-                  {isSuperAdmin ? "Control Global" : isSostenedor ? "Red de Colegios" : isDirectivo ? "Gestión Escolar" : "Aula Docente"}
+                  {isSuperAdmin ? "Control Global" : isSostenedor ? "Red de Colegios" : isDirectivo ? "Directivo" : isGestion ? "Gestión Escolar" : "Profesor"}
                 </span>
               </div>
             )}
@@ -232,14 +234,14 @@ export default function UnifiedSidebar() {
             <NavItem href="/mensajeria" icon={MessageSquare} label="Mensajería" isActive={isActive("/mensajeria")} show={show} onClick={closeMobile} />
           </CollapsibleSection>
 
-          {(isDirectivo || isSuperAdmin) && !individualPlan && (isSuperAdmin || isDirectivo || ["pro", "enterprise"].includes(schoolPlan)) && (
+          {isLiderazgo && !individualPlan && (isSuperAdmin || isLiderazgo || ["pro", "enterprise"].includes(schoolPlan)) && (
             <CollapsibleSection label="Gestión Escolar" icon={LayoutDashboard} show={show}>
               <NavItem href="/acompanamiento/dashboard" icon={LayoutDashboard} label="Dashboard 360°" isActive={isActive("/acompanamiento/dashboard")} show={show} onClick={closeMobile} />
               <NavItem href="/acompanamiento/docentes" icon={Users} label="Mis Docentes" isActive={isActive("/acompanamiento/docentes")} show={show} onClick={closeMobile} />
-              <NavItem href="/mejora-continua" icon={Target} label="Mejorando Juntos" isActive={isActive("/mejora-continua")} show={show} onClick={closeMobile} />
-              <NavItem href="/simce" icon={BarChart3} label="SIMCE" isActive={isActivePrefix("/simce")} show={show} onClick={closeMobile} />
-              <NavItem href="/acompanamiento/admin/users" icon={Users} label="Gestión Usuarios" isActive={isActive("/acompanamiento/admin/users")} show={show} onClick={closeMobile} />
-              <NavItem href="/acompanamiento/admin/eventos" icon={Calendar} label="Anual" isActive={isActive("/acompanamiento/admin/eventos")} show={show} onClick={closeMobile} />
+               <NavItem href="/mejora-continua" icon={Target} label="Mejorando Juntos" isActive={isActive("/mejora-continua")} show={show} onClick={closeMobile} />
+               <NavItem href="/simce" icon={BarChart3} label="SIMCE" isActive={isActivePrefix("/simce")} show={show} onClick={closeMobile} />
+               {(isSuperAdmin || isDirectivo) && <NavItem href="/acompanamiento/admin/users" icon={Users} label="Gestión Usuarios" isActive={isActive("/acompanamiento/admin/users")} show={show} onClick={closeMobile} />}
+               <NavItem href="/acompanamiento/admin/eventos" icon={Calendar} label="Anual" isActive={isActive("/acompanamiento/admin/eventos")} show={show} onClick={closeMobile} />
             </CollapsibleSection>
           )}
 

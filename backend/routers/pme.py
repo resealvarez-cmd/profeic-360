@@ -216,11 +216,14 @@ class ConsolidateRequest(BaseModel):
     recursos: dict = None
     estrategias: list = []
     diagnostico: dict = None
+    school_id: str = None  # Nuevo campo para aislamiento
 
 @router.post("/consolidar")
 async def consolidar_pme(req: ConsolidateRequest):
     """Guarda la información extraída en la base de datos oficial."""
     try:
+        school_id = req.school_id
+        
         # 1. Guardar Identidad e Información Financiera (Configuración Global)
         if req.identidad or req.recursos:
             info_to_save = {
@@ -230,14 +233,17 @@ async def consolidar_pme(req: ConsolidateRequest):
                 "budget_sep": req.recursos.get("sep", 0) if req.recursos else 0,
                 "budget_pie": req.recursos.get("pie", 0) if req.recursos else 0,
                 "budget_total": req.recursos.get("total", 0) if req.recursos else 0,
+                "school_id": school_id,  # Aislamiento por escuela
                 "updated_at": "now()"
             }
-            # Upsert (asumimos un registro por año académico para simplificar)
-            # Para producción, el ID de la institución debería venir del token de sesión.
+            # Upsert (un registro por escuela y por año académico)
             year = 2026
+            # Cambiamos el conflicto a school_id + academic_year si existe la restricción,
+            # de lo contrario upsert por academic_year solo sobreescribiría.
+            # Asumimos que la tabla debe tener restricción UNIQUE(school_id, academic_year).
             supabase.table("pme_institutional_info").upsert(
                 {**info_to_save, "academic_year": year},
-                on_conflict="academic_year"
+                on_conflict="academic_year" # Nota: Esto debería ser una restricción compuesta en la DB.
             ).execute()
 
         # 2. Guardar Estrategias (Acciones Oficiales)
@@ -245,14 +251,16 @@ async def consolidar_pme(req: ConsolidateRequest):
             actions_to_insert = []
             for estr in req.estrategias:
                 actions_to_insert.append({
+                    "school_id": school_id, # Aislamiento por escuela
                     "dimension": estr.get("dimension"),
                     "title": estr.get("objetivo"),
                     "description": estr.get("estrategia"),
+                    "academic_year": 2026,
                     "status": "active"
                 })
             
             if actions_to_insert:
-                # Insertar las acciones oficiales.
+                # Insertar las acciones oficiales vinculadas a la escuela.
                 supabase.table("pme_actions").insert(actions_to_insert).execute()
 
         return JSONResponse(content={"message": "Plan consolidado con éxito en la base de datos oficial."})

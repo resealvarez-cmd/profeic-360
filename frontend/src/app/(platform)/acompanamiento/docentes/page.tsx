@@ -53,8 +53,8 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
 
             if (authUser) {
                 setUserRole(authUser.role);
-                // SECURITY CHECK: If Teacher, Do NOT fetch list, redirect or show empty.
-                if (authUser.role === 'teacher' && user.email !== 're.se.alvarez@gmail.com') {
+                // SECURITY CHECK: If Professor, Do NOT fetch list, redirect or show empty.
+                if (['teacher', 'profesor'].includes(authUser.role) && user.email !== 're.se.alvarez@gmail.com') {
                     setLoading(false);
                     router.push('/acompanamiento/dashboard');
                     return;
@@ -250,7 +250,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
         <div className="font-sans text-[#1a2e3b]">
             <header className="mb-8 flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-black text-[#1B3C73]">Gestión de Talentos Docentes</h1>
+                    <h1 className="text-3xl font-black text-[#1B3C73]">Gestión de Profesores</h1>
                     <p className="text-slate-500 font-medium">Panel de acompañamiento y desarrollo profesional</p>
                 </div>
                 <div className="flex gap-3">
@@ -260,7 +260,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                                 <Mail size={18} /> Contactar Todos
                             </button>
                             <button onClick={handleAddTeacher} className="bg-[#1a2e3b] text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-[#2b546e] shadow-lg shadow-blue-900/20 font-bold whitespace-nowrap">
-                                <Users size={18} /> Gestionar Personal / Perfiles
+                                <Users size={18} /> Gestión de Personal
                             </button>
                         </>
                     )}
@@ -341,10 +341,16 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                                             <span className="text-[10px] bg-slate-50 text-slate-500 px-2.5 py-1 rounded-lg font-black uppercase tracking-wider border border-slate-100">{teacher.grade || 'Media'}</span>
                                             <span className={`text-[10px] px-2.5 py-1 rounded-lg font-black uppercase tracking-wider border ${
                                                 teacher.role === 'admin' ? 'bg-red-50 text-red-600 border-red-100' :
-                                                teacher.role === 'director' || teacher.role === 'utp' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                                ['director', 'directivo'].includes(teacher.role) ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                                ['gestion', 'utp'].includes(teacher.role) ? 'bg-amber-50 text-amber-600 border-amber-100' :
                                                 'bg-indigo-50 text-indigo-600 border-indigo-100'
                                             }`}>
-                                                {teacher.role === 'teacher' ? 'Docente' : teacher.role === 'utp' ? 'Coordinador/UTP' : teacher.role === 'director' ? 'Director' : teacher.role}
+                                                {
+                                                    ['teacher', 'profesor'].includes(teacher.role) ? 'Profesor' : 
+                                                    ['gestion', 'utp'].includes(teacher.role) ? 'Gestión' : 
+                                                    teacher.role === 'directivo' ? 'Directivo' : 
+                                                    teacher.role === 'director' ? 'Director' : teacher.role
+                                                }
                                             </span>
                                         </div>
                                     </div>
@@ -385,7 +391,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                                     <div className="flex items-center gap-4 mb-6">
                                         <h2 className="text-xl font-black text-[#1B3C73] whitespace-nowrap bg-[#F8FAFC] pr-4 z-10">{groupName}</h2>
                                         <div className="h-[2px] bg-slate-200 flex-1"></div>
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{teachers.length} Docentes</span>
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{teachers.length} Profesores</span>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {teachers.map((teacher: any) => (

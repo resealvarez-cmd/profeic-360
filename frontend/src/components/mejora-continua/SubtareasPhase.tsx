@@ -17,6 +17,7 @@ import {
   Clock,
   ChevronDown
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Props {
   phaseId: string;
@@ -24,6 +25,8 @@ interface Props {
 }
 
 export default function SubtareasPhase({ phaseId, profiles }: Props) {
+  const { isDirectivo } = useAuth();
+  const canEdit = isDirectivo;
   const [tasks, setTasks] = useState<PhaseTask[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -135,14 +138,16 @@ export default function SubtareasPhase({ phaseId, profiles }: Props) {
                     </span>
                 </div>
             )}
-            <Button 
-                onClick={(e) => { e.stopPropagation(); setIsAdding(!isAdding); if(!isExpanded) setIsExpanded(true); }} 
-                variant="ghost" 
-                size="sm" 
-                className="h-7 px-2 text-[10px] font-black text-blue-600 hover:bg-blue-50"
-            >
-                {isAdding ? "CANCELAR" : "+ ACCIÓN"}
-            </Button>
+            {canEdit && (
+                <Button 
+                    onClick={(e) => { e.stopPropagation(); setIsAdding(!isAdding); if(!isExpanded) setIsExpanded(true); }} 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 px-2 text-[10px] font-black text-blue-600 hover:bg-blue-50"
+                >
+                    {isAdding ? "CANCELAR" : "+ ACCIÓN"}
+                </Button>
+            )}
         </div>
       </div>
 
@@ -228,7 +233,10 @@ export default function SubtareasPhase({ phaseId, profiles }: Props) {
                                             </span>
                                         </div>
                                         {dueStatus && task.status !== 'completed' && !isEditing && (
-                                            <button onClick={() => setEditingTaskId(task.id)} className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[8px] font-black uppercase tracking-tighter ${dueStatus.color} hover:bg-white transition-colors`}>
+                                            <button 
+                                                onClick={() => canEdit && setEditingTaskId(task.id)} 
+                                                className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[8px] font-black uppercase tracking-tighter ${dueStatus.color} ${canEdit ? 'hover:bg-white' : 'cursor-default transition-none'} transition-colors`}
+                                            >
                                                 {dueStatus.icon}
                                                 {dueStatus.label}
                                             </button>
@@ -237,14 +245,21 @@ export default function SubtareasPhase({ phaseId, profiles }: Props) {
                                             <span className="text-[8px] font-bold text-slate-300 uppercase">LOGRADA EL {new Date(task.due_date).toLocaleDateString('es-CL')}</span>
                                         )}
                                         {!task.due_date && !isEditing && (
-                                            <button onClick={() => setEditingTaskId(task.id)} className="text-[8px] font-bold text-slate-300 uppercase hover:text-blue-500 transition-colors">+ ASIGNAR PLAZO</button>
+                                            <button 
+                                                onClick={() => canEdit && setEditingTaskId(task.id)} 
+                                                className={`text-[8px] font-bold text-slate-300 uppercase ${canEdit ? 'hover:text-blue-500' : 'cursor-default'} transition-colors`}
+                                            >
+                                                {canEdit ? '+ ASIGNAR PLAZO' : 'SIN PLAZO'}
+                                            </button>
                                         )}
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={() => deleteTask(task.id)} className="p-1 text-slate-200 hover:text-rose-500 hover:bg-rose-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
-                                <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                            {canEdit && (
+                                <button onClick={() => deleteTask(task.id)} className="p-1 text-slate-200 hover:text-rose-500 hover:bg-rose-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                            )}
                         </div>
 
                         {isEditing && (

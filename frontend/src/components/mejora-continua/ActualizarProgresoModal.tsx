@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
 import { Indicator } from "@/types/mejora_continua";
 import { Loader2, Save, Pencil, Target, ArrowUpRight } from "lucide-react";
+import confeti from 'canvas-confetti';
 
 interface Props {
   indicator: Indicator;
@@ -45,6 +46,15 @@ export default function ActualizarProgresoModal({ indicator, phaseId }: Props) {
 
       setIsOpen(false);
       setFeedback("");
+      if (currentValue >= indicator.target_value) {
+        confeti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#34d399', '#ffffff']
+        });
+      }
+
       window.dispatchEvent(new Event('mejora-continua-updated'));
 
     } catch (error: any) {

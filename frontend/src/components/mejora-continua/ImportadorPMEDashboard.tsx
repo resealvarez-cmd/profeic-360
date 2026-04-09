@@ -188,16 +188,30 @@ export default function ImportadorPMEDashboard() {
     setIsConsolidating(true);
     setError(null);
     try {
+      // 0. Obtener schoolId del perfil del usuario
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No hay sesión activa.");
+      
+      const { data: pData } = await supabase
+        .from('profiles')
+        .select('school_id')
+        .eq('id', session.user.id)
+        .single();
+      
+      const schoolId = pData?.school_id;
+      if (!schoolId) throw new Error("No se encontró el ID de la escuela en su perfil.");
+
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
       const res = await fetch(`${baseUrl}/api/v1/pme/consolidar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, school_id: schoolId }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Error al consolidar.");
       
       setSuccess("¡Plan PME consolidado exitosamente en el sistema!");
+      window.dispatchEvent(new Event('mejora-continua-updated'));
     } catch (err: any) {
       setError(err.message);
     } finally {

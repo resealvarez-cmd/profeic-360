@@ -15,7 +15,7 @@ export default function AdminUsersPage() {
     const [newUser, setNewUser] = useState({
         email: '',
         full_name: '',
-        role: 'teacher',
+        role: 'profesor',
         password: '', // Optional: if provided, creates account directly
         age: '',
         department: '',
@@ -47,7 +47,7 @@ export default function AdminUsersPage() {
                 .eq('email', user.email)
                 .single();
 
-            if (user.email === 're.se.alvarez@gmail.com' || ['admin', 'director', 'utp'].includes(authUser?.role)) {
+            if (user.email === 're.se.alvarez@gmail.com' || ['admin', 'director', 'directivo'].includes(authUser?.role)) {
                 setIsAuthorized(true);
                 fetchUsers();
             } else {
@@ -107,7 +107,7 @@ export default function AdminUsersPage() {
                     mergedMap.set(email, {
                         email: email,
                         full_name: p.full_name || "Usuario Registrado",
-                        role: 'teacher', // Default for unlisted users
+                        role: 'profesor', // Default for unlisted users
                         status: 'unverified', // Flag for admin to see they are not in whitelist
                         avatar_url: p.avatar_url,
                         created_at: p.updated_at,
@@ -228,7 +228,7 @@ export default function AdminUsersPage() {
 
             setShowModal(false);
             setEditingUser(null);
-            setNewUser({ email: '', full_name: '', role: 'teacher', password: '', age: '', department: '', years_experience: '' });
+            setNewUser({ email: '', full_name: '', role: 'profesor', password: '', age: '', department: '', years_experience: '' });
             fetchUsers();
 
         } catch (error: any) {
@@ -299,7 +299,7 @@ export default function AdminUsersPage() {
 
     const openNewUserModal = () => {
         setEditingUser(null);
-        setNewUser({ email: '', full_name: '', role: 'teacher', password: '', age: '', department: '', years_experience: '' });
+        setNewUser({ email: '', full_name: '', role: 'profesor', password: '', age: '', department: '', years_experience: '' });
         setShowModal(true);
     };
 
@@ -373,11 +373,19 @@ export default function AdminUsersPage() {
                                         </div>
                                     </td>
                                     <td className="p-6">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${user.role === 'admin' ? 'bg-red-50 text-red-600 border-red-100' :
-                                            user.role === 'director' || user.role === 'utp' ? 'bg-orange-50 text-orange-600 border-orange-100' :
-                                                'bg-blue-50 text-blue-600 border-blue-100'
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${
+                                            user.role === 'admin' ? 'bg-red-50 text-red-600 border-red-100' :
+                                            user.role === 'director' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                            user.role === 'directivo' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                                            user.role === 'gestion' || user.role === 'utp' ? 'bg-teal-50 text-teal-600 border-teal-100' :
+                                            'bg-blue-50 text-blue-600 border-blue-100'
                                             }`}>
-                                            {user.role || 'teacher'}
+                                            {user.role === 'profesor' ? 'Profesor' : 
+                                             user.role === 'gestion' ? 'Gestión' : 
+                                             user.role === 'directivo' ? 'Directivo' : 
+                                             user.role === 'director' ? 'Director' : 
+                                             user.role === 'utp' ? 'Gestión (UTP)' : 
+                                             user.role || 'profesor'}
                                         </span>
                                     </td>
                                     <td className="p-6">
@@ -494,9 +502,10 @@ export default function AdminUsersPage() {
                                     value={newUser.role}
                                     onChange={e => setNewUser({ ...newUser, role: e.target.value })}
                                 >
-                                    <option value="teacher">Docente (Aula)</option>
-                                    <option value="director">Director / Gestión</option>
-                                    <option value="utp">Coord. UTP</option>
+                                    <option value="profesor">Profesor (Aula)</option>
+                                    <option value="gestion">Gestión (Coordinación)</option>
+                                    <option value="directivo">Directivo / Subdirector</option>
+                                    <option value="director">Director</option>
                                 </select>
                             </div>
 

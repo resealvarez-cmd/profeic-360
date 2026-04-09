@@ -288,6 +288,12 @@ export default function Dashboard360() {
                                 const avg = wTotal > 0 ? wSum / wTotal : 0;
                                 return { ...item, A: Math.round((avg / 4) * 100) };
                             }));
+                            setRadarDataConvivencia(prev => prev.map(item => {
+                                const wSum = weightedSums[item.id] || 0;
+                                const wTotal = totalWeights[item.id] || 0;
+                                const avg = wTotal > 0 ? wSum / wTotal : 0;
+                                return { ...item, A: Math.round((avg / 4) * 100) };
+                            }));
                         }
                     }
                 }
@@ -434,9 +440,13 @@ export default function Dashboard360() {
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                         {/* Ranking Card */}
                                         <div className="lg:col-span-1 bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden group">
-                                            <h3 className="text-slate-400 text-[10px] font-black uppercase mb-6 flex items-center gap-2 tracking-widest">
+                                            <h3 className="text-slate-400 text-[10px] font-black uppercase mb-6 flex items-center gap-2 tracking-widest relative group w-max cursor-help z-20">
                                                 Ranking Mentoría (KPI)
                                                 <Info size={12} className="text-slate-300" />
+                                                <div className="absolute opacity-0 group-hover:opacity-100 pointer-events-none top-full mt-2 left-0 w-56 bg-slate-900 text-white text-[10px] px-3 py-2 rounded-xl shadow-xl transition-all z-50 text-left font-medium leading-relaxed normal-case">
+                                                    Puntaje promedio obtenido en la rúbrica institucional por todos los docentes bajo la supervisión de este mentor/observador.
+                                                    <div className="absolute -top-1 left-4 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                                </div>
                                             </h3>
                                             <div className="space-y-4 max-h-[250px] overflow-y-auto pr-3 custom-scrollbar">
                                                 {metrics.observer_ranking.map((obs: any) => (
@@ -485,8 +495,15 @@ export default function Dashboard360() {
                                             </div>
 
                                             {/* Rigor Evolution */}
-                                            <div className="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 shadow-xl text-white">
-                                                <h4 className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-4">Evolución Profundidad IA</h4>
+                                            <div className="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 shadow-xl text-white relative">
+                                                <h4 className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 relative group w-max cursor-help">
+                                                    Evolución Profundidad IA
+                                                    <Info size={10} className="text-slate-600" />
+                                                    <div className="absolute opacity-0 group-hover:opacity-100 pointer-events-none top-full mt-2 left-0 w-60 bg-slate-800 text-white text-[10px] px-3 py-2 rounded-xl shadow-xl transition-all z-50 text-left font-medium leading-relaxed normal-case border border-slate-700">
+                                                        Porcentaje que evalúa la calidad de los reportes. Compara la cantidad de apuntes evaluativos/pedagógicos frente a apuntes meramente narrativos/descriptivos.
+                                                        <div className="absolute -top-1 left-4 w-2 h-2 bg-slate-800 border-t border-l border-slate-700 rotate-45"></div>
+                                                    </div>
+                                                </h4>
                                                 <div className="flex items-center justify-between">
                                                     <div>
                                                         <span className="text-2xl font-black text-[#A1C969]">{metrics.trajectory?.global_depth_index || 0}%</span>
@@ -638,21 +655,54 @@ export default function Dashboard360() {
                                         </div>
                                     )}
 
-                                    {/* Highlights Section */}
+                                    {/* Highlights Section — Cuadro de Honor deslizable */}
                                     {metrics.highlights && (
                                         <div className="mt-8 pt-8 border-t border-slate-100">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                {/* CUADRO DE HONOR — 3 slides */}
                                                 <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                                                    <h4 className="text-[10px] font-black text-slate-400 uppercase mb-4 flex items-center gap-2">
-                                                        <Trophy size={14} className="text-[#f2ae60]" /> Cuadro de Honor
-                                                    </h4>
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <h4 className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-2">
+                                                            <Trophy size={14} className="text-[#f2ae60]" /> Cuadro de Honor
+                                                        </h4>
+                                                        <div className="flex items-center gap-1">
+                                                            {['Curricular', 'Formación', 'General'].map((label, i) => (
+                                                                <button
+                                                                    key={i}
+                                                                    onClick={() => setHonorSlide(i)}
+                                                                    title={label}
+                                                                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                                                                        honorSlide === i ? 'bg-[#f2ae60] w-4' : 'bg-slate-300 hover:bg-slate-400'
+                                                                    }`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    {/* Slide label */}
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                                                        {honorSlide === 0 ? '📚 Área Curricular' : honorSlide === 1 ? '🤝 Área Formación y Convivencia' : '🏆 General (Ambas áreas)'}
+                                                    </p>
                                                     <div className="space-y-2">
-                                                        {metrics.highlights.top_teachers.length > 0 ? metrics.highlights.top_teachers.map((teacher: any, idx: number) => (
-                                                            <div key={idx} className="flex justify-between items-center text-xs font-bold text-slate-900">
-                                                                <span className="flex items-center gap-2 opacity-80">#{idx + 1} {teacher.name}</span>
-                                                                <span className="text-green-600">+{teacher.score}%</span>
-                                                            </div>
-                                                        )) : <span className="text-[10px] text-slate-400">Sin datos de mejora este mes</span>}
+                                                        {(() => {
+                                                            // Filtrar según slide: 0=curricular, 1=formación/convivencia, 2=general(todos)
+                                                            const teachers = metrics.highlights.top_teachers || [];
+                                                            const curricular = teachers.filter((t: any) => t.rubric_type === 'pedagogica' || !t.rubric_type);
+                                                            const formacion = teachers.filter((t: any) => t.rubric_type === 'convivencia');
+                                                            const lista = honorSlide === 0 ? curricular : honorSlide === 1 ? formacion : teachers;
+                                                            return lista.length > 0
+                                                                ? lista.map((teacher: any, idx: number) => (
+                                                                    <div key={idx} className="flex justify-between items-center text-xs font-bold text-slate-900">
+                                                                        <span className="flex items-center gap-2 opacity-80">#{idx + 1} {teacher.name}</span>
+                                                                        <span className="text-green-600">+{teacher.score}%</span>
+                                                                    </div>
+                                                                ))
+                                                                : <span className="text-[10px] text-slate-400 italic">Sin datos para esta categoría</span>;
+                                                        })()}
+                                                    </div>
+                                                    {/* Nav arrows */}
+                                                    <div className="flex justify-between mt-4">
+                                                        <button onClick={() => setHonorSlide(s => Math.max(0, s-1))} disabled={honorSlide === 0} className="text-[10px] font-black text-slate-400 hover:text-slate-700 disabled:opacity-30">‹ Ant.</button>
+                                                        <button onClick={() => setHonorSlide(s => Math.min(2, s+1))} disabled={honorSlide === 2} className="text-[10px] font-black text-slate-400 hover:text-slate-700 disabled:opacity-30">Sig. ›</button>
                                                     </div>
                                                 </div>
                                                 <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
@@ -692,6 +742,7 @@ export default function Dashboard360() {
     };
 
     // RADAR CHART DATA STATE
+    const [radarMode, setRadarMode] = useState<'pedagogica' | 'convivencia'>('pedagogica');
     const [radarData, setRadarData] = useState([
         { subject: 'Activación', A: 0, fullMark: 100, id: 'activacion_cognitiva' },
         { subject: 'Andamiaje', A: 0, fullMark: 100, id: 'andamiaje_modelaje' },
@@ -702,6 +753,19 @@ export default function Dashboard360() {
         { subject: 'Monitoreo', A: 0, fullMark: 100, id: 'monitoreo_formativo' },
         { subject: 'Feedback', A: 0, fullMark: 100, id: 'calidad_feedback' },
     ]);
+    const [radarDataConvivencia, setRadarDataConvivencia] = useState([
+        { subject: 'Respeto', A: 0, fullMark: 100, id: 'promocion_respeto' },
+        { subject: 'Diversidad', A: 0, fullMark: 100, id: 'diversidad_aula' },
+        { subject: 'Anti-discrim.', A: 0, fullMark: 100, id: 'abordaje_discriminacion' },
+        { subject: 'Convivencia', A: 0, fullMark: 100, id: 'habilidades_convivir' },
+        { subject: 'Normas', A: 0, fullMark: 100, id: 'prevencion_normas' },
+        { subject: 'Roles', A: 0, fullMark: 100, id: 'claridad_responsabilidades' },
+        { subject: 'Distrac.', A: 0, fullMark: 100, id: 'prevencion_distracciones' },
+        { subject: 'Vínculos', A: 0, fullMark: 100, id: 'vinculos_contencion' },
+        { subject: 'Habilidades', A: 0, fullMark: 100, id: 'practica_habilidades' },
+    ]);
+    // Cuadro de Honor slider state
+    const [honorSlide, setHonorSlide] = useState(0); // 0=curricular, 1=formación, 2=general
 
 
 
@@ -716,6 +780,11 @@ export default function Dashboard360() {
                 recentCycles={recentCycles}
                 allCycles={allCycles}
                 radarData={radarData}
+                radarDataConvivencia={radarDataConvivencia}
+                radarMode={radarMode}
+                setRadarMode={setRadarMode}
+                honorSlide={honorSlide}
+                setHonorSlide={setHonorSlide}
                 handleGenerateExecutive={handleGenerateExecutive}
                 loadingExecutive={loadingExecutive}
                 handleNewCycle={handleNewCycle}
@@ -727,7 +796,7 @@ export default function Dashboard360() {
                 SuperAdminWidget={() => <SuperAdminWidget currentUser={currentUser} userRole={userRole} />}
                 usersMap={usersMap}
                 latestInsight={latestInsight}
-                setShowConfigModal={setShowConfigModal} // Pass this
+                setShowConfigModal={setShowConfigModal}
                 handleViewTeacherDetail={handleViewTeacherDetail}
                 showTeacherDetailDrawer={showTeacherDetailDrawer}
                 setShowTeacherDetailDrawer={setShowTeacherDetailDrawer}
@@ -816,178 +885,6 @@ export default function Dashboard360() {
                 </div>
             )}
 
-            {/* TEACHER DETAIL DRAWER */}
-            {showTeacherDetailDrawer && (
-                <div className="fixed inset-0 z-[150] flex justify-end">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowTeacherDetailDrawer(false)} />
-                    <div className="w-full max-w-lg bg-white h-full shadow-2xl overflow-y-auto relative animate-in slide-in-from-right duration-300">
-                        <div className="bg-[#1B3C73] p-6 text-white sticky top-0 z-10 shadow-md">
-                            <button onClick={() => setShowTeacherDetailDrawer(false)} className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-colors">
-                                <X size={20} />
-                            </button>
-                            <h2 className="text-2xl font-bold flex items-center gap-3">
-                                <Users className="text-[#f2ae60]" size={28} />
-                                Perfil Docente Interactivo
-                            </h2>
-                            <p className="text-blue-100 text-sm mt-2 opacity-90">Resumen y trayectoria pedagógica basada en observación empírica</p>
-                        </div>
-
-                        <div className="p-8">
-                            {loadingTeacherDetail ? (
-                                <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                                    <div className="w-16 h-16 rounded-full border-4 border-slate-100 border-t-[#C87533] animate-spin"></div>
-                                    <p className="text-slate-500 font-medium animate-pulse">Solicitando análisis de trayectoria a IA...</p>
-                                </div>
-                            ) : teacherDetailData ? (
-                                <div className="space-y-8 animate-in mt-4 fade-in duration-500">
-
-                                    {/* CABECERA RESUMEN */}
-                                    <div className="text-center">
-                                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#1B3C73] to-[#2A59A8] text-white text-3xl font-black shadow-lg mb-4">
-                                            {teacherDetailData.teacher_name?.charAt(0) || 'D'}
-                                        </div>
-                                        <h3 className="text-2xl font-black text-[#1B3C73]">{teacherDetailData.teacher_name || 'Docente'}</h3>
-                                        <p className="text-slate-500 font-medium flex items-center justify-center gap-2 mt-2">
-                                            <Calendar size={14} /> Historial de {teacherDetailData.total_observations || 0} Acompañamientos
-                                        </p>
-                                    </div>
-
-                                    {/* STATS RAPIDAS */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-                                            <span className="block text-slate-500 text-xs font-bold uppercase mb-1">Cierre Cliclos</span>
-                                            <span className="text-2xl font-black text-[#1B3C73]">{teacherDetailData.closure_rate || 0}%</span>
-                                        </div>
-                                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-                                            <span className="block text-slate-500 text-xs font-bold uppercase mb-1">Índice Rigor</span>
-                                            <span className="text-2xl font-black text-[#C87533]">{teacherDetailData.depth_index || 0}%</span>
-                                        </div>
-                                    </div>
-
-                                    {/* TRAYECTORIA IA */}
-                                    {teacherDetailData.trajectory_analysis && (
-                                        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-3xl border border-indigo-100 relative overflow-hidden">
-                                            <BrainCircuit className="absolute top-4 right-4 text-indigo-200/50" size={100} />
-                                            <div className="relative z-10">
-                                                <h4 className="font-bold text-indigo-900 mb-4 flex items-center gap-2">
-                                                    <BrainCircuit size={18} className="text-indigo-600" />
-                                                    IA Trajectory Report
-                                                </h4>
-
-                                                <div className="space-y-4">
-                                                    <div>
-                                                        <span className="text-xs font-bold uppercase text-indigo-400">Tendencia General</span>
-                                                        <p className="text-indigo-900 font-medium text-lg leading-tight mt-1">
-                                                            {teacherDetailData.trajectory_analysis.trend || 'Sin datos suficientes'}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="bg-white/60 p-4 rounded-xl border border-indigo-100">
-                                                        <span className="text-xs font-bold uppercase text-indigo-400 mb-2 block">Insight Segmentado ({userRole?.toUpperCase()})</span>
-                                                        <p className="text-sm text-slate-700 leading-relaxed italic">
-                                                            "{userRole === 'teacher' ? teacherDetailData.trajectory_analysis.teacher_view : userRole === 'utp' ? teacherDetailData.trajectory_analysis.utp_view : teacherDetailData.trajectory_analysis.director_view || teacherDetailData.trajectory_analysis.summary || 'El docente requiere de más ciclos de observación.'}"
-                                                        </p>
-                                                    </div>
-
-                                                    {teacherDetailData.trajectory_analysis.focus && (
-                                                        <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
-                                                            <span className="text-xs font-bold uppercase text-orange-600 mb-1 flex items-center gap-1">
-                                                                <Target size={14} /> Foco Directivo Recomendado
-                                                            </span>
-                                                            <p className="text-sm text-orange-900 font-medium">
-                                                                {teacherDetailData.trajectory_analysis.focus}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* GAMIFICATION XP */}
-                                    <div className="mt-8">
-                                        <h4 className="font-bold text-[#1B3C73] mb-4 flex items-center gap-2">
-                                            <Trophy size={20} className="text-[#f2ae60]" />
-                                            Insignias y Desarrollo Profesional
-                                        </h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {teacherDetailData.skills && teacherDetailData.skills.length > 0 ? teacherDetailData.skills.map((skill: any) => {
-                                                const lvlIcons: Record<string, string> = { 'Novato': '🌱', 'Competente': '⭐', 'Referente': '🔥', 'Mentor': '👑' };
-                                                const xp = skill.total_xp || 0;
-                                                const lvlName = skill.current_level || 'Novato';
-                                                
-                                                // Calculate progress to next tier
-                                                let floor = 0;
-                                                let ceil = 150;
-                                                let maxedOut = false;
-                                                
-                                                if(xp >= 500) { floor = 500; ceil = 500; maxedOut = true; }
-                                                else if(xp >= 300) { floor = 300; ceil = 500; }
-                                                else if(xp >= 150) { floor = 150; ceil = 300; }
-                                                
-                                                const progressPercent = maxedOut ? 100 : Math.round(((xp - floor) / (ceil - floor)) * 100);
-
-                                                return (
-                                                    <div key={skill.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group">
-                                                        {maxedOut && <div className="absolute top-0 right-0 p-2 opacity-10 pointer-events-none"><Trophy size={60} /></div>}
-                                                        
-                                                        <div className="flex justify-between items-start mb-3 relative z-10">
-                                                            <div>
-                                                                <h5 className="font-bold text-[#1B3C73] text-sm leading-tight pr-2">{skill.skill_name}</h5>
-                                                                <span className="inline-flex mt-1 items-center gap-1 bg-blue-50 text-[#2A59A8] text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
-                                                                    {lvlIcons[lvlName] || ''} Nivel {lvlName}
-                                                                </span>
-                                                            </div>
-                                                            <div className="text-right shrink-0">
-                                                                <span className="block text-xl font-black text-[#C87533] leading-none">{xp}</span>
-                                                                <span className="text-[10px] uppercase font-bold text-slate-400">XP</span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div className="relative z-10">
-                                                            <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1">
-                                                                <span>Progreso Hito</span>
-                                                                <span>{maxedOut ? 'Máximo' : `${progressPercent}%`}</span>
-                                                            </div>
-                                                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                                                <div 
-                                                                    className={`h-full rounded-full transition-all duration-1000 ${maxedOut ? 'bg-yellow-400' : 'bg-[#1B3C73]'}`}
-                                                                    style={{ width: `${progressPercent}%` }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }) : (
-                                                <div className="col-span-2 text-center p-6 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
-                                                    <p className="text-sm text-slate-500 font-medium">Aún no hay insignias desbloqueadas. ¡Completa más observaciones para subir de nivel!</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* VER DETALLE BOTON */}
-                                    <div className="pt-4">
-                                        <button
-                                            // TODO: link to full historic view for this specific teacher
-                                            onClick={() => router.push(`/acompanamiento/docentes?q=${encodeURIComponent(teacherDetailData.teacher_name)}`)}
-                                            className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center justify-center gap-2"
-                                        >
-                                            <Eye size={18} /> VER HISTORIAL COMPLETO
-                                        </button>
-                                    </div>
-
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 text-slate-400">
-                                    <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
-                                    <p>No se pudo cargar la información del docente.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* CONFIG MODAL */}
             {showConfigModal && (
@@ -1067,6 +964,7 @@ export default function Dashboard360() {
 
 function DashboardContent({
     loading, userRole, userName, currentUser, stats, recentCycles, allCycles, radarData,
+    radarDataConvivencia, radarMode, setRadarMode, honorSlide, setHonorSlide,
     handleGenerateExecutive, loadingExecutive, handleNewCycle,
     showInsightDrawer, setShowInsightDrawer, showExecutiveModal, setShowExecutiveModal, executiveData, SuperAdminWidget, usersMap,
     latestInsight, setShowConfigModal, handleViewTeacherDetail,
@@ -1284,7 +1182,19 @@ function DashboardContent({
                                                             <h5 className="font-bold text-[#1B3C73] mb-2">{item.foco || "Sugerencia de Capacitación"}</h5>
                                                             <p className="text-slate-600 mb-2 leading-relaxed"><span className="font-semibold text-slate-700">Objetivo:</span> {item.objetivo}</p>
                                                             <p className="text-slate-600 mb-2 leading-relaxed"><span className="font-semibold text-slate-700">Metodología:</span> {item.metodologia}</p>
-                                                            {item.kpi && <p className="text-blue-700 font-medium italic mt-2 bg-blue-50/50 p-2 rounded-lg border border-blue-100"><span className="text-slate-500 not-italic font-semibold">KPI Esperado:</span> {item.kpi}</p>}
+                                                            {item.kpi && (
+                                                                <p className="text-blue-700 font-medium italic mt-2 bg-blue-50/50 p-2 rounded-lg border border-blue-100 flex items-center gap-2">
+                                                                    <div className="relative group flex items-center gap-1 cursor-help w-max z-10">
+                                                                        <span className="text-slate-500 not-italic font-semibold">KPI Esperado:</span>
+                                                                        <AlertCircle size={12} className="text-blue-300" />
+                                                                        <div className="absolute opacity-0 group-hover:opacity-100 pointer-events-none bottom-full mb-2 left-0 w-48 bg-slate-900 text-white text-[10px] px-3 py-2 rounded-xl shadow-xl transition-all z-50 text-left font-medium leading-relaxed normal-case not-italic">
+                                                                            Indicador Clave de Rendimiento proyectado si se implementa esta capacitación en el aula.
+                                                                            <div className="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    {item.kpi}
+                                                                </p>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1437,7 +1347,17 @@ function DashboardContent({
                                                     <h5 className="font-bold text-indigo-900 mb-1">{item.foco}</h5>
                                                     <p className="text-slate-600 mb-2 whitespace-pre-wrap leading-relaxed"><span className="font-semibold text-slate-700">Objetivo:</span> {item.objetivo}</p>
                                                     <p className="text-slate-600 mb-2 whitespace-pre-wrap leading-relaxed"><span className="font-semibold text-slate-700">Metodología:</span> {item.metodologia}</p>
-                                                    <p className="text-indigo-600 font-medium italic"><span className="text-slate-500 not-italic">KPI:</span> {item.kpi}</p>
+                                                    <p className="text-indigo-600 font-medium italic flex items-center gap-2">
+                                                        <div className="relative group flex items-center gap-1 cursor-help w-max z-10">
+                                                            <span className="text-slate-500 not-italic">KPI Esperado:</span>
+                                                            <AlertCircle size={12} className="text-indigo-300" />
+                                                            <div className="absolute opacity-0 group-hover:opacity-100 pointer-events-none bottom-full mb-2 left-0 w-48 bg-slate-900 text-white text-[10px] px-3 py-2 rounded-xl shadow-xl transition-all z-50 text-left font-medium leading-relaxed normal-case not-italic">
+                                                                Indicador de meta (Key Performance Indicator) estimado para medir el éxito de esta estrategia.
+                                                                <div className="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                                            </div>
+                                                        </div>
+                                                        {item.kpi}
+                                                    </p>
                                                 </div>
                                             ))
                                         ) : (
@@ -1865,21 +1785,44 @@ function DashboardContent({
                             </div>
                         </div>
 
-                        {/* WIDGET 2: RADAR CHART */}
-                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 lg:col-span-1 h-[400px] flex flex-col">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="font-bold text-[#1B3C73] flex items-center gap-2">
-                                    <TrendingUp size={18} className="text-[#C87533]" />
+                        {/* WIDGET 2: RADAR CHART — con toggle área */}
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 lg:col-span-1 h-[420px] flex flex-col">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="font-bold text-[#1B3C73] flex items-center gap-2 text-sm">
+                                    <TrendingUp size={16} className="text-[#C87533]" />
                                     {userRole === 'teacher' ? 'Mi Pulso Metodológico' : 'Pulso Metodológico (Colegio)'}
                                 </h3>
                             </div>
+                            {/* Toggle área */}
+                            <div className="flex gap-1 bg-slate-100 rounded-lg p-0.5 mb-3">
+                                <button
+                                    onClick={() => setRadarMode('pedagogica')}
+                                    className={`flex-1 py-1.5 text-[10px] font-black rounded-md uppercase tracking-wider transition-all ${
+                                        radarMode === 'pedagogica' ? 'bg-white text-[#1B3C73] shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                                    }`}
+                                >Pedagógica</button>
+                                <button
+                                    onClick={() => setRadarMode('convivencia')}
+                                    className={`flex-1 py-1.5 text-[10px] font-black rounded-md uppercase tracking-wider transition-all ${
+                                        radarMode === 'convivencia' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                                    }`}
+                                >Convivencia</button>
+                            </div>
                             <div className="flex-1 min-h-0">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                                    <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarMode === 'pedagogica' ? radarData : radarDataConvivencia}>
                                         <PolarGrid stroke="#e2e8f0" />
-                                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 600 }} />
+                                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 9, fontWeight: 600 }} />
                                         <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                        <Radar name="Colegio" dataKey="A" stroke="#C87533" strokeWidth={3} fill="#C87533" fillOpacity={0.2} activeDot={{ onClick: handleRadarClick, cursor: 'pointer' }} />
+                                        <Radar
+                                            name={radarMode === 'pedagogica' ? 'Pedagógica' : 'Convivencia'}
+                                            dataKey="A"
+                                            stroke={radarMode === 'pedagogica' ? '#C87533' : '#0d9488'}
+                                            strokeWidth={3}
+                                            fill={radarMode === 'pedagogica' ? '#C87533' : '#0d9488'}
+                                            fillOpacity={0.15}
+                                            activeDot={{ onClick: handleRadarClick, cursor: 'pointer' }}
+                                        />
                                         <Tooltip />
                                     </RadarChart>
                                 </ResponsiveContainer>
@@ -1941,35 +1884,48 @@ function DashboardContent({
                                     ) : (
                                         <div className="space-y-1">
                                             {recentCycles.map((cycle: any) => (
-                                                <Link key={cycle.id} href={`/acompanamiento/observacion/${cycle.id}`} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-2 h-2 rounded-full ${cycle.status === 'completed' ? 'bg-green-500' : 'bg-[#C87533]'}`}></div>
-                                                        <div>
-                                                            <p className="font-bold text-sm text-[#1B3C73]">{usersMap[cycle.teacher_id] || 'Docente Observado'}</p>
+                                                <div key={cycle.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                                                    <Link href={`/acompanamiento/observacion/${cycle.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                                                        <div className={`w-2 h-2 rounded-full shrink-0 ${cycle.status === 'completed' ? 'bg-green-500' : 'bg-[#C87533]'}`}></div>
+                                                        <div className="min-w-0">
+                                                            <p className="font-bold text-sm text-[#1B3C73] truncate">{usersMap[cycle.teacher_id] || 'Docente Observado'}</p>
                                                             <p className="text-xs text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</p>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase ${cycle.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-[#C87533]'}`}>
+                                                    </Link>
+                                                    <div className="flex items-center gap-1.5 shrink-0">
+                                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase ${cycle.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-[#C87533]'}`}>
                                                             {cycle.status === 'in_progress' ? 'En Curso' : 'Completado'}
                                                         </span>
-                                                        <div className="flex items-center gap-1">
-                                                            <ArrowRight size={14} className="text-slate-300 group-hover:text-[#1B3C73]" />
-                                                            {canManageTeachers && (
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-                                                                        handleDeleteObservation(cycle.id);
-                                                                    }}
-                                                                    className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all"
-                                                                >
-                                                                    <Trash2 size={14} />
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                        {/* Botón Expediente Docente */}
+                                                        {cycle.teacher_id && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleViewTeacherDetail(cycle.teacher_id);
+                                                                }}
+                                                                title="Ver Expediente del Docente"
+                                                                className="p-1.5 opacity-0 group-hover:opacity-100 bg-[#1B3C73] text-white rounded-lg hover:bg-[#2A59A8] transition-all text-[9px] font-black flex items-center gap-1"
+                                                            >
+                                                                <FileText size={11} /> Expediente
+                                                            </button>
+                                                        )}
+                                                        <Link href={`/acompanamiento/observacion/${cycle.id}`} className="p-1.5 text-slate-300 hover:text-[#1B3C73] transition-colors">
+                                                            <ArrowRight size={14} />
+                                                        </Link>
+                                                        {canManageTeachers && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleDeleteObservation(cycle.id);
+                                                                }}
+                                                                className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                </Link>
+                                                </div>
                                             ))}
                                         </div>
                                     )}

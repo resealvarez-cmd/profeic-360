@@ -8,7 +8,7 @@ export interface StrategicGoal {
   created_by?: string;
   created_at: string;
   updated_at: string;
-  pme_action_link?: string;
+  pme_action_link?: string | null;
   // Anidaciones para UI
   implementation_phases?: ImplementationPhase[];
   pme_actions?: { title: string; dimension: string };

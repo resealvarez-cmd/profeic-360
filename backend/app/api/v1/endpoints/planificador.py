@@ -27,7 +27,19 @@ async def get_options(req: CurriculumRequest):
 
 @router.post("/generate-strategy", response_model=EstrategiaUnidad)
 async def gen_strat(req: UnitRequest):
-    prompt = STRATEGY_PROMPT.format(asignatura=req.asignatura, nivel=req.nivel, lista_oas=str(req.oas), contexto_manual=req.contexto_manual, total_clases=max(1, req.horas // 2))
+    # Contexto Colegio
+    contexto_colegio = ""
+    if req.school_id:
+        try:
+            school_resp = supabase.table("schools").select("*").eq("id", req.school_id).maybe_single().execute()
+            if school_resp.data:
+                s = school_resp.data
+                contexto_colegio = f"CONTEXTO COLEGIO: Vulnerabilidad {s.get('priority_pct')}% SEP, {s.get('pie_neet_count', 0) + s.get('pie_neep_count', 0)} alumnos PIE, Nivel {s.get('socioeconomic_level')}."
+        except: pass
+
+    ctx_full = f"{contexto_colegio} {req.contexto_manual}" if contexto_colegio else req.contexto_manual
+    
+    prompt = STRATEGY_PROMPT.format(asignatura=req.asignatura, nivel=req.nivel, lista_oas=str(req.oas), contexto_manual=ctx_full, total_clases=max(1, req.horas // 2))
     return json.loads(clean_json(model.generate_content(prompt).text))
 
 @router.post("/generate-class", response_model=DetalleClase)

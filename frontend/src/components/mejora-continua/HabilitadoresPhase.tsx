@@ -10,6 +10,7 @@ import {
   AlertCircle, 
   Hourglass 
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 import CrearHabilitadorModal from "./CrearHabilitadorModal";
 import EditarHabilitadorModal from "./EditarHabilitadorModal";
@@ -20,12 +21,15 @@ interface Props {
 }
 
 export default function HabilitadoresPhase({ phaseId, enablers = [] }: Props) {
+  const { isDirectivo } = useAuth();
+  const canEdit = isDirectivo;
+
   if (enablers.length === 0) {
     return (
       <div className="pt-4 border-t border-slate-100 mt-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Habilitadores y Recursos</span>
-          <CrearHabilitadorModal phaseId={phaseId} />
+          {canEdit && <CrearHabilitadorModal phaseId={phaseId} />}
         </div>
         <div className="p-4 bg-slate-50/50 rounded-xl border border-dashed border-slate-200 text-center">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">No hay recursos solicitados aún</p>
@@ -77,7 +81,7 @@ export default function HabilitadoresPhase({ phaseId, enablers = [] }: Props) {
     <div className="space-y-3 pt-4 border-t border-slate-100 mt-4">
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Habilitadores y Recursos</span>
-        <CrearHabilitadorModal phaseId={phaseId} />
+        {canEdit && <CrearHabilitadorModal phaseId={phaseId} />}
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -99,7 +103,7 @@ export default function HabilitadoresPhase({ phaseId, enablers = [] }: Props) {
               </div>
 
               <div className="flex items-center gap-2">
-                <EditarHabilitadorModal enabler={enabler} />
+                {canEdit && <EditarHabilitadorModal enabler={enabler} />}
                 <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter border ${status.color}`}>
                   {status.label}
                 </div>

@@ -55,13 +55,24 @@ def get_query_embedding(text: str):
 # --- PERSONALIDAD REFORZADA (Con Pragmatismo Didáctico) ---
 fecha_hoy = datetime.now().strftime("%A %d de %B de %Y")
 
-def get_system_prompt(nombre_usuario="Docente", nombre_colegio="tu colegio", sello=""):
+def get_system_prompt(nombre_usuario="Docente", nombre_colegio="tu colegio", sello="", caracterizacion=None):
     sello_line = f"SELLO: {sello}.\n" if sello else ""
+    ctx_line = ""
+    if caracterizacion:
+        ctx_line = f"""
+CONTEXTO INSTITUCIONAL DETALLADO:
+- Matrícula Total: {caracterizacion.get('enrollment_count', 'No especificada')} alumnos.
+- Asistencia Promedio: {caracterizacion.get('attendance_avg', 'N/A')}%
+- Alumnos Prioritarios (SEP): {caracterizacion.get('priority_pct', 'N/A')}% ({caracterizacion.get('priority_count', 0)} alumnos)
+- Alumnos Preferentes: {caracterizacion.get('preferred_pct', 'N/A')}% ({caracterizacion.get('preferred_count', 0)} alumnos)
+- Alumnos PIE (Necesidades Especiales): {caracterizacion.get('pie_neet_count', 0)} NEET, {caracterizacion.get('pie_neep_count', 0)} NEEP.
+- Nivel Socioeconómico: {caracterizacion.get('socioeconomic_level', 'No definido')}.
+"""
     return f"""
 ROL: Eres 'Mentor IC', el consejero pedagógico y pastoral de {nombre_colegio}.
 FECHA: {fecha_hoy}.
 USUARIO: Estás hablando con {nombre_usuario}. Llámalo por su nombre de vez en cuando para generar cercanía.
-{sello_line}
+{sello_line}{ctx_line}
 TUS 4 PILARES FUNDAMENTALES:
 
 1. **RAÍCES Y ALAS:** Valora la identidad local e institucional de {nombre_colegio}, pero conéctala con lo universal.
@@ -91,6 +102,7 @@ async def chat_mentor(req: ChatRequest, authorization: Optional[str] = Header(No
         school_id = None
         nombre_colegio = "tu colegio"
         sello_colegio = ""
+        caracterizacion_colegio = None
         if authorization and supabase:
             try:
                 token = authorization.split("Bearer ")[-1]
@@ -105,11 +117,12 @@ async def chat_mentor(req: ChatRequest, authorization: Optional[str] = Header(No
 
                     if school_id:
                         school_resp = supabase.table("schools").select(
-                            "name, sello_institucional"
+                            "name, sello_institucional, attendance_avg, enrollment_count, priority_pct, priority_count, preferred_pct, preferred_count, pie_neet_count, pie_neep_count, socioeconomic_level"
                         ).eq("id", school_id).maybe_single().execute()
                         school_data = school_resp.data or {}
                         nombre_colegio = school_data.get("name", "tu colegio")
                         sello_colegio = school_data.get("sello_institucional", "")
+                        caracterizacion_colegio = school_data
             except Exception as e_auth:
                 print(f"⚠️ No se pudo resolver school: {e_auth}")
         
@@ -145,7 +158,7 @@ async def chat_mentor(req: ChatRequest, authorization: Optional[str] = Header(No
                 contexto_institucional += f"FUENTE{tipo_label}: {source}\nFRAGMENTO: {content}\n\n"
         
         # ── 4. Armar Prompt ──
-        SYSTEM_PROMPT = get_system_prompt(req.user_name, nombre_colegio, sello_colegio)
+        SYSTEM_PROMPT = get_system_prompt(req.user_name, nombre_colegio, sello_colegio, caracterizacion_colegio)
         full_prompt = SYSTEM_PROMPT + contexto_institucional + "\n--- HISTORIAL DE CONVERSACIÓN ---\n"
         
         for msg in req.history:

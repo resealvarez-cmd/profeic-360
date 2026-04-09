@@ -283,8 +283,15 @@ export default function PlanificadorWizard() {
     const handleGenerar = async () => {
         setLoading(true);
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
             const res = await fetch(`${API_URL}/api/generate`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                method: 'POST', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ""
+                },
                 body: JSON.stringify({
                     nivel,
                     asignatura: Array.from(new Set(mochila.map(m => m.asignatura))).join(" + "),

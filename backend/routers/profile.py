@@ -65,7 +65,7 @@ async def get_institutional_context(authorization: str = Header(...)):
         school_data = None
         if school_id:
             school_resp = supabase.table("schools").select(
-                "name, city, region, sello_institucional, valores, proyecto_educativo"
+                "name, city, region, sello_institucional, valores, proyecto_educativo, attendance_avg, priority_pct, pie_neet_count, pie_neep_count, socioeconomic_level"
             ).eq("id", school_id).maybe_single().execute()
             school_data = school_resp.data
 
@@ -82,6 +82,22 @@ async def get_institutional_context(authorization: str = Header(...)):
 
             if nombre_colegio:
                 context_parts.append(f"INSTITUCIÓN: {nombre_colegio}")
+            
+            # --- NUEVO: Caracterización ---
+            vulnerabilidad = school_data.get("priority_pct")
+            pie_total = (school_data.get("pie_neet_count") or 0) + (school_data.get("pie_neep_count") or 0)
+            asistencia = school_data.get("attendance_avg")
+            nvs = school_data.get("socioeconomic_level")
+
+            caract_parts = []
+            if vulnerabilidad: caract_parts.append(f"{vulnerabilidad}% vulnerabilidad (SEP)")
+            if pie_total > 0: caract_parts.append(f"{pie_total} alumnos PIE")
+            if asistencia: caract_parts.append(f"{asistencia}% asistencia promedio")
+            if nvs: caract_parts.append(f"NSE: {nvs}")
+            
+            if caract_parts:
+                context_parts.append(f"CARACTERIZACIÓN: {', '.join(caract_parts)}.")
+
             if sello:
                 context_parts.append(f"SELLO INSTITUCIONAL: {sello}")
             if valores:

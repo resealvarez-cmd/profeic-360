@@ -20,6 +20,7 @@ export default function CopilotoMejoraModal() {
   // Novedades PME
   const [pmeActions, setPmeActions] = useState<any[]>([]);
   const [selectedPmeAction, setSelectedPmeAction] = useState<string>("");
+  const [schoolId, setSchoolId] = useState<string | null>(null);
 
   // Fetch profiles and PME actions
   useEffect(() => {
@@ -32,6 +33,13 @@ export default function CopilotoMejoraModal() {
       // Fetch PME actions
       const { data: pmeData } = await supabase.from('pme_actions').select('id, title, dimension').order('title');
       if (pmeData) setPmeActions(pmeData);
+
+      // Fetch user profile for school_id
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase.from('profiles').select('school_id').eq('id', session.user.id).single();
+        if (profile) setSchoolId(profile.school_id);
+      }
     }
     if (isOpen) {
       loadData();
@@ -46,7 +54,7 @@ export default function CopilotoMejoraModal() {
       const res = await fetch(`${baseUrl}/api/v1/mejora-continua/copiloto`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ desafio })
+        body: JSON.stringify({ desafio, school_id: schoolId })
       });
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
       const data = await res.json();

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-export type UserRole = "teacher" | "director" | "utp" | "admin" | "sostenedor" | null;
+export type UserRole = "profesor" | "gestion" | "directivo" | "director" | "sostenedor" | "admin" | null;
 
 interface School {
   id: string;
@@ -24,9 +24,12 @@ interface AuthState {
   schoolPlan: string;
   isLoading: boolean;
   isSuperAdmin: boolean;
-  isDirectivo: boolean;  // director, utp, admin, sostenedor
+  isDirectivo: boolean;  // director, directivo
+  isGestion: boolean;    // gestion
+  isLiderazgo: boolean;  // director, directivo, gestion
   isSostenedor: boolean; // admin, sostenedor
-  isTeacher: boolean;
+  isTeacher: boolean;    // @deprecated use isProfesor
+  isProfesor: boolean;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (v: boolean) => void;
   logout: () => Promise<void>;
@@ -83,7 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           supabase.from("profiles").select("*").eq("id", u.id).maybeSingle()
         ]);
 
-        const userRole: UserRole = authResponse.data?.role || (meta?.role as UserRole) || "teacher";
+        let userRole: UserRole = authResponse.data?.role || (meta?.role as UserRole) || "profesor";
+        
+        // Mapping old roles for backward compatibility during transition
+        if (userRole === ("teacher" as any)) userRole = "profesor";
+        if (userRole === ("utp" as any)) userRole = "gestion";
+        
         setRole(userRole);
 
         if (profileResponse.data) {
@@ -103,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         // Schools for leadership
-        if (userRole && ["admin", "sostenedor", "director", "utp"].includes(userRole)) {
+        if (userRole && ["admin", "sostenedor", "director", "directivo", "gestion"].includes(userRole)) {
           const { data: sData } = await supabase.from("schools").select("*");
           if (sData) {
             setSchools(sData);
@@ -139,9 +147,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isSuperAdmin = userEmail === "re.se.alvarez@gmail.com";
-  const isDirectivo = ["admin", "director", "utp", "sostenedor"].includes(role || "");
+  const isDirectivo = ["director", "directivo"].includes(role || "");
+  const isGestion = role === "gestion";
+  const isLiderazgo = ["admin", "sostenedor", "director", "directivo", "gestion"].includes(role || "");
   const isSostenedor = ["admin", "sostenedor"].includes(role || "");
-  const isTeacher = role === "teacher";
+  const isProfesor = role === "profesor";
+  const isTeacher = isProfesor; // for legacy compatibility
 
   return (
     <AuthContext.Provider value={{
@@ -158,8 +169,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       isSuperAdmin,
       isDirectivo,
+      isGestion,
+      isLiderazgo,
       isSostenedor,
       isTeacher,
+      isProfesor,
       sidebarCollapsed,
       setSidebarCollapsed: handleSetSidebarCollapsed,
       logout,
