@@ -33,6 +33,7 @@ export default function LoginPage() {
         formState: { errors },
     } = useForm<LoginForm>({
         resolver: zodResolver(loginSchema),
+        mode: "onBlur",
     });
 
     const onSubmit = async (data: LoginForm) => {
@@ -100,6 +101,7 @@ export default function LoginPage() {
                         <input
                             type="email"
                             {...register('email')}
+                            autoComplete="email"
                             className={`w-full pl-4 pr-4 py-3 bg-[#F8FAFC] border rounded-xl text-slate-800 
                         ${errors.email ? 'border-red-500' : 'border-slate-200'}
                         focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-400`}
@@ -116,6 +118,7 @@ export default function LoginPage() {
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 {...register('password')}
+                                autoComplete="current-password"
                                 className={`w-full pl-4 pr-12 py-3 bg-[#F8FAFC] border rounded-xl text-slate-800 
                             ${errors.password ? 'border-red-500' : 'border-slate-200'}
                             focus:ring-2 focus:ring-[#1B3C73] outline-none transition-all placeholder:text-slate-400`}

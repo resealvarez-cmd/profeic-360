@@ -375,7 +375,7 @@ async def descargar_informe_word(payload: dict):
         
         # --- PORTADA ---
         # Logo Centrado
-        logo_path = "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/assets/logo_profeic.svg.png"
+        logo_path = "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/assets/logo_profeic..png"
         if os.path.exists(logo_path):
             p_logo = doc.add_paragraph()
             p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -623,7 +623,7 @@ async def exportar_gantt_pdf(req: GanttExportRequest):
 
         # ── Header band (simulated with a single-cell table) ─────────────────────
         import os
-        logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "logo_profeic.svg.png")
+        logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "logo_profeic..png")
         logo_flowable = ""
         if os.path.exists(logo_path):
             try:

@@ -238,7 +238,7 @@ def add_header_logo(doc, asignatura, nivel, titulo_extra=""):
     
     from pathlib import Path
     base_dir = Path(__file__).resolve().parent.parent
-    logo_path = base_dir / 'assets' / 'logo_profeic.svg.png'
+    logo_path = base_dir / 'assets' / 'logo_profeic..png'
     
     if logo_path.exists():
         try:

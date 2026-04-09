@@ -13,28 +13,28 @@ import React from 'react';
 
 export const modules = [
     {
-        title: "Monitorización PME",
+        title: "Monitorización PME & Finanzas",
         icon: <LayoutDashboard className="text-blue-500" />,
         bg: "bg-blue-50",
-        desc: "Visualización dinámica de metas y acciones. Gestión de subactividades con responsables asignados para asegurar el cumplimiento del Plan de Mejora Educativa."
+        desc: "Correlación en tiempo real entre inversión financiera (SEP) y avance estratégico. Scorecard de salud institucional para una toma de decisiones en 5 segundos."
     },
     {
-        title: "Evaluación SIMCE de Alta Precisión",
+        title: "Evaluación SIMCE Multimodal",
         icon: <Target className="text-orange-500" />,
         bg: "bg-orange-50",
-        desc: "Diseño de instrumentos con estímulos visuales complejos y algoritmos de varianza dimensional para medir habilidades reales, no solo memoria."
+        desc: "Generación de ítems con estímulos visuales complejos e infografías IA. Cumplimiento estricto de tablas de especificaciones MINEDUC y niveles DOK 3-4."
     },
     {
         title: "Analítica Predictiva 360",
         icon: <BarChart3 className="text-emerald-500" />,
         bg: "bg-emerald-50",
-        desc: "Dashboards de impacto que traducen el uso de la plataforma en datos accionables para intervenciones pedagógicas oportunas."
+        desc: "Dashboards de impacto que transforman el uso de la plataforma en alertas tempranas de riesgo académico y sugerencias de intervención pedagógica."
     },
     {
-        title: "Motor OMR ProfeIC",
+        title: "Motor OMR & Visión IA",
         icon: <ScanFace className="text-purple-500" />,
         bg: "bg-purple-50",
-        desc: "Reconocimiento óptico de alta precisión para la corrección masiva de pruebas con total privacidad institucional."
+        desc: "Reconocimiento óptico de alta precisión para corrección masiva. Integración inmediata con el portafolio docente para feedback basado en evidencia."
     }
 ];
 

@@ -200,7 +200,7 @@ async def download_nee_docx(data: DownloadRequest):
         # Logo
         cell_logo = t.cell(0, 0)
         base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        logo_path = os.path.join(base, "assets", "logo_profeic.svg.png")
+        logo_path = os.path.join(base, "assets", "logo_profeic..png")
         p_logo = cell_logo.paragraphs[0]
         run_logo = p_logo.add_run()
         if os.path.exists(logo_path):

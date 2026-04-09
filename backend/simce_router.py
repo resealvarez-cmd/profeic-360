@@ -230,7 +230,7 @@ def _add_profeic_header(doc: Document, asignatura: str, nivel: str, tipo: str) -
     t.columns[0].width = Inches(1.2)
     t.columns[1].width = Inches(5.3)
     cell_logo = t.cell(0, 0)
-    logo_path = _ASSETS_DIR / "logo_profeic.svg.png"
+    logo_path = _ASSETS_DIR / "logo_profeic..png"
     p_logo = cell_logo.paragraphs[0]
     run_logo = p_logo.add_run()
     if logo_path.exists():
@@ -652,7 +652,7 @@ async def download_omr(req: DescargaOMRRequest, current_user_id: Optional[str] =
         generator = OMRTemplateGenerator()
         buf = io.BytesIO()
         
-        logo_path = _ASSETS_DIR / "logo_profeic.svg.png"
+        logo_path = _ASSETS_DIR / "logo_profeic..png"
         if not logo_path.exists():
             logo_path = None
         else:

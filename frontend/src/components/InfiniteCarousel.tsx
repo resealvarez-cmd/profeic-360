@@ -1,6 +1,6 @@
 
 "use client";
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface CarouselProps {
     children: React.ReactNode;
@@ -19,9 +19,12 @@ export function InfiniteCarousel({ children, speed = 40 }: CarouselProps) {
                     animationDuration: `${speed}s`,
                 }}
             >
-                {children}
-                {/* Duplicar children para loop seamless */}
-                {children}
+                {/* Repetir children para asegurar loop continuo sin saltos visuales */}
+                {[...Array(3)].map((_, i) => (
+                    <React.Fragment key={i}>
+                        {children}
+                    </React.Fragment>
+                ))}
             </div>
         </div>
     );

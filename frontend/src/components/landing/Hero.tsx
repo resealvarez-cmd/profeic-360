@@ -35,7 +35,7 @@ export const Hero = () => {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 shadow-sm mb-4"
                 >
                     <Sparkles className="w-4 h-4 text-[#f2ae60]" />
-                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Potenciado por Gemini 2.5</span>
+                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Potenciado por Gemini 1.5 Pro (Multimodal)</span>
                 </motion.div>
 
                 {/* HEADLINE */}

@@ -65,7 +65,7 @@ const LandingPage = () => {
                             </span>
                         </h1>
                         <p className="text-xl text-slate-500 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
-                            El ecosistema definitivo de gestión y mejora educativa 360°. Integra el control del PME, analítica predictiva y diseño pedagógico avanzado en un solo centro de control.
+                            El ecosistema definitivo de gestión y mejora educativa 360°. Integra el control del PME, analítica predictiva y nuestro <span className="text-[#C87533] font-bold">Elevador Cognitivo</span> para asegurar rigor pedagógico DOK 3-4 en cada aula.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
@@ -235,8 +235,8 @@ const LandingPage = () => {
                         ))}
                     </div>
                     <div className="mt-20 flex justify-center">
-                        <Link href="/login" className="bg-white text-[#1B3C73] px-12 py-5 rounded-2xl font-black shadow-2xl flex items-center gap-3 hover:bg-orange-50 transition-all text-lg">
-                            Acceder al Panel de Gestión <ArrowRight size={24} />
+                        <Link href="/login" className="bg-white text-[#1B3C73] px-12 py-5 rounded-2xl font-black shadow-2xl flex items-center gap-3 hover:bg-orange-400/20 hover:text-white transition-all text-lg group">
+                            Acceder al Panel de Gestión <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
                 </div>
@@ -328,8 +328,8 @@ const LandingPage = () => {
                     </div>
                     <p className="text-slate-400 text-xs font-black uppercase tracking-[0.4em]">© 2026 ProfeIC • Innovación Educativa</p>
                     <div className="flex gap-10 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <Link href="#" className="hover:text-[#1B3C73] transition-colors">Privacidad</Link>
-                        <Link href="#" className="hover:text-[#1B3C73] transition-colors">Soporte</Link>
+                        <Link href="mailto:soporte@profeic.cl?subject=Consulta de Privacidad" className="hover:text-[#1B3C73] transition-colors">Privacidad</Link>
+                        <Link href="mailto:soporte@profeic.cl?subject=Soporte Técnico" className="hover:text-[#1B3C73] transition-colors">Soporte</Link>
                     </div>
                 </div>
             </footer>

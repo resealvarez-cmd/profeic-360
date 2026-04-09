@@ -6564,7 +6564,7 @@ const LandingPage = () => {
 
             {/* Grid Pattern Background */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.06]"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 0H0V60H60V0ZM1 1H59V59H1V1Z' fill='%231B3C73' fill-rule='evenodd'/%3E%3C/svg%3E")` }} />
+                style={{ backgroundImage: `url("data:image/+xml,%3C width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/'%3E%3Cpath d='M60 0H0V60H60V0ZM1 1H59V59H1V1Z' fill='%231B3C73' fill-rule='evenodd'/%3E%3C/%3E")` }} />
 
             {/* Navigation */}
             <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200">
@@ -6741,9 +6741,9 @@ const LandingPage = () => {
                         <div key={i} className={`bg-[#F8FAFC] p-10 rounded-[2.5rem] border-t-8 ${t.accent} shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between`}>
                             <div>
                                 <div className="text-slate-200 mb-6">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    < width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/">
                                         <path d="M14.017 21L16.411 14.182C15.821 14.182 15.114 13.978 14.613 13.568C14.113 13.159 13.863 12.545 13.863 11.523C13.863 10.614 14.158 9.818 14.75 9.136C15.341 8.455 16.159 8.114 17.205 8.114C18.25 8.114 19.068 8.455 19.659 9.136C20.25 9.818 20.545 10.614 20.545 11.523C20.545 13.159 19.955 15.023 18.773 17.114L14.017 21ZM3.722 21L6.116 14.182C5.526 14.182 4.819 13.978 4.318 13.568C3.818 13.159 3.568 12.545 3.568 11.523C3.568 10.614 3.863 9.818 4.455 9.136C5.045 8.455 5.864 8.114 6.909 8.114C7.955 8.114 8.773 8.455 9.364 9.136C9.955 9.818 10.25 10.614 10.25 11.523C10.25 13.159 9.659 15.023 8.477 17.114L3.722 21Z" />
-                                    </svg>
+                                    </>
                                 </div>
                                 <p className="text-slate-700 mb-10 font-bold italic text-lg leading-relaxed">"{t.quote}"</p>
                             </div>
