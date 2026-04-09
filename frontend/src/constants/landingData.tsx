@@ -19,12 +19,6 @@ export const modules = [
         desc: "Correlación en tiempo real entre inversión financiera (SEP) y avance estratégico. Scorecard de salud institucional para una toma de decisiones en 5 segundos."
     },
     {
-        title: "Evaluación SIMCE Multimodal",
-        icon: <Target className="text-orange-500" />,
-        bg: "bg-orange-50",
-        desc: "Generación de ítems con estímulos visuales complejos e infografías IA. Cumplimiento estricto de tablas de especificaciones MINEDUC y niveles DOK 3-4."
-    },
-    {
         title: "Analítica Predictiva 360",
         icon: <BarChart3 className="text-emerald-500" />,
         bg: "bg-emerald-50",
