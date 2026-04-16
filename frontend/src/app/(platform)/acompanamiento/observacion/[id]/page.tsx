@@ -350,6 +350,7 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <PreObservation
                             onSubmit={(data: any) => handleSave('pre', data)}
+                            initialData={cycle?.observation_data?.find((d: any) => d.stage === 'pre')?.content}
                             lastCommitment={lastCommitment}
                             rubricType={cycle?.rubric_type || 'curricular'}
                         />
@@ -358,21 +359,26 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
 
                 {activeStage === 'execution' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {cycle?.rubric_type === 'convivencia' ? (
-                            <ConvivenciaMatrix
-                                onSubmit={(data: any) => handleSave('execution', data)}
-                                initialData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
-                                lastCommitment={lastCommitment}
-                                teacherFocus={cycle?.teacher_declared_focus}
-                            />
-                        ) : (
-                            <FocusMatrix
-                                onSubmit={(data: any) => handleSave('execution', data)}
-                                initialData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
-                                lastCommitment={lastCommitment}
-                                teacherFocus={cycle?.teacher_declared_focus}
-                            />
-                        )}
+                        {/* teacherFocus: prefer stored column, fallback to pre stage content */}
+                        {(() => {
+                            const teacherFocus = cycle?.teacher_declared_focus
+                                || cycle?.observation_data?.find((d: any) => d.stage === 'pre')?.content;
+                            return cycle?.rubric_type === 'convivencia' ? (
+                                <ConvivenciaMatrix
+                                    onSubmit={(data: any) => handleSave('execution', data)}
+                                    initialData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
+                                    lastCommitment={lastCommitment}
+                                    teacherFocus={teacherFocus}
+                                />
+                            ) : (
+                                <FocusMatrix
+                                    onSubmit={(data: any) => handleSave('execution', data)}
+                                    initialData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
+                                    lastCommitment={lastCommitment}
+                                    teacherFocus={teacherFocus}
+                                />
+                            );
+                        })()}
                     </div>
                 )}
 
