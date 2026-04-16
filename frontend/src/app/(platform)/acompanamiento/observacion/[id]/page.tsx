@@ -387,6 +387,7 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
                         <Reflection 
                             onSubmit={(data: any) => handleSave('reflection', data)} 
                             observationData={cycle?.observation_data?.find((d: any) => d.stage === 'execution')?.content}
+                            initialData={cycle?.observation_data?.find((d: any) => d.stage === 'reflection')?.content}
                         />
                     </div>
                 )}
