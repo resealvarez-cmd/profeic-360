@@ -210,24 +210,43 @@ export default function Dashboard360() {
                 const schoolUserEmails = profilesList?.map(p => p.email?.toLowerCase()) || [];
                 const schoolUserIds = profilesList?.map(p => p.id) || [];
 
-                // 2. Fetch Authorized Users (Whitelist)
+                // 2. Fetch ALL Authorized Users (todos los roles actuales)
                 const { data: authorizedList } = await supabase
                     .from('authorized_users')
                     .select('*')
-                    .in('role', ['teacher', 'utp'])
+                    .in('role', ['teacher', 'utp', 'profesor', 'gestion', 'directivo', 'director', 'admin'])
                     .order('full_name', { ascending: true });
 
                 const uMap: Record<string, string> = {};
                 let filteredAuthorized: any[] = [];
 
+                // Build name map from profiles directly (covers observers + teachers)
+                // This ensures all UIDs (teacher_id, observer_id) resolve to a name
+                if (profilesList) {
+                    profilesList.forEach(profile => {
+                        if (profile.id) {
+                            // Try to enrich with full_name from authorized_users if profile.full_name is empty
+                            let name = profile.full_name;
+                            if (!name && authorizedList) {
+                                const authMatch = authorizedList.find(
+                                    a => a.email?.toLowerCase() === profile.email?.toLowerCase()
+                                );
+                                name = authMatch?.full_name || profile.email;
+                            }
+                            uMap[profile.id] = name || profile.email || 'Sin nombre';
+                        }
+                    });
+                }
+
+                // Build filteredAuthorized for the "new cycle" modal teacher selector
+                // Include teachers/professors roles only
                 if (authorizedList && profilesList) {
-                    filteredAuthorized = authorizedList.filter(auth => 
-                        schoolUserEmails.includes(auth.email?.toLowerCase())
+                    const teacherRoles = ['teacher', 'utp', 'profesor', 'gestion'];
+                    filteredAuthorized = authorizedList.filter(auth =>
+                        schoolUserEmails.includes(auth.email?.toLowerCase()) &&
+                        teacherRoles.includes(auth.role)
                     ).map(auth => {
                         const profile = profilesList.find(p => p.email?.toLowerCase() === auth.email?.toLowerCase());
-                        if (profile && profile.id) {
-                            uMap[profile.id] = profile.full_name || auth.full_name || auth.email;
-                        }
                         return { ...auth, id: profile?.id };
                     }).filter(u => u.id);
                 }
