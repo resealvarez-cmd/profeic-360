@@ -61,6 +61,24 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
             if (cycleData.status === 'in_progress') stage = 'execution';
             if (cycleData.status === 'completed') stage = 'reflection';
 
+            // *** FIX: Load saved observation_data for this cycle ***
+            // Without this, stage tabs stay locked after any page reload
+            const { data: savedStageData } = await supabase
+                .from('observation_data')
+                .select('*')
+                .eq('cycle_id', params.id);
+
+            if (savedStageData && savedStageData.length > 0) {
+                cycleData.observation_data = savedStageData;
+
+                // Determine the real active stage from saved data (not just status)
+                const hasExecution = savedStageData.some((d: any) => d.stage === 'execution');
+                const hasReflection = savedStageData.some((d: any) => d.stage === 'reflection');
+                if (hasReflection || cycleData.status === 'completed') stage = 'reflection';
+                else if (hasExecution) stage = 'reflection'; // Move to reflection if execution saved
+                else stage = 'execution'; // Move to execution if pre already saved
+            }
+
             setActiveStage(stage);
             setCycle(cycleData);
 
