@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { ChevronDown, Sparkles, CheckCircle2, Bookmark, Target, Loader2, ArrowRight, Trophy } from "lucide-react";
+import { ChevronDown, Sparkles, CheckCircle2, Bookmark, Target, Loader2, ArrowRight, Trophy, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogroBanner, TipoLogro } from "@/components/dashboard/LogroBanner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -48,50 +48,64 @@ export function TrackerCobertura() {
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://profeic-backend-484019506864.us-central1.run.app";
 
-    useEffect(() => {
-        const fetchCoverage = async () => {
-            if (!userId) {
-                setLoadingRecords(false);
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from("cobertura_curricular")
-                .select("*")
-                .eq("user_id", userId);
-
-            if (data && !error) {
-                setRecords(data);
-
-                // Extraer combinaciones únicas de Nivel + Asignatura
-                const uniqueCoursesMap = new Map();
-                data.forEach(r => {
-                    const key = `${r.nivel}|||${r.asignatura}`;
-                    if (!uniqueCoursesMap.has(key)) {
-                        uniqueCoursesMap.set(key, { nivel: r.nivel, asignatura: r.asignatura });
-                    }
-                });
-
-                const coursesArray = Array.from(uniqueCoursesMap.values());
-                setCourses(coursesArray);
-            }
+    // ─── Función de carga separada para poder llamarla manualmente (refresh) ───
+    const fetchCoverage = useCallback(async () => {
+        if (!userId) {
             setLoadingRecords(false);
+            return;
+        }
 
-            // Cargar logros existentes (tabla puede no existir aún en producción)
-            try {
-                const { data: logros, error: logrosError } = await supabase
-                    .from("logros_usuario")
-                    .select("tipo_logro, asignatura, nivel")
-                    .eq("user_id", userId);
-                if (logros && !logrosError) {
-                    setLogrosObtenidos(new Set(logros.map((l: any) => `${l.tipo_logro}|${l.asignatura}|${l.nivel}`)));
+        setLoadingRecords(true);
+        const { data, error } = await supabase
+            .from("cobertura_curricular")
+            .select("*")
+            .eq("user_id", userId);
+
+        if (data && !error) {
+            setRecords(data);
+
+            const uniqueCoursesMap = new Map();
+            data.forEach(r => {
+                const key = `${r.nivel}|||${r.asignatura}`;
+                if (!uniqueCoursesMap.has(key)) {
+                    uniqueCoursesMap.set(key, { nivel: r.nivel, asignatura: r.asignatura });
                 }
-            } catch (_) {
-                // La tabla logros_usuario aún no existe en este entorno — continúa sin logros
+            });
+
+            const coursesArray = Array.from(uniqueCoursesMap.values());
+            setCourses(coursesArray);
+        }
+        setLoadingRecords(false);
+
+        try {
+            const { data: logros, error: logrosError } = await supabase
+                .from("logros_usuario")
+                .select("tipo_logro, asignatura, nivel")
+                .eq("user_id", userId);
+            if (logros && !logrosError) {
+                setLogrosObtenidos(new Set(logros.map((l: any) => `${l.tipo_logro}|${l.asignatura}|${l.nivel}`)));
             }
-        };
+        } catch (_) {
+            // La tabla logros_usuario aún no existe en este entorno
+        }
+    }, [userId]);
+
+    // Bug fix: userId como dependencia + suscripción en tiempo real
+    useEffect(() => {
         fetchCoverage();
-    }, []);
+
+        if (!userId) return;
+        const channel = supabase
+            .channel(`cobertura-${userId}`)
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'cobertura_curricular', filter: `user_id=eq.${userId}` },
+                () => { fetchCoverage(); }
+            )
+            .subscribe();
+
+        return () => { supabase.removeChannel(channel); };
+    }, [userId, fetchCoverage]);
 
     // Cada vez que cambia el curso seleccionado, traer OAs oficiales
     useEffect(() => {
@@ -237,8 +251,16 @@ export function TrackerCobertura() {
                         <span>Mi Cobertura</span>
                     </div>
 
-                    {/* Dropdown de cursos */}
-                    <div className="relative">
+                    <div className="flex items-center gap-2">
+                        {/* Botón de refresco manual */}
+                        <button
+                            onClick={fetchCoverage}
+                            disabled={loadingRecords}
+                            title="Actualizar datos"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-[#2b546e] hover:bg-white border border-transparent hover:border-slate-200 transition-all disabled:opacity-40"
+                        >
+                            <RefreshCw size={14} className={loadingRecords ? 'animate-spin' : ''} />
+                        </button>
                         <button
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                             className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:border-slate-300 transition-colors shadow-sm"
