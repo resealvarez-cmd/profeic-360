@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     BookOpen, Layers, ArrowRight, ArrowLeft,
     CheckCircle, Target, Sparkles, Download,
-    RefreshCcw, AlertTriangle, FileText, GripVertical, ChevronDown, Edit3, Settings2
+    RefreshCcw, AlertTriangle, FileText, GripVertical, ChevronDown, Edit3, Settings2, PenLine
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
@@ -529,19 +529,26 @@ export default function LecturaInteligente() {
                                         <div className="flex-1 flex items-center gap-3">
                                             <span className="bg-[#1a2e3b] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0">{idx + 1}</span>
 
-                                            <select
-                                                value={q.nivel_taxonomico}
-                                                onChange={(e) => updateQuestionField(q.id, 'nivel_taxonomico', e.target.value)}
-                                                className={cn("px-3 py-1.5 rounded-lg border text-xs font-bold outline-none",
-                                                    q.nivel_taxonomico?.includes("Nivel I") ? "bg-green-50 text-green-700 border-green-200" :
-                                                        q.nivel_taxonomico?.includes("Nivel II") ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
-                                                            "bg-red-50 text-red-700 border-red-200"
-                                                )}
-                                            >
-                                                <option value="Nivel I (Local)">Nivel I (Local)</option>
-                                                <option value="Nivel II (Relacional)">Nivel II (Relacional)</option>
-                                                <option value="Nivel III (Reflexivo)">Nivel III (Reflexivo)</option>
-                                            </select>
+                                            {/* Badge tipo */}
+                                            {q.tipo === 'desarrollo' ? (
+                                                <span className="px-3 py-1.5 rounded-lg border text-xs font-bold bg-purple-50 text-purple-700 border-purple-200 flex items-center gap-1">
+                                                    <PenLine size={12} /> Desarrollo
+                                                </span>
+                                            ) : (
+                                                <select
+                                                    value={q.nivel_taxonomico}
+                                                    onChange={(e) => updateQuestionField(q.id, 'nivel_taxonomico', e.target.value)}
+                                                    className={cn("px-3 py-1.5 rounded-lg border text-xs font-bold outline-none",
+                                                        q.nivel_taxonomico?.includes("Nivel I") ? "bg-green-50 text-green-700 border-green-200" :
+                                                            q.nivel_taxonomico?.includes("Nivel II") ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                                                                "bg-red-50 text-red-700 border-red-200"
+                                                    )}
+                                                >
+                                                    <option value="Nivel I (Local)">Nivel I (Local)</option>
+                                                    <option value="Nivel II (Relacional)">Nivel II (Relacional)</option>
+                                                    <option value="Nivel III (Reflexivo)">Nivel III (Reflexivo)</option>
+                                                </select>
+                                            )}
                                         </div>
                                         <button
                                             onClick={() => handleRegenerarPregunta(q.id, q.nivel_taxonomico)}
@@ -560,31 +567,79 @@ export default function LecturaInteligente() {
                                             placeholder="Texto de la pregunta..."
                                         />
 
-                                        <div className="space-y-2">
-                                            {q.alternativas?.map((alt: string, aIdx: number) => {
-                                                const isCorrect = q.respuesta_correcta === alt ||
-                                                    q.respuesta_correcta?.startsWith(String.fromCharCode(65 + aIdx)) ||
-                                                    q.respuesta_correcta?.toLowerCase().includes(`opcion ${String.fromCharCode(97 + aIdx)}`) ||
-                                                    q.respuesta_correcta?.toLowerCase().includes(`opción ${String.fromCharCode(97 + aIdx)}`);
+                                        {/* SELECCIÓN MÚLTIPLE */}
+                                        {q.tipo !== 'desarrollo' && (
+                                            <div className="space-y-2">
+                                                {q.alternativas?.map((alt: string, aIdx: number) => {
+                                                    const isCorrect = q.respuesta_correcta === alt ||
+                                                        q.respuesta_correcta?.startsWith(String.fromCharCode(65 + aIdx)) ||
+                                                        q.respuesta_correcta?.toLowerCase().includes(`opcion ${String.fromCharCode(97 + aIdx)}`) ||
+                                                        q.respuesta_correcta?.toLowerCase().includes(`opción ${String.fromCharCode(97 + aIdx)}`);
 
-                                                return (
-                                                    <div key={aIdx} className="flex items-center gap-3">
-                                                        <button
-                                                            onClick={() => updateQuestionField(q.id, 'respuesta_correcta', alt)}
-                                                            className={cn("w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 transition-colors cursor-pointer", isCorrect ? "bg-green-500 text-white border-green-600" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}
-                                                        >
-                                                            {String.fromCharCode(65 + aIdx)}
-                                                        </button>
-                                                        <input
-                                                            type="text"
-                                                            value={alt}
-                                                            onChange={(e) => updateAlternative(q.id, aIdx, e.target.value)}
-                                                            className={cn("flex-1 p-2.5 rounded-lg border outline-none text-sm transition-colors", isCorrect ? "border-green-300 bg-green-50/30 font-medium" : "border-slate-200 bg-white focus:border-[#4a6b8c]")}
-                                                        />
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
+                                                    return (
+                                                        <div key={aIdx} className="flex items-center gap-3">
+                                                            <button
+                                                                onClick={() => updateQuestionField(q.id, 'respuesta_correcta', alt)}
+                                                                className={cn("w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 transition-colors cursor-pointer", isCorrect ? "bg-green-500 text-white border-green-600" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}
+                                                            >
+                                                                {String.fromCharCode(65 + aIdx)}
+                                                            </button>
+                                                            <input
+                                                                type="text"
+                                                                value={alt}
+                                                                onChange={(e) => updateAlternative(q.id, aIdx, e.target.value)}
+                                                                className={cn("flex-1 p-2.5 rounded-lg border outline-none text-sm transition-colors", isCorrect ? "border-green-300 bg-green-50/30 font-medium" : "border-slate-200 bg-white focus:border-[#4a6b8c]")}
+                                                            />
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* DESARROLLO: campo de respuesta esperada + rúbrica */}
+                                        {q.tipo === 'desarrollo' && (
+                                            <div className="space-y-3">
+                                                {/* Rúbrica colapsable */}
+                                                {q.rubrica && (
+                                                    <details className="group">
+                                                        <summary className="cursor-pointer list-none flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100 hover:bg-purple-100 transition-colors">
+                                                            <span className="text-xs font-black text-purple-700 uppercase tracking-widest flex items-center gap-2">
+                                                                📊 Rúbrica de Evaluación — {q.rubrica.criterio}
+                                                            </span>
+                                                            <ChevronDown size={14} className="text-purple-400 group-open:rotate-180 transition-transform" />
+                                                        </summary>
+                                                        <div className="mt-2 overflow-x-auto">
+                                                            <table className="w-full text-xs border-collapse">
+                                                                <thead>
+                                                                    <tr>
+                                                                        {q.rubrica.niveles.map((n: any) => (
+                                                                            <th key={n.nivel} className={cn(
+                                                                                "p-2 text-center font-black uppercase tracking-wider border",
+                                                                                n.nivel === 4 ? "bg-green-100 text-green-800 border-green-200" :
+                                                                                n.nivel === 3 ? "bg-blue-100 text-blue-800 border-blue-200" :
+                                                                                n.nivel === 2 ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
+                                                                                "bg-red-100 text-red-800 border-red-200"
+                                                                            )}>
+                                                                                {n.nivel} — {n.label}
+                                                                            </th>
+                                                                        ))}
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        {q.rubrica.niveles.map((n: any) => (
+                                                                            <td key={n.nivel} className="p-3 align-top border border-slate-100 text-slate-600 leading-relaxed">
+                                                                                {n.descriptor}
+                                                                            </td>
+                                                                        ))}
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </details>
+                                                )}
+                                            </div>
+                                        )}
 
                                         <div className="bg-[#f2ae60]/10 border border-[#f2ae60]/30 rounded-xl p-4 mt-4">
                                             <label className="text-xs font-bold text-[#f2ae60] uppercase mb-1 block">Justificación Pedagógica</label>

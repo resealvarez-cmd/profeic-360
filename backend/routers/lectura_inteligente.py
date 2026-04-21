@@ -40,10 +40,12 @@ class GenerarPreguntasRequest(BaseModel):
 
 class PreguntaContexto(BaseModel):
     nivel_taxonomico: str
+    tipo: str = "seleccion_multiple"  # 'seleccion_multiple' | 'desarrollo'
     pregunta: str
-    alternativas: List[str]
-    respuesta_correcta: str
+    alternativas: Optional[List[str]] = None
+    respuesta_correcta: Optional[str] = None
     justificacion: str
+    rubrica: Optional[dict] = None  # Solo para preguntas de desarrollo
 
 class RegenerarPreguntaRequest(BaseModel):
     nivel: str
@@ -120,9 +122,10 @@ async def generar_preguntas(request: GenerarPreguntasRequest):
             generation_config={"response_mime_type": "application/json"}
         )
 
-        n1 = int(round(request.num_preguntas * 0.3))
-        n2 = int(round(request.num_preguntas * 0.4))
-        n3 = request.num_preguntas - n1 - n2
+        n1 = max(1, int(round((request.num_preguntas - 2) * 0.3)))
+        n2 = max(1, int(round((request.num_preguntas - 2) * 0.4)))
+        n3 = max(1, (request.num_preguntas - 2) - n1 - n2)
+        n_desarrollo = 2  # Siempre 2 preguntas de desarrollo
 
         prompt = f"""
         ACTÚA COMO: Evaluador experto en diseño instruccional y construcción de instrumentos de evaluación.
@@ -135,23 +138,47 @@ async def generar_preguntas(request: GenerarPreguntasRequest):
         "{request.texto}"
         
         TAREA:
-        A partir del TEXTO BASE proporcionado, diseña {request.num_preguntas} ítems (preguntas) de selección múltiple con 4 alternativas (A, B, C, D) cada uno.
+        A partir del TEXTO BASE, diseña {request.num_preguntas} ítems en total:
         
-        DISTRIBUCIÓN TAXONÓMICA EXIGIDA:
+        PARTE 1 - SELECCIÓN MÚLTIPLE ({request.num_preguntas - n_desarrollo} preguntas con 4 alternativas A, B, C, D):
+        DISTRIBUCIÓN TAXONÓMICA:
         - {n1} preguntas de Nivel I (Local / Extracción de información explícita).
         - {n2} preguntas de Nivel II (Relacional / Inferencia, relación de ideas).
         - {n3} preguntas de Nivel III (Reflexivo / Evaluación, propósito, reflexión crítica).
         
-        FORMATO DE SALIDA DEBE SER ESTRICTAMENTE JSON:
+        PARTE 2 - DESARROLLO ({n_desarrollo} preguntas abiertas de alto nivel cognitivo, Nivel III):
+        Genera preguntas que exijan al estudiante construir una respuesta escrita fundamentada (mínimo 3-5 oraciones).
+        Cada pregunta de desarrollo DEBE incluir una rúbrica de evaluación con 4 niveles de desempeño.
+        
+        FORMATO DE SALIDA JSON ESTRICTO:
         {{
             "preguntas": [
                 {{
                     "id": "1",
-                    "nivel_taxonomico": "Nivel I (Local)", 
+                    "tipo": "seleccion_multiple",
+                    "nivel_taxonomico": "Nivel I (Local)",
                     "pregunta": "Texto de la pregunta...",
                     "alternativas": ["opcion A", "opcion B", "opcion C", "opcion D"],
                     "respuesta_correcta": "opcion C",
-                    "justificacion": "Explicación pedagógica de por qué esta es la respuesta correcta basada en el texto y el OA..."
+                    "justificacion": "Explicación pedagógica..."
+                }},
+                {{
+                    "id": "{request.num_preguntas - 1}",
+                    "tipo": "desarrollo",
+                    "nivel_taxonomico": "Nivel III (Reflexivo)",
+                    "pregunta": "Texto de la pregunta de desarrollo...",
+                    "alternativas": null,
+                    "respuesta_correcta": null,
+                    "justificacion": "Criterio pedagógico de esta pregunta abierta...",
+                    "rubrica": {{
+                        "criterio": "Nombre del criterio principal de evaluación",
+                        "niveles": [
+                            {{"nivel": 4, "label": "Logrado", "descriptor": "Descripción del desempeño óptimo..."}},
+                            {{"nivel": 3, "label": "Medianamente Logrado", "descriptor": "Descripción del desempeño aceptable..."}},
+                            {{"nivel": 2, "label": "Por Lograr", "descriptor": "Descripción del desempeño insuficiente..."}},
+                            {{"nivel": 1, "label": "No Logrado", "descriptor": "Descripción del desempeño mínimo..."}}
+                        ]
+                    }}
                 }}
             ]
         }}
@@ -160,7 +187,6 @@ async def generar_preguntas(request: GenerarPreguntasRequest):
         response = await model.generate_content_async(prompt)
         resultado = response.text.strip()
         
-        # Limpieza robusta
         if resultado.startswith("```"):
             resultado = resultado.replace("```json", "").replace("```", "").strip()
             
