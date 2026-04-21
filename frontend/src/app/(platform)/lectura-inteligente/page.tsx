@@ -459,7 +459,7 @@ export default function LecturaInteligente() {
                                 )}
 
                                 {/* Input para agregar criterio */}
-                                {criteriosRubrica.length < 4 && (
+                                {criteriosRubrica.length < 6 && (
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
@@ -489,8 +489,8 @@ export default function LecturaInteligente() {
                                     </div>
                                 )}
 
-                                {criteriosRubrica.length >= 4 && (
-                                    <p className="text-xs text-slate-400 italic text-center mt-1">Máximo 4 criterios por rúbrica.</p>
+                                {criteriosRubrica.length >= 6 && (
+                                    <p className="text-xs text-slate-400 italic text-center mt-1">Máximo 6 criterios por rúbrica.</p>
                                 )}
 
                                 {criteriosRubrica.length === 0 && (
