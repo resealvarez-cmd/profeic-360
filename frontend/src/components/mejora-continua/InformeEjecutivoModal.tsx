@@ -32,6 +32,10 @@ export default function InformeEjecutivoModal({ dashboardData }: { dashboardData
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerate = async () => {
+    if (!dashboardData || dashboardData.length === 0) {
+      alert("No hay metas estratégicas para analizar. Agregue metas al PME para que la IA disponga de información analítica.");
+      return;
+    }
     setIsLoading(true);
     setInforme(null);
     try {
@@ -181,9 +185,11 @@ export default function InformeEjecutivoModal({ dashboardData }: { dashboardData
               </p>
               <Button 
                 onClick={handleGenerate} 
-                className="bg-slate-900 hover:bg-black text-white h-12 px-10 text-base font-bold rounded-2xl shadow-xl transition-all hover:-translate-y-1 active:scale-95 flex items-center gap-3"
+                className={`h-12 px-10 text-base font-bold rounded-2xl shadow-xl transition-all flex items-center gap-3 ${dashboardData?.length > 0 ? "bg-slate-900 hover:bg-black text-white hover:-translate-y-1 active:scale-95" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`}
+                disabled={!dashboardData || dashboardData.length === 0}
               >
-                <Sparkles className="w-5 h-5 text-amber-400" /> Generar Informe Directivo
+                <Sparkles className={`w-5 h-5 ${dashboardData?.length > 0 ? "text-amber-400" : "text-slate-400"}`} /> 
+                {dashboardData?.length > 0 ? "Generar Informe Directivo" : "Requiere metas en el PME"}
               </Button>
             </div>
           )}

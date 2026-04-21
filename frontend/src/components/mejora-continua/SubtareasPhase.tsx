@@ -174,7 +174,7 @@ export default function SubtareasPhase({ phaseId, profiles }: Props) {
                             onChange={(e) => setNewAssignee(e.target.value)}
                         >
                             <option value="">SIN ASIGNAR</option>
-                            {profiles.filter(p => ['admin', 'director', 'utp', 'sostenedor'].includes(p.role?.toLowerCase())).map(p => (
+                            {profiles.filter(p => ['admin', 'director', 'directivo', 'utp', 'gestion', 'sostenedor'].includes(p.role?.toLowerCase())).map(p => (
                                 <option key={p.id} value={p.id}>{p.full_name || p.email}</option>
                             ))}
                         </select>

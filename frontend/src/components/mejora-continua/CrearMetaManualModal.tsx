@@ -42,7 +42,7 @@ export default function CrearMetaManualModal() {
 
   useEffect(() => {
     async function loadData() {
-      const { data: authUsers } = await supabase.from('authorized_users').select('email').in('role', ['admin', 'director', 'utp']);
+      const { data: authUsers } = await supabase.from('authorized_users').select('email').in('role', ['admin', 'director', 'directivo', 'utp', 'gestion']);
       const emails = authUsers?.map(u => u.email) || [];
       const { data: profilesData } = await supabase.from('profiles').select('id, full_name, email').in('email', emails).order('full_name');
       if (profilesData) {

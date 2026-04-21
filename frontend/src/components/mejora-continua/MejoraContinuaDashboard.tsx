@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import CrearMetaManualModal from "@/components/mejora-continua/CrearMetaManualModal";
 import ImportarPMEModal from "@/components/mejora-continua/ImportarPMEModal";
@@ -18,16 +18,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Loader2, Target, Activity, UserCircle2, ChevronDown, Pencil,
   Download, Sparkles, PieChart, Clock, AlertCircle, Link2,
-  Paperclip, FileText, Upload, CheckCircle2, Star, Trophy, Flame
+  Paperclip, FileText, Upload, CheckCircle2, Star, Trophy, Flame,
+  LayoutDashboard, BarChart3, ListChecks, BookOpen, FileBarChart2,
+  PlusCircle, ChevronRight, TrendingUp, AlertTriangle, X, Plus
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 // ---------------------------------------------------------------------------
-// Utilidades
+// Utilities
 // ---------------------------------------------------------------------------
 const DIMENSIONS = ['Gestión Pedagógica', 'Liderazgo', 'Convivencia Escolar', 'Gestión de Recursos'];
+const ALL_LEADERSHIP_ROLES = ["admin", "director", "directivo", "utp", "gestion", "sostenedor"];
 
 const semaphoreColor = (current: number, target: number) => {
   if (!target) return "bg-slate-200";
@@ -42,8 +45,18 @@ const translateStatus = (s: string) => {
   return m[s] || s;
 };
 
+// Derive the canonical status of a goal from its phases
+const getGoalStatus = (goal: StrategicGoal): "pending" | "in_progress" | "completed" => {
+  const phases = goal.implementation_phases || [];
+  if (phases.length === 0) return "pending";
+  const done = phases.filter(p => p.status === "completed").length;
+  if (done === phases.length) return "completed";
+  if (done > 0) return "in_progress";
+  return "pending";
+};
+
 // ---------------------------------------------------------------------------
-// Badge de gamificación
+// GoalBadge
 // ---------------------------------------------------------------------------
 function GoalBadge({ goal, evidenceCount }: { goal: StrategicGoal; evidenceCount: number }) {
   const phases = goal.implementation_phases || [];
@@ -70,7 +83,245 @@ function GoalBadge({ goal, evidenceCount }: { goal: StrategicGoal; evidenceCount
 }
 
 // ---------------------------------------------------------------------------
-// Componente principal
+// KPI Card
+// ---------------------------------------------------------------------------
+function KpiCard({ label, value, sub, accent, icon }: { label: string; value: string | number; sub?: string; accent?: string; icon: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-2 hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+        <div className="p-1.5 bg-slate-50 rounded-lg text-slate-400">{icon}</div>
+      </div>
+      <p className={`text-3xl font-black ${accent || "text-slate-900"}`}>{value}</p>
+      {sub && <p className="text-[10px] text-slate-400 font-medium">{sub}</p>}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Kanban Column
+// ---------------------------------------------------------------------------
+function KanbanColumn({
+  title, color, goals, evidences, pmeMap, canEdit, profiles, mgmtProfiles, onEdit, onExpand, expandedGoals, expandedPhases, setExpandedPhases, handleUpdatePhaseLeader, fetchData, pmeActions
+}: any) {
+  return (
+    <div className="flex flex-col gap-3 min-w-0">
+      <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl ${color}`}>
+        <h3 className="text-[11px] font-black uppercase tracking-widest">{title}</h3>
+        <span className="text-[10px] font-bold opacity-70">{goals.length}</span>
+      </div>
+      {goals.length === 0 && (
+        <div className="flex-1 flex items-center justify-center py-10 border-2 border-dashed border-slate-200 rounded-xl">
+          <p className="text-xs text-slate-400 font-medium">Sin metas aquí</p>
+        </div>
+      )}
+      <div className="space-y-3">
+        {goals.map((goal: StrategicGoal) => {
+          const goalEvidences = evidences.filter((e: any) => e.goal_id === goal.id);
+          const phasesDone = (goal.implementation_phases || []).filter(p => p.status === "completed").length;
+          const phasesTotal = (goal.implementation_phases || []).length;
+          const pct = phasesTotal > 0 ? Math.round((phasesDone / phasesTotal) * 100) : 0;
+          const isExpanded = expandedGoals[goal.id];
+
+          return (
+            <div key={goal.id} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-200 transition-all">
+              {/* Card header */}
+              <div
+                className="p-4 cursor-pointer flex items-start gap-3"
+                onClick={() => onExpand(goal.id)}
+              >
+                <div className={`mt-1 w-2.5 h-2.5 rounded-full shrink-0 ${pct === 100 ? "bg-emerald-500" : pct >= 50 ? "bg-amber-400" : "bg-blue-400"}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="text-sm font-bold text-slate-900 leading-snug">{goal.title}</h4>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {canEdit && (
+                        <button
+                          onClick={e => { e.stopPropagation(); onEdit(goal); }}
+                          className="p-1 text-slate-300 hover:text-blue-500 transition-colors rounded"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                      )}
+                      <ChevronDown className={`w-4 h-4 text-slate-300 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                    </div>
+                  </div>
+
+                  {/* Badges */}
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {goal.pme_action_link && pmeMap[goal.pme_action_link] && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-100 uppercase">
+                        🔗 {pmeMap[goal.pme_action_link].dimension}
+                      </span>
+                    )}
+                    <GoalBadge goal={goal} evidenceCount={goalEvidences.length} />
+                  </div>
+
+                  {/* Progress bar */}
+                  {phasesTotal > 0 && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all ${pct >= 90 ? "bg-emerald-400" : pct >= 50 ? "bg-amber-400" : "bg-blue-400"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-black text-slate-500 shrink-0">{pct}%</span>
+                      {goalEvidences.length > 0 && (
+                        <span className="flex items-center gap-1 text-[9px] font-black text-violet-600">
+                          <Paperclip className="w-2.5 h-2.5" /> {goalEvidences.length}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Expanded body */}
+              {isExpanded && (
+                <div className="border-t border-slate-100 p-4 space-y-3 bg-slate-50/40">
+                  {goal.description && (
+                    <p className="text-xs text-slate-500 italic leading-relaxed bg-white p-3 rounded-lg border border-slate-100">
+                      "{goal.description}"
+                    </p>
+                  )}
+
+                  {(goal.implementation_phases || []).map((phase: any, pIdx: number) => {
+                    const phaseEvidences = evidences.filter((e: any) => e.phase_id === phase.id);
+                    const isPhaseExpanded = expandedPhases[phase.id];
+
+                    return (
+                      <div key={phase.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        {/* Phase header */}
+                        <div
+                          className={`px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors ${isPhaseExpanded ? "border-b border-slate-100" : ""}`}
+                          onClick={() => setExpandedPhases((prev: any) => ({ ...prev, [phase.id]: !prev[phase.id] }))}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-5 h-5 rounded bg-slate-100 text-[10px] font-bold text-slate-500 flex items-center justify-center shrink-0">{pIdx + 1}</span>
+                            <span className="text-sm font-bold text-slate-700">{phase.title}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {phaseEvidences.length > 0 && (
+                              <span className="flex items-center gap-1 px-2 py-0.5 bg-violet-50 border border-violet-100 rounded-full text-[9px] font-black text-violet-600">
+                                <Paperclip className="w-2.5 h-2.5" /> {phaseEvidences.length}
+                              </span>
+                            )}
+                            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${phase.status === "completed" ? "bg-emerald-100 text-emerald-700" : phase.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-500"}`}>
+                              {translateStatus(phase.status)}
+                            </span>
+                            <span className="text-[9px] font-bold text-slate-400 tabular-nums">
+                              {new Date(phase.end_date).toLocaleDateString("es-CL", { day: "2-digit", month: "short" })}
+                            </span>
+                            <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform ${isPhaseExpanded ? "rotate-180 text-blue-500" : ""}`} />
+                          </div>
+                        </div>
+
+                        {/* Phase body */}
+                        {isPhaseExpanded && (
+                          <div className="p-4 space-y-5">
+                            {/* Evidences */}
+                            <div className="bg-violet-50/60 border border-violet-100 rounded-xl p-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <h6 className="text-[10px] font-black text-violet-700 uppercase tracking-widest flex items-center gap-1.5">
+                                  <Paperclip className="w-3 h-3" /> Evidencias
+                                </h6>
+                                <SubirEvidenciaModal phaseId={phase.id} goalId={goal.id} onSuccess={fetchData} />
+                              </div>
+                              {phaseEvidences.length === 0 ? (
+                                <div className="text-center py-4 border border-dashed border-violet-200 rounded-lg bg-white/50">
+                                  <p className="text-[9px] font-bold text-violet-400 uppercase tracking-widest">Sin documentos cargados</p>
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {phaseEvidences.map((ev: any) => (
+                                    <div key={ev.id} className="flex items-center justify-between p-2.5 bg-white border border-violet-100 rounded-lg hover:border-violet-300 transition-all shadow-sm group">
+                                      <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="p-1.5 bg-violet-100 rounded-lg"><FileText className="w-3.5 h-3.5 text-violet-600" /></div>
+                                        <div className="min-w-0">
+                                          <p className="text-xs font-bold text-slate-900 truncate">{ev.file_name}</p>
+                                          <p className="text-[9px] text-slate-400">{new Date(ev.created_at).toLocaleDateString("es-CL")}</p>
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={async () => {
+                                          const { data } = supabase.storage.from("pme_evidencias").getPublicUrl(ev.file_path);
+                                          window.open(data.publicUrl, "_blank");
+                                        }}
+                                        className="p-1.5 text-slate-300 hover:text-violet-600 transition-colors opacity-0 group-hover:opacity-100"
+                                      >
+                                        <Download className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Responsable */}
+                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                              <UserCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
+                              <div>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Responsable</p>
+                                <select
+                                  value={phase.leader_id || ""}
+                                  onChange={e => handleUpdatePhaseLeader(phase.id, e.target.value)}
+                                  disabled={!canEdit}
+                                  className="text-xs font-bold text-slate-900 bg-transparent border-none p-0 focus:ring-0 cursor-pointer"
+                                >
+                                  <option value="">Sin asignar</option>
+                                  {mgmtProfiles.map((p: any) => <option key={p.id} value={p.id}>{p.full_name || p.email}</option>)}
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Indicators */}
+                            {(phase.indicators || []).length > 0 && (
+                              <div className="space-y-2">
+                                {phase.indicators?.map((ind: any) => (
+                                  <div key={ind.id} className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                    <div className="flex justify-between items-start mb-3 gap-3">
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Indicador</p>
+                                        <p className="text-xs font-bold text-slate-700 leading-snug line-clamp-3">{ind.description}</p>
+                                      </div>
+                                      <div className="shrink-0 mt-1">
+                                        <ActualizarProgresoModal indicator={ind} phaseId={phase.id} />
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                        <div
+                                          className={`h-full ${semaphoreColor(ind.current_value, ind.target_value)} transition-all`}
+                                          style={{ width: `${Math.min((ind.current_value / ind.target_value) * 100, 100)}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-xs font-black text-slate-600">{Math.round((ind.current_value / ind.target_value) * 100)}%</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            <HabilitadoresPhase phaseId={phase.id} enablers={phase.enablers} />
+                            <SubtareasPhase phaseId={phase.id} profiles={profiles} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
 // ---------------------------------------------------------------------------
 export default function MejoraContinuaDashboard() {
   const { isDirectivo, user: authUser, currentSchoolId: authSchoolId } = useAuth();
@@ -86,24 +337,35 @@ export default function MejoraContinuaDashboard() {
   const [pmeActions, setPmeActions] = useState<any[]>([]);
   const [evidences, setEvidences] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<"dashboard" | "analytics" | "goals" | "pme" | "reports">("dashboard");
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
+  const createMenuRef = useRef<HTMLDivElement>(null);
 
   const canEdit = isDirectivo;
   const pmeMap = Object.fromEntries(pmeActions.map(a => [a.id, a]));
 
+  // Close create menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (createMenuRef.current && !createMenuRef.current.contains(e.target as Node)) {
+        setShowCreateMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   // -------------------------------------------------------------------------
-  // Carga de datos
+  // Data loading
   // -------------------------------------------------------------------------
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Obtener school_id
       let schoolId = authSchoolId;
       if (!schoolId && authUser) {
         const { data: pData } = await supabase.from("profiles").select("school_id").eq("id", authUser.id).single();
         if (pData) schoolId = pData.school_id;
       }
 
-      // 2. Cargar metas (sin filtro school_id — lo maneja RLS)
       const { data: goalsRaw, error: goalsError } = await supabase
         .from("strategic_goals")
         .select("*")
@@ -114,8 +376,6 @@ export default function MejoraContinuaDashboard() {
 
       if (typedGoals.length > 0) {
         const goalIds = typedGoals.map(g => g.id);
-
-        // 3. Fases y evidencias en paralelo
         const [phasesRes, evidRes] = await Promise.all([
           supabase.from("implementation_phases").select("*").in("goal_id", goalIds),
           supabase.from("pme_evidences").select("*").in("goal_id", goalIds),
@@ -148,7 +408,6 @@ export default function MejoraContinuaDashboard() {
         setGoals([]);
       }
 
-      // 4. Perfiles
       const [profRes, authRes] = await Promise.all([
         supabase.from("profiles").select("id, full_name, email"),
         supabase.from("authorized_users").select("email, role"),
@@ -156,11 +415,10 @@ export default function MejoraContinuaDashboard() {
       if (profRes.data && authRes.data) {
         setProfiles(profRes.data.map(p => ({
           ...p,
-          role: authRes.data?.find(a => a.email?.toLowerCase() === p.email?.toLowerCase())?.role || "teacher",
+          role: authRes.data?.find(a => a.email?.toLowerCase() === p.email?.toLowerCase())?.role || "profesor",
         })));
       }
 
-      // 5. Acciones PME — con fallback si school_id no existe
       if (schoolId) {
         const { data: pmeFiltered, error: pmeErr } = await supabase
           .from("pme_actions")
@@ -171,7 +429,6 @@ export default function MejoraContinuaDashboard() {
         if (!pmeErr && pmeFiltered && pmeFiltered.length > 0) {
           setPmeActions(pmeFiltered);
         } else {
-          // Fallback: traer todas las acciones sin filtro
           const { data: pmeAll } = await supabase.from("pme_actions").select("*").order("dimension");
           setPmeActions(pmeAll || []);
         }
@@ -215,6 +472,8 @@ export default function MejoraContinuaDashboard() {
     setEditTitle(goal.title);
     setEditDesc(goal.description || "");
     setEditPmeLink(goal.pme_action_link || null);
+    setActiveTab("goals");
+    setTimeout(() => setExpandedGoals(prev => ({ ...prev, [goal.id]: true })), 100);
   };
 
   const saveEdit = async (goalId: string) => {
@@ -222,11 +481,12 @@ export default function MejoraContinuaDashboard() {
     if (!error) { setEditingGoalId(null); fetchData(); }
   };
 
-  const mgmtProfiles = profiles.filter(p => ["admin", "director", "utp", "sostenedor"].includes(p.role?.toLowerCase()));
+  // FIX: Include all leadership roles (new + legacy)
+  const mgmtProfiles = profiles.filter(p => ALL_LEADERSHIP_ROLES.includes(p.role?.toLowerCase()));
   const totalInversion = goals.reduce((acc, g) => acc + (g.implementation_phases?.reduce((pa, p) => pa + (p.enablers?.reduce((ea, e) => ea + (e.estimated_cost || 0), 0) || 0), 0) || 0), 0);
 
   // -------------------------------------------------------------------------
-  // Alertas de vencimiento
+  // Alert data
   // -------------------------------------------------------------------------
   const buildAlerts = () => {
     const now = new Date();
@@ -242,12 +502,30 @@ export default function MejoraContinuaDashboard() {
   };
 
   // -------------------------------------------------------------------------
+  // Dashboard KPIs
+  // -------------------------------------------------------------------------
+  const globalPhasesTotal = goals.reduce((acc, g) => acc + (g.implementation_phases?.length || 0), 0);
+  const globalPhasesDone = goals.reduce((acc, g) => acc + (g.implementation_phases?.filter(p => p.status === "completed").length || 0), 0);
+  const globalPct = globalPhasesTotal > 0 ? Math.round((globalPhasesDone / globalPhasesTotal) * 100) : 0;
+  const overdueAlerts = buildAlerts().filter(a => a.type === "critical").length;
+  const goalsCompleted = goals.filter(g => getGoalStatus(g) === "completed").length;
+
+  // Kanban groups
+  const kanbanGroups = {
+    pending: goals.filter(g => getGoalStatus(g) === "pending"),
+    in_progress: goals.filter(g => getGoalStatus(g) === "in_progress"),
+    completed: goals.filter(g => getGoalStatus(g) === "completed"),
+  };
+
+  const kanbanProps = { evidences, pmeMap, canEdit, profiles, mgmtProfiles, onEdit: startEdit, onExpand: (id: string) => setExpandedGoals(prev => ({ ...prev, [id]: !prev[id] })), expandedGoals, expandedPhases, setExpandedPhases, handleUpdatePhaseLeader, fetchData, pmeActions };
+
+  // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
 
-      {/* NAV */}
+      {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto h-14 px-6 flex items-center justify-between gap-4">
           {/* Logo + tabs */}
@@ -261,62 +539,114 @@ export default function MejoraContinuaDashboard() {
 
             <div className="hidden lg:flex items-center gap-0.5 bg-slate-100 rounded-lg p-0.5">
               {([
-                { id: "dashboard", label: "Dashboard" },
-                { id: "analytics", label: "Analítica" },
-                { id: "goals", label: "Metas" },
-                { id: "pme", label: "Vista PME" },
-                { id: "reports", label: "Reportes" },
+                { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-3 h-3" /> },
+                { id: "analytics", label: "Analítica", icon: <BarChart3 className="w-3 h-3" /> },
+                { id: "goals", label: "Metas", icon: <ListChecks className="w-3 h-3" /> },
+                { id: "pme", label: "Vista PME", icon: <BookOpen className="w-3 h-3" /> },
+                { id: "reports", label: "Reportes", icon: <FileBarChart2 className="w-3 h-3" /> },
               ] as const).map(t => (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`px-3 py-1.5 text-[11px] font-bold rounded-md transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-md transition-all ${
                     activeTab === t.id
                       ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  {t.label}
+                  {t.icon} {t.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Acciones */}
+          {/* Actions */}
           <div className="flex items-center gap-2">
             <PMEGantt goals={goals} profiles={profiles} isAdminView={isDirectivo} currentUserId={authUser?.id} />
-            {canEdit && <ImportarPMEModal />}
-            {canEdit && <CrearMetaManualModal />}
             <CuadroMandoScorecard goals={goals} />
+            {canEdit && (
+              <div className="relative" ref={createMenuRef}>
+                <button
+                  onClick={() => setShowCreateMenu(!showCreateMenu)}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-black transition-all shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Nueva Meta
+                  <ChevronDown className={`w-3 h-3 transition-transform ${showCreateMenu ? "rotate-180" : ""}`} />
+                </button>
+                {showCreateMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="p-2 space-y-0.5">
+                      <div onClick={() => setShowCreateMenu(false)}>
+                        <CrearMetaManualModal />
+                      </div>
+                      <div className="w-full h-px bg-slate-100 my-1" />
+                      <div onClick={() => setShowCreateMenu(false)}>
+                        <ImportarPMEModal />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </nav>
 
-      {/* CONTENIDO */}
+      {/* ── MAIN ── */}
       <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-6 space-y-6">
 
-        {/* ── DASHBOARD ── */}
+        {/* ── DASHBOARD TAB ── */}
         {activeTab === "dashboard" && (
           <>
-            {/* Header + inversión */}
+            {/* Page title */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Gestión Estratégica Institucional</h2>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">Plataforma colaborativa · Mejorando Juntos PME</p>
+                <h2 className="text-xl font-bold text-slate-900">Panel Ejecutivo</h2>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">Gestión Estratégica · Mejorando Juntos PME</p>
               </div>
-              <div className="flex items-center gap-4">
-                {totalInversion > 0 && (
-                  <div className="text-right">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Inversión total</p>
-                    <p className="text-lg font-black text-slate-900">${totalInversion.toLocaleString("es-CL")}</p>
-                  </div>
-                )}
-                <PMEAlertBanner goals={goals} />
-              </div>
+              <PMEAlertBanner goals={goals} />
             </div>
 
-            {/* Alertas vencimiento */}
-            {buildAlerts().length > 0 && (
+            {/* KPI Cards */}
+            {loading ? (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1,2,3,4].map(i => <div key={i} className="h-28 bg-white rounded-2xl border border-slate-100 animate-pulse" />)}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <KpiCard
+                  label="Metas Activas"
+                  value={goals.length}
+                  sub={`${goals.filter(g => g.pme_action_link).length} vinculadas al PME`}
+                  icon={<Target className="w-4 h-4" />}
+                />
+                <KpiCard
+                  label="Avance Global"
+                  value={`${globalPct}%`}
+                  sub={`${globalPhasesDone} de ${globalPhasesTotal} fases completadas`}
+                  accent={globalPct >= 70 ? "text-emerald-600" : globalPct >= 40 ? "text-amber-600" : "text-blue-600"}
+                  icon={<TrendingUp className="w-4 h-4" />}
+                />
+                <KpiCard
+                  label="Fases Vencidas"
+                  value={overdueAlerts}
+                  sub={overdueAlerts > 0 ? "Requieren atención inmediata" : "Todo dentro del plazo ✓"}
+                  accent={overdueAlerts > 0 ? "text-rose-600" : "text-emerald-600"}
+                  icon={<AlertTriangle className="w-4 h-4" />}
+                />
+                <KpiCard
+                  label="Metas Logradas"
+                  value={goalsCompleted}
+                  sub={`${Math.round((goalsCompleted / Math.max(goals.length, 1)) * 100)}% de tasa de cierre`}
+                  accent="text-amber-600"
+                  icon={<Trophy className="w-4 h-4" />}
+                />
+              </div>
+            )}
+
+            {/* Deadline alerts */}
+            {!loading && buildAlerts().length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {buildAlerts().slice(0, 3).map((a, i) => (
                   <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border ${a.type === "critical" ? "bg-rose-50 border-rose-200" : "bg-amber-50 border-amber-200"}`}>
@@ -326,291 +656,183 @@ export default function MejoraContinuaDashboard() {
                         {a.days < 0 ? "Vencido" : `Vence en ${a.days} días`}
                       </p>
                       <p className="text-xs font-bold text-slate-800 truncate">{a.title}</p>
+                      <p className="text-[9px] text-slate-500 truncate">{a.goal}</p>
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {loading ? (
-              <div className="flex flex-col items-center justify-center h-52 gap-3 text-slate-400">
-                <Loader2 className="w-8 h-8 animate-spin" />
-                <p className="text-xs font-bold uppercase tracking-widest">Cargando datos...</p>
+            {/* Analytics charts — only shown when there's indicator progress data */}
+            {!loading && goals.length > 0 && (() => {
+              const hasAnyProgress = goals.some(g =>
+                g.implementation_phases?.some(p =>
+                  p.indicators?.some((i: any) => i.current_value > 0)
+                )
+              );
+              if (!hasAnyProgress) return (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50/40 border border-blue-100 rounded-2xl p-6 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-xl shrink-0">
+                      <BarChart3 className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">La analítica se activará automáticamente</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Registra avances en los indicadores de tus fases para ver gráficos de salud PME, cobertura e inversión.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab("analytics")}
+                    className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors"
+                  >
+                    Ver Analítica
+                  </button>
+                </div>
+              );
+              return <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} />;
+            })()}
+
+            {/* Quick access to goals */}
+            {!loading && goals.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span className="w-1 h-4 bg-blue-600 rounded-full block" />
+                    Metas en Progreso
+                  </h3>
+                  <button
+                    onClick={() => setActiveTab("goals")}
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  >
+                    Ver todas <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="divide-y divide-slate-50">
+                  {kanbanGroups.in_progress.slice(0, 5).map(goal => {
+                    const phasesDone = (goal.implementation_phases || []).filter(p => p.status === "completed").length;
+                    const phasesTotal = (goal.implementation_phases || []).length;
+                    const pct = phasesTotal > 0 ? Math.round((phasesDone / phasesTotal) * 100) : 0;
+                    const goalEvidences = evidences.filter(e => e.goal_id === goal.id);
+
+                    return (
+                      <div
+                        key={goal.id}
+                        onClick={() => { setActiveTab("goals"); setExpandedGoals(p => ({ ...p, [goal.id]: true })); }}
+                        className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 cursor-pointer group transition-colors"
+                      >
+                        <div className={`w-2 h-2 rounded-full shrink-0 ${pct >= 90 ? "bg-emerald-500" : pct >= 50 ? "bg-amber-400" : "bg-blue-400"}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors">{goal.title}</p>
+                          {goal.pme_action_link && pmeMap[goal.pme_action_link] && (
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">{pmeMap[goal.pme_action_link].dimension}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          {goalEvidences.length > 0 && (
+                            <span className="flex items-center gap-1 text-[9px] font-black text-violet-600">
+                              <Paperclip className="w-2.5 h-2.5" /> {goalEvidences.length}
+                            </span>
+                          )}
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div className={`h-full transition-all ${pct >= 90 ? "bg-emerald-400" : pct >= 50 ? "bg-amber-400" : "bg-blue-400"}`} style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-500">{pct}%</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {kanbanGroups.in_progress.length === 0 && (
+                    <div className="px-5 py-8 text-center">
+                      <Activity className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                      <p className="text-sm text-slate-400 font-medium">No hay metas en progreso aún</p>
+                      {canEdit && (
+                        <p className="text-xs text-slate-400 mt-1">Usa "Nueva Meta" para comenzar</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            ) : (
-              <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} />
+            )}
+
+            {/* Empty state */}
+            {!loading && goals.length === 0 && (
+              <div className="text-center py-20 border-2 border-dashed border-slate-200 rounded-2xl bg-white">
+                <Target className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-slate-700 mb-1">Comienza tu Plan Estratégico</h3>
+                <p className="text-sm text-slate-400 mb-6 max-w-xs mx-auto">Crea las primeras metas de tu PME de forma manual o importa el plan completo desde un archivo Excel.</p>
+                {canEdit && (
+                  <div className="flex justify-center gap-3">
+                    <CrearMetaManualModal />
+                    <ImportarPMEModal />
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}
 
-        {/* ── ANALÍTICA ── */}
+        {/* ── ANALYTICS TAB ── */}
         {activeTab === "analytics" && !loading && (
-          <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} />
+          <>
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Analítica Estratégica</h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">Métricas de rendimiento por dimensión y cobertura PME</p>
+            </div>
+            <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} />
+          </>
         )}
 
-        {/* ── METAS ── */}
-        {(activeTab === "goals" || activeTab === "dashboard") && !loading && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <span className="w-1 h-4 bg-blue-600 rounded-full block" />
-                Bitácora de Metas Estratégicas ({goals.length})
-              </h3>
-              <button onClick={() => { setExpandedGoals({}); setExpandedPhases({}); }} className="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1">
+        {/* ── GOALS TAB — KANBAN ── */}
+        {activeTab === "goals" && !loading && (
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Metas Estratégicas</h2>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">{goals.length} metas · Vista Kanban por estado</p>
+              </div>
+              <button
+                onClick={() => setExpandedGoals({})}
+                className="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors"
+              >
                 <ChevronDown className="w-3.5 h-3.5" /> Colapsar todo
               </button>
             </div>
 
             {goals.length === 0 ? (
-              <div className="text-center py-16 border-2 border-dashed border-slate-200 rounded-xl">
+              <div className="text-center py-16 border-2 border-dashed border-slate-200 rounded-xl bg-white">
                 <Activity className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-500 font-semibold text-sm">Sin metas aún</p>
                 <p className="text-slate-400 text-xs mt-1">Importa el PME o crea metas manualmente</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {goals.map(goal => {
-                  const goalEvidences = evidences.filter(e => e.goal_id === goal.id);
-                  const phasesDone = (goal.implementation_phases || []).filter(p => p.status === "completed").length;
-                  const phasesTotal = (goal.implementation_phases || []).length;
-                  const pct = phasesTotal > 0 ? Math.round((phasesDone / phasesTotal) * 100) : 0;
-
-                  return (
-                    <div key={goal.id} className={`bg-white rounded-xl border shadow-sm transition-all ${expandedGoals[goal.id] ? "ring-1 ring-blue-100" : "hover:border-slate-300"} border-slate-200`}>
-                      {/* Cabecera de meta */}
-                      <div
-                        className={`p-4 cursor-pointer flex items-center justify-between gap-3 ${expandedGoals[goal.id] ? "border-b border-slate-100" : ""}`}
-                        onClick={() => setExpandedGoals(prev => ({ ...prev, [goal.id]: !prev[goal.id] }))}
-                      >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {/* Semáforo */}
-                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${pct === 100 ? "bg-emerald-500" : pct >= 50 ? "bg-amber-400" : "bg-blue-400"}`} />
-
-                          {editingGoalId === goal.id ? (
-                            <div className="flex-1 space-y-2" onClick={e => e.stopPropagation()}>
-                              <Input
-                                value={editTitle}
-                                onChange={e => setEditTitle(e.target.value)}
-                                className="h-9 text-sm font-bold text-slate-900 border-blue-300 bg-white"
-                                placeholder="Título del objetivo..."
-                              />
-                              <Textarea
-                                value={editDesc}
-                                onChange={e => setEditDesc(e.target.value)}
-                                className="text-xs text-slate-700 border-blue-200 bg-white"
-                                placeholder="Descripción..."
-                              />
-                              <div className="flex items-center gap-2">
-                                <select
-                                  className="flex-1 text-xs font-semibold text-slate-800 bg-white border border-blue-200 rounded-lg px-2 py-1.5"
-                                  value={editPmeLink || ""}
-                                  onChange={e => setEditPmeLink(e.target.value || null)}
-                                >
-                                  <option value="">-- Sin vinculación PME --</option>
-                                  {pmeActions.map(a => (
-                                    <option key={a.id} value={a.id}>({a.dimension}) {a.title}</option>
-                                  ))}
-                                </select>
-                                <Button size="sm" onClick={() => saveEdit(goal.id)} className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black">Guardar</Button>
-                                <Button size="sm" variant="ghost" onClick={() => setEditingGoalId(null)} className="text-slate-400 text-xs">Cancelar</Button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                                <h4 className="text-sm font-bold text-slate-900 truncate">{goal.title}</h4>
-                                {goal.pme_action_link && pmeMap[goal.pme_action_link] && (
-                                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-100 uppercase">
-                                    🔗 {pmeMap[goal.pme_action_link].dimension}
-                                  </span>
-                                )}
-                                <GoalBadge goal={goal} evidenceCount={goalEvidences.length} />
-                              </div>
-                              {!expandedGoals[goal.id] && (
-                                <div className="flex items-center gap-3 mt-1">
-                                  {phasesTotal > 0 && (
-                                    <div className="flex items-center gap-1.5">
-                                      <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                        <div className={`h-full ${pct >= 90 ? "bg-emerald-400" : pct >= 50 ? "bg-amber-400" : "bg-blue-400"} transition-all`} style={{ width: `${pct}%` }} />
-                                      </div>
-                                      <span className="text-[10px] font-black text-slate-500">{pct}%</span>
-                                    </div>
-                                  )}
-                                  {goalEvidences.length > 0 && (
-                                    <span className="flex items-center gap-1 text-[9px] font-black text-violet-600">
-                                      <Paperclip className="w-2.5 h-2.5" /> {goalEvidences.length} evidencia{goalEvidences.length > 1 ? "s" : ""}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          {canEdit && (
-                            <button
-                              onClick={e => { e.stopPropagation(); startEdit(goal); }}
-                              className="p-1.5 text-slate-300 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${expandedGoals[goal.id] ? "rotate-180 text-blue-600" : ""}`} />
-                        </div>
-                      </div>
-
-                      {/* Cuerpo expandido */}
-                      {expandedGoals[goal.id] && (
-                        <div className="p-4 space-y-4 bg-slate-50/40">
-                          {goal.description && (
-                            <p className="text-xs text-slate-500 italic leading-relaxed bg-white p-3 rounded-lg border border-slate-100">
-                              "{goal.description}"
-                            </p>
-                          )}
-
-                          {/* FASES */}
-                          {(goal.implementation_phases || []).map((phase, pIdx) => {
-                            const phaseEvidences = evidences.filter(e => e.phase_id === phase.id);
-                            return (
-                              <div key={phase.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                                {/* Cabecera de fase */}
-                                <div
-                                  className={`px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors ${expandedPhases[phase.id] ? "border-b border-slate-100" : ""}`}
-                                  onClick={() => setExpandedPhases(prev => ({ ...prev, [phase.id]: !prev[phase.id] }))}
-                                >
-                                  <div className="flex items-center gap-2.5">
-                                    <span className="w-5 h-5 rounded bg-slate-100 text-[10px] font-bold text-slate-500 flex items-center justify-center shrink-0">{pIdx + 1}</span>
-                                    <span className="text-sm font-bold text-slate-700">{phase.title}</span>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                    {/* Contador evidencias */}
-                                    {phaseEvidences.length > 0 && (
-                                      <span className="flex items-center gap-1 px-2 py-0.5 bg-violet-50 border border-violet-100 rounded-full text-[9px] font-black text-violet-600">
-                                        <Paperclip className="w-2.5 h-2.5" /> {phaseEvidences.length}
-                                      </span>
-                                    )}
-                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${phase.status === "completed" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
-                                      {translateStatus(phase.status)}
-                                    </span>
-                                    <span className="text-[9px] font-bold text-slate-400 tabular-nums">
-                                      {new Date(phase.end_date).toLocaleDateString("es-CL", { day: "2-digit", month: "short" })}
-                                    </span>
-                                    <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform ${expandedPhases[phase.id] ? "rotate-180 text-blue-500" : ""}`} />
-                                  </div>
-                                </div>
-
-                                {/* Cuerpo de fase */}
-                                {expandedPhases[phase.id] && (
-                                  <div className="p-4 space-y-5">
-
-                                    {/* ── EVIDENCIAS ── */}
-                                    <div className="bg-violet-50/60 border border-violet-100 rounded-xl p-4">
-                                      <div className="flex items-center justify-between mb-3">
-                                        <h6 className="text-[10px] font-black text-violet-700 uppercase tracking-widest flex items-center gap-1.5">
-                                          <Paperclip className="w-3 h-3" /> Evidencias de Cumplimiento
-                                        </h6>
-                                        {/* Botón prominente para subir */}
-                                        <SubirEvidenciaModal
-                                          phaseId={phase.id}
-                                          goalId={goal.id}
-                                          onSuccess={fetchData}
-                                        />
-                                      </div>
-
-                                      {phaseEvidences.length === 0 ? (
-                                        <div className="text-center py-5 border border-dashed border-violet-200 rounded-lg bg-white/50">
-                                          <Upload className="w-6 h-6 text-violet-300 mx-auto mb-2" />
-                                          <p className="text-[9px] font-bold text-violet-400 uppercase tracking-widest">Sin documentos cargados</p>
-                                          <p className="text-[9px] text-slate-400 mt-0.5">Usa el botón "Subir" para agregar evidencias</p>
-                                        </div>
-                                      ) : (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                          {phaseEvidences.map(ev => (
-                                            <div key={ev.id} className="flex items-center justify-between p-2.5 bg-white border border-violet-100 rounded-lg hover:border-violet-300 transition-all shadow-sm group">
-                                              <div className="flex items-center gap-2.5 min-w-0">
-                                                <div className="p-1.5 bg-violet-100 rounded-lg"><FileText className="w-3.5 h-3.5 text-violet-600" /></div>
-                                                <div className="min-w-0">
-                                                  <p className="text-xs font-bold text-slate-900 truncate">{ev.file_name}</p>
-                                                  <p className="text-[9px] text-slate-400">{new Date(ev.created_at).toLocaleDateString("es-CL")}</p>
-                                                </div>
-                                              </div>
-                                              <button
-                                                onClick={async () => {
-                                                  const { data } = supabase.storage.from("pme_evidencias").getPublicUrl(ev.file_path);
-                                                  window.open(data.publicUrl, "_blank");
-                                                }}
-                                                className="p-1.5 text-slate-300 hover:text-violet-600 transition-colors opacity-0 group-hover:opacity-100"
-                                              >
-                                                <Download className="w-4 h-4" />
-                                              </button>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    {/* Responsable */}
-                                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                      <UserCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-                                      <div>
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Responsable</p>
-                                        <select
-                                          value={phase.leader_id || ""}
-                                          onChange={e => handleUpdatePhaseLeader(phase.id, e.target.value)}
-                                          disabled={!canEdit}
-                                          className="text-xs font-bold text-slate-900 bg-transparent border-none p-0 focus:ring-0 cursor-pointer"
-                                        >
-                                          <option value="">Sin asignar</option>
-                                          {mgmtProfiles.map(p => <option key={p.id} value={p.id}>{p.full_name || p.email}</option>)}
-                                        </select>
-                                      </div>
-                                    </div>
-
-                                    {/* Indicadores */}
-                                    {(phase.indicators || []).length > 0 && (
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {phase.indicators?.map((ind: any) => (
-                                          <div key={ind.id} className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                            <div className="flex justify-between items-start mb-3">
-                                              <div>
-                                                <p className="text-[9px] font-black text-blue-600 uppercase">Indicador</p>
-                                                <p className="text-xs font-bold text-slate-700 leading-tight mt-0.5">{ind.description}</p>
-                                              </div>
-                                              <ActualizarProgresoModal indicator={ind} phaseId={phase.id} />
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                              <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                                <div
-                                                  className={`h-full ${semaphoreColor(ind.current_value, ind.target_value)} transition-all`}
-                                                  style={{ width: `${Math.min((ind.current_value / ind.target_value) * 100, 100)}%` }}
-                                                />
-                                              </div>
-                                              <span className="text-xs font-black text-slate-600">{Math.round((ind.current_value / ind.target_value) * 100)}%</span>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-
-                                    <HabilitadoresPhase phaseId={phase.id} enablers={phase.enablers} />
-                                    <SubtareasPhase phaseId={phase.id} profiles={profiles} />
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+                <KanbanColumn
+                  title={`⬜ Pendiente (${kanbanGroups.pending.length})`}
+                  color="bg-slate-100 text-slate-600"
+                  goals={kanbanGroups.pending}
+                  {...kanbanProps}
+                />
+                <KanbanColumn
+                  title={`🔵 En Curso (${kanbanGroups.in_progress.length})`}
+                  color="bg-blue-600 text-white"
+                  goals={kanbanGroups.in_progress}
+                  {...kanbanProps}
+                />
+                <KanbanColumn
+                  title={`✅ Logradas (${kanbanGroups.completed.length})`}
+                  color="bg-emerald-600 text-white"
+                  goals={kanbanGroups.completed}
+                  {...kanbanProps}
+                />
               </div>
             )}
           </section>
         )}
 
-        {/* ── VISTA PME ── */}
+        {/* ── PME TAB ── */}
         {activeTab === "pme" && !loading && (
           <section className="space-y-6">
             <div className="flex items-center justify-between">
@@ -631,13 +853,9 @@ export default function MejoraContinuaDashboard() {
                 <Link2 className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                 <h3 className="text-base font-bold text-slate-700">No hay acciones PME importadas</h3>
                 <p className="text-sm text-slate-400 mt-1 max-w-xs mx-auto">
-                  Usa el botón "Importar PME" (arriba a la derecha) para cargar las acciones desde tu archivo XLSX.
+                  Usa el botón "Nueva Meta → Importar PME" para cargar las acciones desde tu archivo XLSX.
                 </p>
-                {canEdit && (
-                  <div className="mt-4 flex justify-center">
-                    <ImportarPMEModal />
-                  </div>
-                )}
+                {canEdit && <div className="mt-4 flex justify-center"><ImportarPMEModal /></div>}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5 items-start">
@@ -645,12 +863,10 @@ export default function MejoraContinuaDashboard() {
                   const dimActions = pmeActions.filter(a => a.dimension === dim);
                   return (
                     <div key={dim} className="space-y-3">
-                      {/* Header dimensión */}
                       <div className="bg-slate-900 text-white px-4 py-2.5 rounded-xl text-center">
                         <h3 className="font-black text-[10px] uppercase tracking-widest">{dim}</h3>
                         <p className="text-[9px] text-slate-400 mt-0.5">{dimActions.length} acción{dimActions.length !== 1 ? "es" : ""}</p>
                       </div>
-
                       {dimActions.length === 0 ? (
                         <div className="p-4 text-center border-2 border-dashed border-slate-200 rounded-xl">
                           <p className="text-xs text-slate-400">Sin acciones</p>
@@ -667,7 +883,6 @@ export default function MejoraContinuaDashboard() {
                                   : "border-slate-200 hover:border-blue-200"
                               }`}
                             >
-                              {/* Badge crítico + toggle */}
                               <div className="flex items-start justify-between mb-3">
                                 {action.is_critical ? (
                                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[8px] font-black bg-amber-100 text-amber-700 uppercase tracking-tight">
@@ -686,12 +901,9 @@ export default function MejoraContinuaDashboard() {
                                   </button>
                                 )}
                               </div>
-
                               <h4 className={`font-bold text-xs leading-snug uppercase tracking-tight mb-3 ${action.is_critical ? "text-amber-900" : "text-slate-900"}`}>
                                 {action.title}
                               </h4>
-
-                              {/* Metas vinculadas */}
                               {linkedGoals.length > 0 && (
                                 <div className="space-y-1.5 pt-3 border-t border-slate-100">
                                   {linkedGoals.map(lg => (
@@ -714,7 +926,7 @@ export default function MejoraContinuaDashboard() {
                   );
                 })}
 
-                {/* Columna sin vincular */}
+                {/* Unlinked column */}
                 <div className="space-y-3">
                   <div className="bg-rose-600 text-white px-4 py-2.5 rounded-xl text-center">
                     <h3 className="font-black text-[10px] uppercase tracking-widest">Por Vincular</h3>
@@ -739,7 +951,7 @@ export default function MejoraContinuaDashboard() {
           </section>
         )}
 
-        {/* ── REPORTES ── */}
+        {/* ── REPORTS TAB ── */}
         {activeTab === "reports" && (
           <section className="space-y-6">
             <div>
@@ -755,7 +967,6 @@ export default function MejoraContinuaDashboard() {
                 <p className="text-xs text-slate-500 leading-relaxed">Copia vectorial del plan estratégico para carpetas técnicas y directivos.</p>
                 <PMEGantt goals={goals} profiles={profiles} isAdminView={isDirectivo} currentUserId={authUser?.id} />
               </div>
-
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-200 hover:shadow-md transition-all space-y-4">
                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                   <Activity className="w-5 h-5 text-blue-600" />
@@ -764,7 +975,6 @@ export default function MejoraContinuaDashboard() {
                 <p className="text-xs text-slate-500 leading-relaxed">Análisis automático de brechas y recomendaciones generadas por IA.</p>
                 <InformeEjecutivoModal dashboardData={goals} />
               </div>
-
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all space-y-4">
                 <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
                   <PieChart className="w-5 h-5 text-emerald-600" />
