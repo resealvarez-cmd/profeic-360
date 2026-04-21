@@ -1127,6 +1127,8 @@ async def get_executive_metrics(req: MetricsRequest):
                     stats["commitments_total"] += 1
                     if st == 'achieved':
                         stats["commitments_achieved"] += 1
+                    elif st == 'partial':
+                        stats["commitments_achieved"] += 0.5  # Partial counts as half
 
         # Finalize Observer KPI Calculations
         observer_ranking = []
