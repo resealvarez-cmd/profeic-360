@@ -615,12 +615,11 @@ export default function LecturaInteligente() {
                                                                         {q.rubrica.niveles.map((n: any) => (
                                                                             <th key={n.nivel} className={cn(
                                                                                 "p-2 text-center font-black uppercase tracking-wider border",
-                                                                                n.nivel === 4 ? "bg-green-100 text-green-800 border-green-200" :
-                                                                                n.nivel === 3 ? "bg-blue-100 text-blue-800 border-blue-200" :
-                                                                                n.nivel === 2 ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
+                                                                                n.nivel === 3 || n.label === 'Adecuado'    ? "bg-green-100 text-green-800 border-green-200" :
+                                                                                n.nivel === 2 || n.label === 'Elemental'   ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
                                                                                 "bg-red-100 text-red-800 border-red-200"
                                                                             )}>
-                                                                                {n.nivel} — {n.label}
+                                                                                {n.label}
                                                                             </th>
                                                                         ))}
                                                                     </tr>

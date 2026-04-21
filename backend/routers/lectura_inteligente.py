@@ -148,7 +148,8 @@ async def generar_preguntas(request: GenerarPreguntasRequest):
         
         PARTE 2 - DESARROLLO ({n_desarrollo} preguntas abiertas de alto nivel cognitivo, Nivel III):
         Genera preguntas que exijan al estudiante construir una respuesta escrita fundamentada (mínimo 3-5 oraciones).
-        Cada pregunta de desarrollo DEBE incluir una rúbrica de evaluación con 4 niveles de desempeño.
+        Cada pregunta de desarrollo DEBE incluir una rúbrica de evaluación con exactamente 3 niveles de desempeño,
+        usando ESTRICTAMENTE los indicadores nacionales SIMCE de Chile:
         
         FORMATO DE SALIDA JSON ESTRICTO:
         {{
@@ -173,10 +174,9 @@ async def generar_preguntas(request: GenerarPreguntasRequest):
                     "rubrica": {{
                         "criterio": "Nombre del criterio principal de evaluación",
                         "niveles": [
-                            {{"nivel": 4, "label": "Logrado", "descriptor": "Descripción del desempeño óptimo..."}},
-                            {{"nivel": 3, "label": "Medianamente Logrado", "descriptor": "Descripción del desempeño aceptable..."}},
-                            {{"nivel": 2, "label": "Por Lograr", "descriptor": "Descripción del desempeño insuficiente..."}},
-                            {{"nivel": 1, "label": "No Logrado", "descriptor": "Descripción del desempeño mínimo..."}}
+                            {{"nivel": 3, "label": "Adecuado", "descriptor": "El estudiante responde de forma completa, con argumentos claros y evidencia del texto..."}},
+                            {{"nivel": 2, "label": "Elemental", "descriptor": "El estudiante responde parcialmente, con argumentos básicos o sin evidencia suficiente..."}},
+                            {{"nivel": 1, "label": "Insuficiente", "descriptor": "El estudiante no responde, responde de forma incorrecta o no demuestra comprensión..."}}
                         ]
                     }}
                 }}
