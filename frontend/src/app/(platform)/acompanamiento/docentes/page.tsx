@@ -23,17 +23,17 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
     const [hideNoObservations, setHideNoObservations] = useState(false);
     const [observationStats, setObservationStats] = useState<Record<string, number>>({});
     const [selectedSkill, setSelectedSkill] = useState<string>("all");
+    const [teacherSkillsMap, setTeacherSkillsMap] = useState<Record<string, string[]>>({});
     const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
     const [selectedRubricType, setSelectedRubricType] = useState<'pedagogica' | 'convivencia'>('pedagogica');
     const [targetTeacher, setTargetTeacher] = useState<any>(null);
 
+    // Habilidades reales del sistema de gamificación
     const SKILLS = [
-        "Gestión del Clima",
-        "Dominio de Contenido",
-        "Estrategias de Enseñanza",
-        "Evaluación y Retroalimentación",
-        "Uso de TIC",
-        "Inclusión y Diversidad"
+        "Mediador Cognitivo",
+        "Catalizador de Feedback",
+        "Curador Didáctico",
+        "Líder de Cultura de Aula"
     ];
 
     useEffect(() => {
@@ -112,6 +112,21 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                     });
                     setObservationStats(stats);
                 }
+
+                // 6. Fetch Teacher Skills for the skill filter
+                const { data: skillsData } = await supabase
+                    .from('teacher_skills')
+                    .select('teacher_id, skill_name')
+                    .in('teacher_id', schoolUserIds);
+
+                if (skillsData) {
+                    const skillsMap: Record<string, string[]> = {};
+                    skillsData.forEach((s: any) => {
+                        if (!skillsMap[s.teacher_id]) skillsMap[s.teacher_id] = [];
+                        skillsMap[s.teacher_id].push(s.skill_name);
+                    });
+                    setTeacherSkillsMap(skillsMap);
+                }
             }
 
             setTeachers(merged);
@@ -148,12 +163,10 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
         );
         if (!matchesSearch) return false;
 
-        // C. Filter by Skill (Placeholder logic: if we don't have skills array in list, we match 'all')
-        // In a real scenario, t.skills would be an array of strings.
+        // C. Filter by Skill — uses teacher_skills table data loaded on mount
         if (selectedSkill !== "all") {
-            // Note: If t.skills is not yet available in the list fetch, this will currently show nothing
-            // if a skill is selected. This is the correct behavior for a filter.
-            if (!t.skills || !t.skills.includes(selectedSkill)) return false;
+            const skills = teacherSkillsMap[t.id] || [];
+            if (!skills.includes(selectedSkill)) return false;
         }
 
         return true;
@@ -353,6 +366,16 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                                                 }
                                             </span>
                                         </div>
+                                        {/* HABILIDADES GAMIFICACIÓN */}
+                                        {teacherSkillsMap[teacher.id] && teacherSkillsMap[teacher.id].length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5 mt-3">
+                                                {teacherSkillsMap[teacher.id].map((skill: string) => (
+                                                    <span key={skill} className="text-[9px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-black border border-purple-100 flex items-center gap-1">
+                                                        ⭐ {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="pl-4 flex flex-col gap-2 border-t border-slate-50 pt-5">

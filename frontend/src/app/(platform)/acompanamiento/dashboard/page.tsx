@@ -1008,6 +1008,7 @@ function DashboardContent({
         }
     }, [view, showExecutiveModal, loadingExecutive]);
 
+    const [historialFilter, setHistorialFilter] = useState<'all' | 'planned' | 'in_progress' | 'completed'>('all');
     const [showDrillDown, setShowDrillDown] = useState(false);
     const [drillDownDimension, setDrillDownDimension] = useState<any>(null);
     const [drillDownData, setDrillDownData] = useState<{tags: {name: string, count: number}[], notes: any[]}>({tags: [], notes: []});
@@ -1694,11 +1695,40 @@ function DashboardContent({
                 {view === 'observations' ? (
                     /* FULL OBSERVATIONS LIST VIEW */
                     <div className="bg-white rounded-3xl border border-slate-200/60 overflow-hidden flex flex-col shadow-sm">
-                        <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
-                            <h3 className="font-bold text-[#1B3C73] text-lg">Historial Completo de Observaciones</h3>
-                            <button onClick={() => router.push('/acompanamiento/dashboard')} className="text-sm font-bold text-slate-500 hover:text-[#1B3C73]">
-                                Volver al Dashboard
-                            </button>
+                        <div className="p-6 border-b border-slate-50 bg-slate-50/50">
+                            <div className="flex justify-between items-center mb-5">
+                                <h3 className="font-bold text-[#1B3C73] text-lg">Historial de Planificaciones</h3>
+                                <button onClick={() => router.push('/acompanamiento/dashboard')} className="text-sm font-bold text-slate-500 hover:text-[#1B3C73]">
+                                    Volver al Dashboard
+                                </button>
+                            </div>
+                            {/* FILTROS DE ESTADO */}
+                            <div className="flex flex-wrap gap-2">
+                                {([
+                                    { key: 'all', label: 'Todos', color: 'bg-slate-800 text-white', inactive: 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300' },
+                                    { key: 'planned', label: '📅 Planificado', color: 'bg-blue-600 text-white', inactive: 'bg-white text-blue-600 border border-blue-200 hover:border-blue-400' },
+                                    { key: 'in_progress', label: '⚡ En Curso', color: 'bg-orange-500 text-white', inactive: 'bg-white text-orange-500 border border-orange-200 hover:border-orange-400' },
+                                    { key: 'completed', label: '✅ Realizado', color: 'bg-green-600 text-white', inactive: 'bg-white text-green-600 border border-green-200 hover:border-green-400' },
+                                ] as const).map(f => (
+                                    <button
+                                        key={f.key}
+                                        onClick={() => setHistorialFilter(f.key)}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm ${
+                                            historialFilter === f.key ? f.color : f.inactive
+                                        }`}
+                                    >
+                                        {f.label}
+                                        <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+                                            historialFilter === f.key ? 'bg-white/20' : 'bg-slate-100 text-slate-500'
+                                        }`}>
+                                            {f.key === 'all'
+                                                ? allCycles.length
+                                                : allCycles.filter((c: any) => c.status === f.key).length
+                                            }
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                         <div className="overflow-x-auto p-4">
                             <table className="w-full text-left border-collapse">
@@ -1711,11 +1741,17 @@ function DashboardContent({
                                     </tr>
                                 </thead>
                                 <tbody className="text-sm divide-y divide-slate-50">
-                                    {allCycles.map((cycle: any) => (
+                                    {allCycles
+                                        .filter((c: any) => historialFilter === 'all' || c.status === historialFilter)
+                                        .map((cycle: any) => (
                                         <tr key={cycle.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="p-3">
-                                                <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase ${cycle.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-[#C87533]'}`}>
-                                                    {cycle.status === 'in_progress' ? 'En Curso' : cycle.status === 'planned' ? 'Planificado' : 'Completado'}
+                                                <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase ${
+                                                    cycle.status === 'completed' ? 'bg-green-50 text-green-600' :
+                                                    cycle.status === 'planned' ? 'bg-blue-50 text-blue-600' :
+                                                    'bg-orange-50 text-[#C87533]'
+                                                }`}>
+                                                    {cycle.status === 'in_progress' ? 'En Curso' : cycle.status === 'planned' ? 'Planificado' : 'Realizado'}
                                                 </span>
                                             </td>
                                             <td className="p-3">
@@ -1728,7 +1764,6 @@ function DashboardContent({
                                                 <div className="text-xs text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</div>
                                             </td>
                                             <td className="p-3 text-slate-500">
-                                                {/* Requires join, using ID for now if name not available in this view */}
                                                 {usersMap[cycle.observer_id] || (cycle.observer_id === currentUser?.id ? 'Mí mismo' : 'Otro observador')}
                                             </td>
                                             <td className="p-3 text-right">
@@ -1751,8 +1786,13 @@ function DashboardContent({
                                     ))}
                                 </tbody>
                             </table>
-                            {allCycles.length === 0 && (
-                                <p className="text-center text-slate-400 py-10">No hay observaciones registradas.</p>
+                            {allCycles.filter((c: any) => historialFilter === 'all' || c.status === historialFilter).length === 0 && (
+                                <div className="text-center py-16">
+                                    <p className="text-slate-400 font-bold">No hay planificaciones con este estado.</p>
+                                    <button onClick={() => setHistorialFilter('all')} className="mt-3 text-[#C87533] font-black text-xs uppercase tracking-widest hover:text-[#1B3C73] transition-colors">
+                                        Ver todos
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -1912,8 +1952,12 @@ function DashboardContent({
                                                         </div>
                                                     </Link>
                                                     <div className="flex items-center gap-1.5 shrink-0">
-                                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase ${cycle.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-[#C87533]'}`}>
-                                                            {cycle.status === 'in_progress' ? 'En Curso' : 'Completado'}
+                                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase ${
+                                                            cycle.status === 'completed' ? 'bg-green-50 text-green-600' :
+                                                            cycle.status === 'planned' ? 'bg-blue-50 text-blue-600' :
+                                                            'bg-orange-50 text-[#C87533]'
+                                                        }`}>
+                                                            {cycle.status === 'in_progress' ? 'En Curso' : cycle.status === 'planned' ? 'Planificado' : 'Realizado'}
                                                         </span>
                                                         {/* Botón Expediente Docente */}
                                                         {cycle.teacher_id && (
