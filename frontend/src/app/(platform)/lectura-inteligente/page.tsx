@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     BookOpen, Layers, ArrowRight, ArrowLeft,
     CheckCircle, Target, Sparkles, Download,
-    RefreshCcw, AlertTriangle, FileText, GripVertical, ChevronDown, Edit3, Settings2, PenLine
+    RefreshCcw, AlertTriangle, FileText, GripVertical, ChevronDown, Edit3, Settings2, PenLine,
+    Plus, X, ClipboardList
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
@@ -68,6 +69,10 @@ export default function LecturaInteligente() {
     const [asignaturas, setAsignaturas] = useState<string[]>([]);
     const [oasDisponibles, setOasDisponibles] = useState<any[]>([]);
     const [isManualSubject, setIsManualSubject] = useState(false);
+
+    // Criterios de rúbrica definidos por el docente
+    const [criteriosRubrica, setCriteriosRubrica] = useState<string[]>([]);
+    const [nuevoCriterio, setNuevoCriterio] = useState("");
 
     const [config, setConfig] = useState({
         grade: "",
@@ -198,7 +203,8 @@ export default function LecturaInteligente() {
                     asignatura: config.subject,
                     oa: config.oaText,
                     texto: workingText,
-                    num_preguntas: config.numQuestions
+                    num_preguntas: config.numQuestions,
+                    criterios_rubrica: criteriosRubrica.length > 0 ? criteriosRubrica : null
                 })
             });
 
@@ -423,6 +429,75 @@ export default function LecturaInteligente() {
                                         placeholder="Escribe o edita el objetivo de aprendizaje para orientar la generación de ítems..."
                                     />
                                 </div>
+                            </div>
+
+                            {/* SECCIÓN CRITERIOS DE RÚBRICA */}
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                <h2 className="font-bold text-[#1a2e3b] mb-1 flex items-center gap-2">
+                                    <ClipboardList className="w-5 h-5 text-[#4a6b8c]" /> 3. Criterios de Rúbrica
+                                </h2>
+                                <p className="text-xs text-slate-400 mb-4">
+                                    Opcional. Define los aspectos que quieres evaluar en las preguntas de desarrollo. Si no agregas ninguno, la IA los genera automáticamente.
+                                </p>
+
+                                {/* Lista de criterios agregados */}
+                                {criteriosRubrica.length > 0 && (
+                                    <div className="space-y-2 mb-3">
+                                        {criteriosRubrica.map((c, i) => (
+                                            <div key={i} className="flex items-center gap-2 bg-purple-50 border border-purple-100 rounded-xl px-3 py-2">
+                                                <span className="w-5 h-5 rounded-full bg-purple-200 text-purple-800 text-[10px] font-black flex items-center justify-center shrink-0">{i + 1}</span>
+                                                <span className="flex-1 text-sm text-slate-700 font-medium">{c}</span>
+                                                <button
+                                                    onClick={() => setCriteriosRubrica(criteriosRubrica.filter((_, idx) => idx !== i))}
+                                                    className="text-slate-300 hover:text-red-400 transition-colors p-0.5"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Input para agregar criterio */}
+                                {criteriosRubrica.length < 4 && (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={nuevoCriterio}
+                                            onChange={e => setNuevoCriterio(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter' && nuevoCriterio.trim()) {
+                                                    setCriteriosRubrica([...criteriosRubrica, nuevoCriterio.trim()]);
+                                                    setNuevoCriterio("");
+                                                }
+                                            }}
+                                            placeholder="Ej: Comprensión del texto, Uso de evidencia..."
+                                            className="flex-1 px-3 py-2.5 rounded-xl border-2 border-slate-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none text-sm transition-all"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                if (nuevoCriterio.trim()) {
+                                                    setCriteriosRubrica([...criteriosRubrica, nuevoCriterio.trim()]);
+                                                    setNuevoCriterio("");
+                                                }
+                                            }}
+                                            disabled={!nuevoCriterio.trim()}
+                                            className="p-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                        >
+                                            <Plus size={18} />
+                                        </button>
+                                    </div>
+                                )}
+
+                                {criteriosRubrica.length >= 4 && (
+                                    <p className="text-xs text-slate-400 italic text-center mt-1">Máximo 4 criterios por rúbrica.</p>
+                                )}
+
+                                {criteriosRubrica.length === 0 && (
+                                    <p className="text-[10px] text-slate-300 mt-2 flex items-center gap-1">
+                                        <Sparkles size={10} /> La IA seleccionará los criterios más relevantes para el OA.
+                                    </p>
+                                )}
                             </div>
                         </div>
 

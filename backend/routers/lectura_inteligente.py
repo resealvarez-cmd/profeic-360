@@ -37,6 +37,7 @@ class GenerarPreguntasRequest(BaseModel):
     oa: str
     texto: str
     num_preguntas: int = 10
+    criterios_rubrica: Optional[List[str]] = None  # Criterios definidos por el docente
 
 class PreguntaContexto(BaseModel):
     nivel_taxonomico: str
@@ -150,6 +151,8 @@ async def generar_preguntas(request: GenerarPreguntasRequest):
         Genera preguntas que exijan al estudiante construir una respuesta escrita fundamentada (mínimo 3-5 oraciones).
         Cada pregunta de desarrollo DEBE incluir una rúbrica de evaluación con exactamente 3 niveles de desempeño,
         usando ESTRICTAMENTE los indicadores nacionales SIMCE de Chile:
+        {'- Los criterios de evaluación a usar son (definidos por el docente): ' + ', '.join([f'"{c}"' for c in request.criterios_rubrica]) if request.criterios_rubrica else '- Selecciona los criterios de evaluación más relevantes para el OA (máximo 3 criterios, uno por pregunta de desarrollo).'}
+        Cada pregunta de desarrollo tendrá su propio criterio con sus 3 niveles SIMCE.
         
         FORMATO DE SALIDA JSON ESTRICTO:
         {{
