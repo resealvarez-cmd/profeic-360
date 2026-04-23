@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Calendar, Mail, FileText, MoreVertical, Plus, BrainCircuit, ChevronRight, ChevronDown, Users } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { TeacherProfiler } from "@/components/shared/TeacherProfiler";
 function TeachersList() { // Converted to inner component to usage Suspense in parent if needed (Next.js requirement for useSearchParams)
@@ -12,6 +13,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { currentSchoolId: contextSchoolId } = useAuth(); // Colegio activo del selector del sidebar
 
     const initialQuery = searchParams.get("q") || "";
     const [search, setSearch] = useState(initialQuery);
@@ -72,9 +74,10 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                 return;
             }
 
-            // 3. Fetch Profiles strictly bounded by tenant school_id
-            const { data: myProfile } = await supabase.from('profiles').select('school_id').eq('id', user.id).maybeSingle();
-            const currentSchoolId = myProfile?.school_id;
+            // 3. Fetch Profiles bounded by the ACTIVE school from sidebar selector
+            // For superadmin: contextSchoolId reflects the school chosen in the dropdown
+            // For regular users: contextSchoolId is set from their profile school_id on login
+            const currentSchoolId = contextSchoolId;
 
             let profileQuery = supabase.from('profiles').select('id, email, full_name, avatar_url');
             if (currentSchoolId) {
@@ -133,7 +136,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             setLoading(false);
         };
         initData();
-    }, []);
+    }, [contextSchoolId]); // Re-fetch when school changes in sidebar selector
 
     // Sync search state if URL changes (optional, but good for back button)
     useEffect(() => {
