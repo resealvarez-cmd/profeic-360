@@ -492,24 +492,48 @@ export default function Dashboard360() {
                                             <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                                                 <h3 className="text-slate-400 text-[10px] font-black uppercase mb-6 tracking-widest">Semáforo de Compromisos</h3>
                                                 <div className="space-y-4">
+                                                    {/* Logrados */}
                                                     <div>
                                                         <div className="flex justify-between text-[10px] font-black mb-1.5 uppercase">
-                                                            <span className="text-slate-600">Logrados</span>
+                                                            <span className="text-slate-600">✅ Logrados</span>
                                                             <span className="text-green-600">{metrics.trajectory?.commitments_rates?.achieved_rate || 0}%</span>
                                                         </div>
                                                         <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                                            <div className="bg-green-500 h-full rounded-full" style={{ width: `${metrics.trajectory?.commitments_rates?.achieved_rate || 0}%` }}></div>
+                                                            <div className="bg-green-500 h-full rounded-full transition-all duration-500" style={{ width: `${metrics.trajectory?.commitments_rates?.achieved_rate || 0}%` }}></div>
                                                         </div>
                                                     </div>
+                                                    {/* Parcialmente Logrados */}
                                                     <div>
                                                         <div className="flex justify-between text-[10px] font-black mb-1.5 uppercase">
-                                                            <span className="text-slate-600">En Proceso</span>
+                                                            <span className="text-slate-600">⚠️ Parcialmente</span>
+                                                            <span className="text-amber-500">{metrics.trajectory?.commitments_rates?.partial_rate || 0}%</span>
+                                                        </div>
+                                                        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                            <div className="bg-amber-400 h-full rounded-full transition-all duration-500" style={{ width: `${metrics.trajectory?.commitments_rates?.partial_rate || 0}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                    {/* Pendientes */}
+                                                    <div>
+                                                        <div className="flex justify-between text-[10px] font-black mb-1.5 uppercase">
+                                                            <span className="text-slate-600">🕐 Pendientes</span>
                                                             <span className="text-blue-600">{metrics.trajectory?.commitments_rates?.pending_rate || 0}%</span>
                                                         </div>
                                                         <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                                            <div className="bg-blue-500 h-full rounded-full" style={{ width: `${metrics.trajectory?.commitments_rates?.pending_rate || 0}%` }}></div>
+                                                            <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: `${metrics.trajectory?.commitments_rates?.pending_rate || 0}%` }}></div>
                                                         </div>
                                                     </div>
+                                                    {/* No Logrados */}
+                                                    {(metrics.trajectory?.commitments_rates?.missed_rate || 0) > 0 && (
+                                                        <div>
+                                                            <div className="flex justify-between text-[10px] font-black mb-1.5 uppercase">
+                                                                <span className="text-slate-600">❌ No Logrados</span>
+                                                                <span className="text-red-500">{metrics.trajectory?.commitments_rates?.missed_rate || 0}%</span>
+                                                            </div>
+                                                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                                <div className="bg-red-500 h-full rounded-full transition-all duration-500" style={{ width: `${metrics.trajectory?.commitments_rates?.missed_rate || 0}%` }}></div>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 

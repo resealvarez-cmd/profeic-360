@@ -1055,7 +1055,7 @@ async def get_executive_metrics(req: MetricsRequest):
             .execute()
         obs_map = {item['cycle_id']: item['content'] for item in obs_data_res.data}
         
-        # We need commitments to check Closure Rate
+        # Compromisos para el KPI de observadores (solo ciclos completados)
         commitments_res = supabase.table('commitments')\
             .select('cycle_id, status')\
             .in_('cycle_id', completed_cycle_ids if completed_cycle_ids else ['00000000-0000-0000-0000-000000000000'])\
@@ -1065,6 +1065,21 @@ async def get_executive_metrics(req: MetricsRequest):
             cycle = cmt['cycle_id']
             if cycle not in commitments_map: commitments_map[cycle] = []
             commitments_map[cycle].append(cmt['status'])
+
+        # Compromisos para el SEMÁFORO del panel: TODOS los ciclos (no solo completed)
+        # Un compromiso puede ser evaluado en la Pre-Observación del SIGUIENTE ciclo
+        all_cycle_ids = [c['id'] for c in all_cycles]
+        semaforo_cmts_res = supabase.table('commitments')\
+            .select('status')\
+            .in_('cycle_id', all_cycle_ids if all_cycle_ids else ['00000000-0000-0000-0000-000000000000'])\
+            .execute()
+        semaforo_summary = {"achieved": 0, "pending": 0, "missed": 0, "partial": 0}
+        for cmt in semaforo_cmts_res.data or []:
+            st = cmt.get('status', 'pending')
+            if st in semaforo_summary:
+                semaforo_summary[st] += 1
+            else:
+                semaforo_summary['pending'] += 1
         
         observer_stats = {} # observer_id -> stats
         matriz = [] # Flat list for table rendering
@@ -1194,27 +1209,17 @@ async def get_executive_metrics(req: MetricsRequest):
         top_3_teachers = top_teachers[:3]
 
         # 7. Trazabilidad: Semáforo de Compromisos & Evolución
-        commitments_summary = {
-            "achieved": 0,
-            "pending": 0,
-            "missed": 0
-        }
-        
-        for st_list in commitments_map.values():
-            for st in st_list:
-                if st == 'achieved': commitments_summary["achieved"] += 1
-                elif st == 'pending': commitments_summary["pending"] += 1
-                elif st == 'missed': commitments_summary["missed"] += 1
-                
-        total_cmts = sum(commitments_summary.values())
+        # Usa semaforo_summary (todos los ciclos) para el panel administrativo
+        total_cmts = sum(semaforo_summary.values())
         if total_cmts > 0:
             commitments_rates = {
-                "achieved_rate": round(commitments_summary["achieved"] / total_cmts * 100, 1),
-                "pending_rate": round(commitments_summary["pending"] / total_cmts * 100, 1),
-                "missed_rate": round(commitments_summary["missed"] / total_cmts * 100, 1)
+                "achieved_rate": round(semaforo_summary["achieved"] / total_cmts * 100, 1),
+                "partial_rate":  round(semaforo_summary["partial"]  / total_cmts * 100, 1),
+                "pending_rate":  round(semaforo_summary["pending"]  / total_cmts * 100, 1),
+                "missed_rate":   round(semaforo_summary["missed"]   / total_cmts * 100, 1),
             }
         else:
-            commitments_rates = {"achieved_rate": 0, "pending_rate": 0, "missed_rate": 0}
+            commitments_rates = {"achieved_rate": 0, "partial_rate": 0, "pending_rate": 0, "missed_rate": 0}
 
         # Calculate Global Depth Index for Evolution tracking
         global_evaluative = 0
@@ -1242,7 +1247,7 @@ async def get_executive_metrics(req: MetricsRequest):
                 "top_observers": observer_ranking[:2] # Top 2 observers by KPI
             },
             "trajectory": {
-                "commitments_summary": commitments_summary,
+                "commitments_summary": semaforo_summary,
                 "commitments_rates": commitments_rates,
                 "global_depth_index": global_depth_index
             }
