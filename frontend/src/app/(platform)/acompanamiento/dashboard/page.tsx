@@ -1033,6 +1033,25 @@ function DashboardContent({
     }, [view, showExecutiveModal, loadingExecutive]);
 
     const [historialFilter, setHistorialFilter] = useState<'all' | 'planned' | 'in_progress' | 'completed'>('all');
+
+    // C: Ciclos pendientes de cierre (ejecucion lista, sin reflexion)
+    const [pendingCloseCycles, setPendingCloseCycles] = useState<any[]>([]);
+    useEffect(() => {
+        const inProgressIds = allCycles.filter((c: any) => c.status === 'in_progress').map((c: any) => c.id);
+        if (inProgressIds.length === 0) { setPendingCloseCycles([]); return; }
+        supabase.from('observation_data').select('cycle_id, stage').in('cycle_id', inProgressIds).then(({ data }) => {
+            if (!data) return;
+            const blocked = allCycles.filter((cycle: any) => {
+                if (cycle.status !== 'in_progress') return false;
+                const stages = data.filter((d: any) => d.cycle_id === cycle.id).map((d: any) => d.stage);
+                return stages.includes('execution') && !stages.includes('reflection');
+            }).map((cycle: any) => ({
+                ...cycle,
+                days_blocked: Math.max(0, Math.floor((Date.now() - new Date(cycle.updated_at || cycle.created_at).getTime()) / 86400000))
+            }));
+            setPendingCloseCycles(blocked);
+        });
+    }, [allCycles]);
     const [showDrillDown, setShowDrillDown] = useState(false);
     const [drillDownDimension, setDrillDownDimension] = useState<any>(null);
     const [drillDownData, setDrillDownData] = useState<{tags: {name: string, count: number}[], notes: any[]}>({tags: [], notes: []});
@@ -1714,6 +1733,42 @@ function DashboardContent({
                                 </div>
                             </div>
                         )}
+                    </div>
+                )}
+                {/* A: BANNER ALERTA REFLEXIÓN PENDIENTE */}
+                {currentUser?.id && (
+                    <PendingReflectionBanner
+                        userId={currentUser.id}
+                        isObserver={!['teacher','profesor'].includes(currentUser?.role || '')}
+                    />
+                )}
+                {/* C: SECCIÓN PENDIENTES DE CIERRE */}
+                {pendingCloseCycles.length > 0 && view === 'observations' && (
+                    <div className="mb-6 bg-amber-50 border border-amber-200 rounded-3xl p-6 shadow-sm">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="p-2 bg-amber-100 rounded-xl"><AlertTriangle size={16} className="text-amber-600" /></div>
+                            <div>
+                                <h3 className="font-black text-amber-800 text-sm">⏳ Pendientes de cierre — Reflexión docente requerida</h3>
+                                <p className="text-xs text-amber-600 mt-0.5">{pendingCloseCycles.length} acompañamiento{pendingCloseCycles.length !== 1 ? 's' : ''} con ejecución completa esperando reflexión. No se contabilizan en métricas.</p>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            {pendingCloseCycles.map((cycle: any) => (
+                                <div key={cycle.id} className="flex items-center justify-between bg-white border border-amber-100 rounded-2xl px-4 py-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-1.5 bg-amber-100 rounded-lg"><Clock size={13} className="text-amber-600" /></div>
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-800">{cycle.teacher?.full_name || cycle.teacher_name || 'Docente'}</p>
+                                            <p className="text-xs text-amber-600 font-medium">{cycle.days_blocked} día{cycle.days_blocked !== 1 ? 's' : ''} bloqueado</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => router.push(`/acompanamiento/observacion/${cycle.id}`)}
+                                        className="text-xs font-black bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl transition-colors">
+                                        Ir al ciclo →
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
                 {view === 'observations' ? (

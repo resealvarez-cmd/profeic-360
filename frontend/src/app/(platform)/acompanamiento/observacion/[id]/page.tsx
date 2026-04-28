@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { ChevronRight, LayoutDashboard } from "lucide-react";
+import { ChevronRight, LayoutDashboard, AlertTriangle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { PreObservation } from "@/components/360/PreObservation";
 import { FocusMatrix } from "@/components/360/FocusMatrix";
@@ -20,6 +20,8 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
     // AI FLASH FEEDBACK STATE
     const [showFlashModal, setShowFlashModal] = useState(false);
     const [flashData, setFlashData] = useState<any>(null);
+    const [showForceCloseModal, setShowForceCloseModal] = useState(false);
+    const [forcingClose, setForcingClose] = useState(false);
 
     const router = useRouter();
 
@@ -270,6 +272,23 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
         }
     };
 
+    const handleForceClose = async () => {
+        setForcingClose(true);
+        try {
+            await supabase.from('observation_cycles')
+                .update({ status: 'completed', force_closed: true, updated_at: new Date() })
+                .eq('id', cycle.id);
+            toast.success("Ciclo cerrado manualmente. Las métricas se actualizarán.");
+            router.push('/acompanamiento/dashboard');
+        } catch (e: any) {
+            toast.error("Error al cerrar: " + e.message);
+        } finally {
+            setForcingClose(false);
+            setShowForceCloseModal(false);
+        }
+    };
+
+    
     if (loading) return <div className="p-10 text-center text-slate-500">Cargando ciclo...</div>;
 
     const tabs: Array<'pre' | 'execution' | 'reflection'> = ['pre', 'execution', 'reflection'];
@@ -313,6 +332,23 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
                         <span className="font-semibold text-[#1a2e3b]">Observación a {cycle?.teacher?.full_name}</span>
                     </div>
 
+                    {/* ALERTA: Ciclo bloqueado esperando reflexión */}
+                    {(() => {
+                        const hasExe = cycle?.observation_data?.some((d: any) => d.stage === 'execution');
+                        const hasRef = cycle?.observation_data?.some((d: any) => d.stage === 'reflection');
+                        const isBlocked = hasExe && !hasRef && cycle?.status === 'in_progress';
+                        if (!isBlocked) return null;
+                        return (
+                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold px-3 py-1.5 rounded-xl">
+                                <AlertTriangle size={13} className="text-amber-500" />
+                                Esperando reflexión docente
+                                <button onClick={() => setShowForceCloseModal(true)}
+                                    className="ml-2 bg-amber-500 text-white px-2.5 py-1 rounded-lg text-[10px] hover:bg-amber-600 transition-colors font-black">
+                                    Cerrar igualmente
+                                </button>
+                            </div>
+                        );
+                    })()}
                     <div className="flex bg-slate-100 rounded-lg p-1">
                         {tabs.map((s) => {
                             const disabled = isStageDisabled(s);
@@ -434,6 +470,33 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
                     </div>
                 )}
             </main>
+
+            {/* Modal Cierre Forzado */}
+            {showForceCloseModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white max-w-md w-full rounded-3xl shadow-2xl p-8 border border-slate-100">
+                        <div className="text-center mb-6">
+                            <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <AlertTriangle size={28} className="text-amber-500" />
+                            </div>
+                            <h3 className="text-xl font-black text-[#1a2e3b]">¿Cerrar ciclo sin reflexión?</h3>
+                            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                                El ciclo se marcará como <strong>completado</strong> aunque el docente no haya enviado su reflexión. Las métricas del Panel 360° se actualizarán, pero no habrá compromiso pedagógico registrado para este ciclo.
+                            </p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowForceCloseModal(false)}
+                                className="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors text-sm">
+                                Cancelar
+                            </button>
+                            <button onClick={handleForceClose} disabled={forcingClose}
+                                className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+                                {forcingClose ? 'Cerrando...' : <><CheckCircle2 size={16} /> Confirmar cierre</>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
