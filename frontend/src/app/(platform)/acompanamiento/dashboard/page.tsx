@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageCircle, FileText, CheckCircle, TrendingUp, Search, Calendar, ChevronRight, ArrowRight, X, AlertCircle, Clock, PlayCircle, Eye, Settings, Users, BrainCircuit, Plus, Loader2, Target, Home, Zap, Info, BarChart3, CheckCircle2, ChevronDown, ChevronUp, Trash2, Trophy } from 'lucide-react';
+import { MessageCircle, FileText, CheckCircle, TrendingUp, Search, Calendar, ChevronRight, ArrowRight, X, AlertCircle, AlertTriangle, Clock, PlayCircle, Eye, Settings, Users, BrainCircuit, Plus, Loader2, Target, Home, Zap, Info, BarChart3, CheckCircle2, ChevronDown, ChevronUp, Trash2, Trophy } from 'lucide-react';
 import { supabase } from "@/lib/supabaseClient";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
