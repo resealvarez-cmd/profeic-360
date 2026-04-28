@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, LineChart, Line, AreaChart, Area } from "recharts";
 import { toast } from "sonner";
+import { PendingReflectionBanner } from "@/components/360/PendingReflectionBanner";
 import ProductAnalytics from "@/components/ProductAnalytics";
 import { TeacherProfiler } from "@/components/shared/TeacherProfiler";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
