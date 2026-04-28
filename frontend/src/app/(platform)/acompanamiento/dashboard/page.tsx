@@ -1736,10 +1736,10 @@ function DashboardContent({
                     </div>
                 )}
                 {/* A: BANNER ALERTA REFLEXIÓN PENDIENTE */}
-                {currentUser?.id && (
+                {currentUser?.id && userRole && (
                     <PendingReflectionBanner
                         userId={currentUser.id}
-                        isObserver={!['teacher','profesor'].includes(currentUser?.role || '')}
+                        isObserver={!['teacher','profesor'].includes(userRole || '')}
                     />
                 )}
                 {/* C: SECCIÓN PENDIENTES DE CIERRE */}
