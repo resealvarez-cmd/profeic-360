@@ -16,12 +16,15 @@ API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 CONTEXTO_FALLBACK = "UBICACIÓN: Chile."
 
 # --- MODELO COMPATIBLE CON PYTHON 3.14 ---
+from typing import Optional, List
+
 class RubricRequest(BaseModel):
     nivel: str
     asignatura: str
     oaId: str
     oaDescripcion: str
-    actividad: str 
+    actividad: str
+    criterios_personalizados: Optional[List[str]] = None
 
 # Forzamos reconstrucción por seguridad
 # (no necesario en Pydantic v2 moderno — puede removerse en el futuro)
@@ -60,13 +63,28 @@ async def generar_rubrica(req: RubricRequest, authorization: str = Header(None))
             except Exception:
                 pass
 
+        # Inyectar criterios personalizados si el docente los definió
+        criterios_block = ""
+        if req.criterios_personalizados and len(req.criterios_personalizados) > 0:
+            lista = "\n".join(f"         {i+1}. {c}" for i, c in enumerate(req.criterios_personalizados))
+            criterios_block = f"""
+        CRITERIOS OBLIGATORIOS (definidos por el docente):
+        Debes usar EXACTAMENTE estos criterios, en este orden, sin agregar ni eliminar ninguno:
+{lista}
+        Distribuye el porcentaje de forma equitativa entre ellos (suma = 100%).
+"""
+        else:
+            criterios_block = """
+        CRITERIOS: Elige entre 4 y 6 criterios que mejor evalúen el producto dado el OA.
+"""
+
         # PROMPT V3: "PEDAGOGÍA DE HIERRO"
         prompt = f"""
         ROL: Experto en Evaluación Auténtica.
         TAREA: Crear Rúbrica Analítica para el PRODUCTO: "{req.actividad}".
         CONTEXTO: {req.nivel}, {req.asignatura}, OA: {req.oaDescripcion}.
         CONTEXTO INSTITUCIONAL: {contexto_institucional}
-        
+        {criterios_block}
         LISTA NEGRA (PALABRAS PROHIBIDAS):
         - Alumno, Estudiante, Él/Ella (NUNCA evaluar a la persona).
         - Logra, Entiende, Comprende (Son procesos internos, no observables).

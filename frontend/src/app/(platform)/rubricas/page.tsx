@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
     BrainCircuit, Target, Check, Layers, Sparkles,
-    Download, Database, Edit3, ChevronDown, BookOpen, Calculator
+    Download, Database, Edit3, ChevronDown, BookOpen, Calculator, Plus, X, ClipboardList
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
@@ -54,6 +54,8 @@ export default function RubricasPage() {
     const [result, setResult] = useState<RubricResult | null>(null);
     const [totalScore, setTotalScore] = useState<number>(60);
     const [isDirty, setIsDirty] = useState(false);
+    const [criteriosPersonalizados, setCriteriosPersonalizados] = useState<string[]>([]);
+    const [nuevoCriterio, setNuevoCriterio] = useState("");
 
     useEffect(() => {
         if (result) setIsDirty(true);
@@ -145,7 +147,7 @@ export default function RubricasPage() {
             const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/generate-rubric", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form)
+                body: JSON.stringify({ ...form, criterios_personalizados: criteriosPersonalizados.length > 0 ? criteriosPersonalizados : null })
             });
             const data = await res.json();
             setResult(data);
@@ -282,6 +284,52 @@ export default function RubricasPage() {
                             )}
 
                             <div className="pt-6 border-t border-slate-100"><label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 block ml-1">Producto</label><textarea className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl text-sm h-28 resize-none focus:ring-4 focus:ring-[#f2ae60]/10 outline-none transition-all font-medium text-[#2b546e]" placeholder="Ej: Maqueta, Ensayo..." value={form.actividad} onChange={e => setForm({ ...form, actividad: e.target.value })} /></div>
+                            {/* CRITERIOS PERSONALIZADOS */}
+                            <div className="pt-4 border-t border-slate-100">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <ClipboardList size={15} className="text-[#f2ae60]" />
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Criterios de Evaluación</label>
+                                </div>
+                                <p className="text-[10px] text-slate-400 mb-3">Opcional. Define qué aspectos quieres evaluar. Si no agregas ninguno, la IA los genera automáticamente.</p>
+                                {criteriosPersonalizados.length > 0 && (
+                                    <div className="space-y-1.5 mb-3">
+                                        {criteriosPersonalizados.map((c, i) => (
+                                            <div key={i} className="flex items-center gap-2 bg-[#f2ae60]/10 border border-[#f2ae60]/30 rounded-xl px-3 py-2">
+                                                <span className="w-4 h-4 rounded-full bg-[#f2ae60]/30 text-[#2b546e] text-[9px] font-black flex items-center justify-center shrink-0">{i + 1}</span>
+                                                <span className="flex-1 text-xs text-slate-700 font-medium">{c}</span>
+                                                <button onClick={() => setCriteriosPersonalizados(criteriosPersonalizados.filter((_, idx) => idx !== i))} className="text-slate-300 hover:text-red-400 transition-colors"><X size={12} /></button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {criteriosPersonalizados.length < 6 ? (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={nuevoCriterio}
+                                            onChange={e => setNuevoCriterio(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter' && nuevoCriterio.trim()) {
+                                                    setCriteriosPersonalizados([...criteriosPersonalizados, nuevoCriterio.trim()]);
+                                                    setNuevoCriterio("");
+                                                }
+                                            }}
+                                            placeholder="Ej: Argumentación, Coherencia..."
+                                            className="flex-1 px-3 py-2 rounded-xl border-2 border-slate-200 focus:border-[#f2ae60] focus:ring-2 focus:ring-[#f2ae60]/20 outline-none text-xs transition-all"
+                                        />
+                                        <button
+                                            onClick={() => { if (nuevoCriterio.trim()) { setCriteriosPersonalizados([...criteriosPersonalizados, nuevoCriterio.trim()]); setNuevoCriterio(""); } }}
+                                            disabled={!nuevoCriterio.trim()}
+                                            className="p-2 bg-[#f2ae60] text-white rounded-xl hover:bg-[#e09a50] transition-colors disabled:opacity-40"
+                                        ><Plus size={16} /></button>
+                                    </div>
+                                ) : (
+                                    <p className="text-[10px] text-slate-400 italic text-center">Máximo 6 criterios.</p>
+                                )}
+                                {criteriosPersonalizados.length === 0 && (
+                                    <p className="text-[10px] text-slate-300 mt-2 flex items-center gap-1"><Sparkles size={9} /> La IA elegirá los criterios más relevantes para el OA.</p>
+                                )}
+                            </div>
                             <button onClick={generar} disabled={generating} className="w-full py-4 rounded-xl font-bold text-white bg-[#2b546e] hover:bg-[#203e52] shadow-xl hover:shadow-2xl hover:-translate-y-1 flex justify-center items-center gap-2 transition-all active:scale-[0.98]"><Sparkles size={18} /> Diseñar Rúbrica</button>
                         </div>
                     </div>
