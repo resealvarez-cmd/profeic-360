@@ -15,6 +15,7 @@ interface RubricCriteria { criterio: string; porcentaje: number; niveles: { insu
 interface RubricResult { titulo: string; descripcion: string; tabla: RubricCriteria[]; }
 import { trackEvent } from "@/lib/telemetry";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
 
 const ModernSelect = ({ label, value, options, onChange, placeholder = "Seleccionar...", disabled = false }: any) => {
@@ -75,7 +76,7 @@ export default function RubricasPage() {
     // Carga inicial de niveles
     useEffect(() => {
         trackEvent({ eventName: 'page_view', module: 'rubricas' });
-        const fetchLevels = async () => { try { const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }); const data = await res.json(); if (data.type === "niveles") setLevels(data.data.sort((a: string, b: string) => (NIVEL_ORDER.indexOf(a) === -1 ? 999 : NIVEL_ORDER.indexOf(a)) - (NIVEL_ORDER.indexOf(b) === -1 ? 999 : NIVEL_ORDER.indexOf(b)))); } catch (e) { console.error(e); } };
+        const fetchLevels = async () => { try { const res = await fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }); const data = await res.json(); if (data.type === "niveles") setLevels(data.data.sort((a: string, b: string) => (NIVEL_ORDER.indexOf(a) === -1 ? 999 : NIVEL_ORDER.indexOf(a)) - (NIVEL_ORDER.indexOf(b) === -1 ? 999 : NIVEL_ORDER.indexOf(b)))); } catch (e) { console.error(e); } };
         fetchLevels();
     }, []);
 
@@ -126,7 +127,7 @@ export default function RubricasPage() {
             if (isManualSubject) return; // Si es manual, no reseteamos
             setSubjects([]);
             setForm(p => ({ ...p, asignatura: "", oaId: "" }));
-            fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: form.nivel }) }).then(r => r.json()).then(d => d.type === "asignaturas" && setSubjects(d.data));
+            fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: form.nivel }) }).then(r => r.json()).then(d => d.type === "asignaturas" && setSubjects(d.data));
         }
     }, [form.nivel, mode, isManualSubject]);
 
@@ -136,7 +137,7 @@ export default function RubricasPage() {
             if (isManualSubject) return; // Si es manual, no buscamos en BD
             setOas([]);
             setForm(p => ({ ...p, oaId: "" }));
-            fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: form.nivel, asignatura: form.asignatura }) }).then(r => r.json()).then(d => d.type === "oas" && setOas(d.data));
+            fetch(`${API_URL}/curriculum/options`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: form.nivel, asignatura: form.asignatura }) }).then(r => r.json()).then(d => d.type === "oas" && setOas(d.data));
         }
     }, [form.asignatura, mode, isManualSubject]);
 
@@ -144,7 +145,7 @@ export default function RubricasPage() {
         if (!form.oaDescripcion || !form.actividad) { toast.warning("Faltan datos: Asegúrate de tener un Objetivo y una Actividad."); return; }
         setGenerating(true);
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/generate-rubric", {
+            const res = await fetch(`${API_URL}/generate-rubric`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...form, criterios_personalizados: criteriosPersonalizados.length > 0 ? criteriosPersonalizados : null })
@@ -187,7 +188,7 @@ export default function RubricasPage() {
         if (!result) return;
         setDownloading(true);
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/export/rubrica-docx", {
+            const res = await fetch(`${API_URL}/export/rubrica-docx`, {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ titulo: result.titulo, descripcion: result.descripcion, nivel: form.nivel, asignatura: form.asignatura, oa: form.oaDescripcion, actividad: form.actividad, puntaje_total: totalScore, tabla: result.tabla })
             });

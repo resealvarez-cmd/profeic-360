@@ -80,7 +80,8 @@ class ExportRequest(BaseModel):
     descripcion: str
     nivel: str
     asignatura: str
-    oa: str
+    oa: Optional[str] = None
+    oaDescripcion: Optional[str] = None
     actividad: str
     puntaje_total: int
     tabla: List[Dict[str, Any]]
@@ -100,7 +101,7 @@ class AssessmentItem(BaseModel):
     points: int
     stem: str
     options: Optional[List[Union[str, Dict[str, Any]]]] = None
-    correct_answer: Optional[bool] = None
+    correct_answer: Optional[Any] = None
     rubric_hint: Optional[str] = None
 
 class AssessmentExportRequest(BaseModel):
@@ -122,11 +123,13 @@ class ElevatorExportRequest(BaseModel):
 
 class LecturaPregunta(BaseModel):
     id: str
+    tipo: Optional[str] = "seleccion_multiple" # "seleccion_multiple" o "desarrollo"
     nivel_taxonomico: str
     pregunta: str
-    alternativas: List[str]
-    respuesta_correcta: str
+    alternativas: Optional[List[str]] = None
+    respuesta_correcta: Optional[str] = None
     justificacion: str
+    rubrica: Optional[Dict[str, Any]] = None # Para preguntas de desarrollo
 
 class LecturaInteligenteExportRequest(BaseModel):
     nivel: str
@@ -511,22 +514,42 @@ def renderizar_lectura_inteligente(doc, data: Dict[str, Any]):
             p_q.add_run(f" [{q.get('nivel_taxonomico', '')}]").font.color.rgb = RGBColor(120, 120, 120)
 
         alts = q.get('alternativas', [])
-        for j, alt in enumerate(alts):
-            p_alt = doc.add_paragraph(f"   {chr(65+j)}) {limpiar_latex_para_word(alt)}")
-            # Verificar si la alternativa es la correcta (búsqueda robusta)
-            alt_correcta = str(q.get("respuesta_correcta", "")).strip()
-            es_correcta = False
-            if alt_correcta == alt:
-                es_correcta = True
-            elif alt_correcta.startswith(chr(65+j)) or alt_correcta.startswith(chr(97+j)):
-                es_correcta = True
-            elif f"opcion {chr(97+j)}" in alt_correcta.lower() or f"opción {chr(97+j)}" in alt_correcta.lower():
-                 es_correcta = True
+        # DESARROLLO: campo de respuesta esperada + rúbrica
+        if q.get('tipo') == 'desarrollo' or not alts:
+             doc.add_paragraph("_" * 80)
+             doc.add_paragraph("_" * 80)
+             doc.add_paragraph("_" * 80)
+             
+             if q.get('rubrica'):
+                 rub = q['rubrica']
+                 p_rub = doc.add_paragraph()
+                 p_rub.add_run(f"Criterio de Evaluación: {rub.get('criterio', '')}").bold = True
+                 
+                 # Tabla de rúbrica pequeña
+                 tr = doc.add_table(rows=2, cols=3); tr.style = 'Table Grid'
+                 for idx, n in enumerate(rub.get('niveles', [])):
+                     if idx < 3:
+                         cell_h = tr.cell(0, idx)
+                         cell_h.text = str(n.get('label', ''))
+                         set_cell_background(cell_h, "F3E8FF") # Purpura claro
+                         tr.cell(1, idx).text = str(n.get('descriptor', ''))
+        else:
+            for j, alt in enumerate(alts):
+                p_alt = doc.add_paragraph(f"   {chr(65+j)}) {limpiar_latex_para_word(alt)}")
+                # Verificar si la alternativa es la correcta (búsqueda robusta)
+                alt_correcta = str(q.get("respuesta_correcta", "")).strip()
+                es_correcta = False
+                if alt_correcta == alt:
+                    es_correcta = True
+                elif alt_correcta.startswith(chr(65+j)) or alt_correcta.startswith(chr(97+j)):
+                    es_correcta = True
+                elif f"opcion {chr(97+j)}" in alt_correcta.lower() or f"opción {chr(97+j)}" in alt_correcta.lower():
+                     es_correcta = True
 
-            # En la pauta del profesor, destacar la correcta
-            if is_profesor and es_correcta:
-                p_alt.runs[0].bold = True
-                p_alt.runs[0].font.color.rgb = RGBColor(0, 128, 0) # Verde oscuro
+                # En la pauta del profesor, destacar la correcta
+                if is_profesor and es_correcta:
+                    p_alt.runs[0].bold = True
+                    p_alt.runs[0].font.color.rgb = RGBColor(0, 128, 0) # Verde oscuro
         
         # En versión profesor, mostrar la justificación
         if is_profesor:
@@ -535,8 +558,8 @@ def renderizar_lectura_inteligente(doc, data: Dict[str, Any]):
             r_just.bold = True
             r_just.font.color.rgb = RGBColor(217, 154, 80) # Naranja (#d99a50)
             p_just.add_run(limpiar_latex_para_word(q.get("justificacion", "")))
-        else:
-             doc.add_paragraph()
+        
+        doc.add_paragraph()
 
 # ==========================================
 # 4. ENDPOINTS
