@@ -63,10 +63,38 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                 }
             }
 
-            // 2. Fetch All staff roles (not restricted to teacher)
+            // 2. Fetch Profiles bounded by the ACTIVE school from sidebar selector
+            const currentSchoolId = contextSchoolId;
+
+            let profileQuery = supabase.from('profiles').select('id, email, full_name, avatar_url, school_id');
+            if (currentSchoolId) {
+                profileQuery = profileQuery.eq('school_id', currentSchoolId);
+            }
+            const { data: profiles, error: profilesError } = await profileQuery;
+            
+            if (profilesError) {
+                console.error(profilesError);
+                return;
+            }
+
+            const schoolUserEmails = profiles?.map(p => p.email?.toLowerCase()).filter(Boolean) || [];
+            const schoolUserIds = profiles?.map(p => p.id) || [];
+
+            // If no profiles found for this school, set empty and return
+            if (schoolUserEmails.length === 0) {
+                setTeachers([]);
+                setObservationStats({});
+                setTeacherSkillsMap({});
+                setLoading(false);
+                return;
+            }
+
+            // 3. Fetch All staff roles STRICTLY restricted to the emails of the active school
+            // Since Supabase .in() filter is limited, we fetch those matching the emails
             const { data: authorized, error: authError } = await supabase
                 .from('authorized_users')
                 .select('*')
+                .in('email', schoolUserEmails)
                 .order('full_name', { ascending: true });
 
             if (authError) {
@@ -74,23 +102,8 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                 return;
             }
 
-            // 3. Fetch Profiles bounded by the ACTIVE school from sidebar selector
-            // For superadmin: contextSchoolId reflects the school chosen in the dropdown
-            // For regular users: contextSchoolId is set from their profile school_id on login
-            const currentSchoolId = contextSchoolId;
-
-            let profileQuery = supabase.from('profiles').select('id, email, full_name, avatar_url');
-            if (currentSchoolId) {
-                profileQuery = profileQuery.eq('school_id', currentSchoolId);
-            }
-            const { data: profiles } = await profileQuery;
-            const schoolUserEmails = profiles?.map(p => p.email?.toLowerCase()) || [];
-            const schoolUserIds = profiles?.map(p => p.id) || [];
-
             // 4. Merge Data
-            const merged = authorized.filter(auth => 
-                schoolUserEmails.includes(auth.email?.toLowerCase())
-            ).map(auth => {
+            const merged = authorized.map(auth => {
                 const profile = profiles?.find(p => p.email?.toLowerCase() === auth.email?.toLowerCase());
                 return {
                     ...auth,
