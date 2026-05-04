@@ -110,13 +110,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
 
+        const mySchoolId = profileResponse.data?.school_id;
+
         // Schools for leadership
         if (userRole && ["admin", "sostenedor", "director", "directivo", "gestion"].includes(userRole)) {
-          const { data: sData } = await supabase.from("schools").select("*");
-          if (sData) {
-            setSchools(sData);
-            const sp = new URLSearchParams(window.location.search);
-            setCurrentSchoolId(sp.get("school_id") || sData[0]?.id || null);
+          // Global admins can see all schools
+          if (["admin", "sostenedor"].includes(userRole) || email === "re.se.alvarez@gmail.com") {
+            const { data: sData } = await supabase.from("schools").select("*");
+            if (sData) {
+              setSchools(sData);
+              const sp = new URLSearchParams(window.location.search);
+              setCurrentSchoolId(sp.get("school_id") || mySchoolId || sData[0]?.id || null);
+            }
+          } else {
+            // School-level leadership is locked to their own school
+            if (mySchoolId) {
+              const { data: sData } = await supabase.from("schools").select("*").eq("id", mySchoolId);
+              if (sData) {
+                setSchools(sData);
+                setCurrentSchoolId(mySchoolId);
+              }
+            } else {
+              // Fallback if they don't have a school assigned yet
+              setSchools([]);
+              setCurrentSchoolId(null);
+            }
           }
         }
 
