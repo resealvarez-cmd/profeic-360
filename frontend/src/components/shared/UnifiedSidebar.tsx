@@ -217,6 +217,7 @@ export default function UnifiedSidebar() {
         {/* Navigation */}
         <nav className="flex-1 px-3 overflow-y-auto overflow-x-hidden custom-scrollbar space-y-4 py-2">
           <NavItem href="/dashboard" icon={Home} label="Inicio" isActive={isActive("/dashboard")} show={show} onClick={closeMobile} />
+          <NavItem href="/comunidad" icon={Globe} label="Sala de Profesores" isActive={isActivePrefix("/comunidad")} show={show} onClick={closeMobile} />
 
           <CollapsibleSection label="Aula Docente" icon={BookOpen} show={show}>
             <NavItem href="/planificador" icon={BookOpen} label="Planificador" isActive={isActive("/planificador")} show={show} onClick={closeMobile} />
