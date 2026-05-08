@@ -28,6 +28,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
     const [teacherSkillsMap, setTeacherSkillsMap] = useState<Record<string, string[]>>({});
     const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
     const [selectedRubricType, setSelectedRubricType] = useState<'pedagogica' | 'convivencia'>('pedagogica');
+    const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>("all");
     const [targetTeacher, setTargetTeacher] = useState<any>(null);
 
     // Habilidades reales del sistema de gamificación
@@ -116,14 +117,19 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             if (schoolUserIds.length > 0) {
                 const { data: cycles } = await supabase
                     .from('observation_cycles')
-                    .select('teacher_id, status')
+                    .select('teacher_id, status, rubric_type')
                     .in('teacher_id', schoolUserIds);
                 
                 if (cycles) {
-                    const stats: Record<string, number> = {};
+                    const stats: Record<string, any> = {};
                     cycles.forEach(c => {
+                        if (!stats[c.teacher_id]) {
+                            stats[c.teacher_id] = { total: 0, pedagogica: 0, convivencia: 0 };
+                        }
                         if (c.status === 'completed') {
-                            stats[c.teacher_id] = (stats[c.teacher_id] || 0) + 1;
+                            stats[c.teacher_id].total += 1;
+                            if (c.rubric_type === 'pedagogica') stats[c.teacher_id].pedagogica += 1;
+                            if (c.rubric_type === 'convivencia') stats[c.teacher_id].convivencia += 1;
                         }
                     });
                     setObservationStats(stats);
@@ -166,8 +172,10 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
     // 3. DERIVED STATE (Reactivity FTW)
     // ─────────────────────────────────────────────────────────────────────────
     const filteredTeachers = teachers.filter(t => {
+        const stats = observationStats[t.id] || { total: 0, pedagogica: 0, convivencia: 0 };
+
         // A. Filter by observation count if toggle is active
-        if (hideNoObservations && !observationStats[t.id]) return false;
+        if (hideNoObservations && stats.total === 0) return false;
 
         // B. Filter by search query
         const low = search.toLowerCase();
@@ -185,13 +193,18 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
             if (!skills.includes(selectedSkill)) return false;
         }
 
+        // D. Filter by Accompaniment Type
+        if (selectedTypeFilter === "pedagogica" && stats.pedagogica === 0) return false;
+        if (selectedTypeFilter === "convivencia" && stats.convivencia === 0) return false;
+
         return true;
     });
 
     // Derive grouped data in real-time
     const groupedData = viewMode === 'grouped' 
         ? filteredTeachers.reduce((acc: any, t: any) => {
-            const completedCount = observationStats[t.id] || 0;
+            const stats = observationStats[t.id] || { total: 0 };
+            const completedCount = stats.total;
             let key = '⚪ Por Evaluar (Sin observaciones)';
             
             if (completedCount >= 4) key = '🏆 Fortalezas: Liderazgo Pedagógico';
@@ -332,6 +345,19 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
                     >
                         <option value="all">Todas</option>
                         {SKILLS.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                </div>
+
+                <div className="flex items-center gap-3 bg-white px-2 py-1.5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 italic">Tipo:</span>
+                    <select 
+                        value={selectedTypeFilter}
+                        onChange={(e) => setSelectedTypeFilter(e.target.value)}
+                        className="bg-transparent border-none outline-none text-[11px] font-bold text-[#1B3C73] cursor-pointer"
+                    >
+                        <option value="all">Cualquiera</option>
+                        <option value="pedagogica">Pedagógico</option>
+                        <option value="convivencia">Convivencia</option>
                     </select>
                 </div>
                 
