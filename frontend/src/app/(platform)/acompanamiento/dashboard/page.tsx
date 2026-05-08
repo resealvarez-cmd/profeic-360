@@ -1034,6 +1034,7 @@ function DashboardContent({
     }, [view, showExecutiveModal, loadingExecutive]);
 
     const [historialFilter, setHistorialFilter] = useState<'all' | 'planned' | 'in_progress' | 'completed'>('all');
+    const [historialTypeFilter, setHistorialTypeFilter] = useState<string>("all");
 
     // C: Ciclos pendientes de cierre (ejecucion lista, sin reflexion)
     const [pendingCloseCycles, setPendingCloseCycles] = useState<any[]>([]);
@@ -1783,31 +1784,54 @@ function DashboardContent({
                                 </button>
                             </div>
                             {/* FILTROS DE ESTADO */}
-                            <div className="flex flex-wrap gap-2">
-                                {([
-                                    { key: 'all', label: 'Todos', color: 'bg-slate-800 text-white', inactive: 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300' },
-                                    { key: 'planned', label: '📅 Planificado', color: 'bg-blue-600 text-white', inactive: 'bg-white text-blue-600 border border-blue-200 hover:border-blue-400' },
-                                    { key: 'in_progress', label: '⚡ En Curso', color: 'bg-orange-500 text-white', inactive: 'bg-white text-orange-500 border border-orange-200 hover:border-orange-400' },
-                                    { key: 'completed', label: '✅ Realizado', color: 'bg-green-600 text-white', inactive: 'bg-white text-green-600 border border-green-200 hover:border-green-400' },
-                                ] as const).map(f => (
-                                    <button
-                                        key={f.key}
-                                        onClick={() => setHistorialFilter(f.key)}
-                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm ${
-                                            historialFilter === f.key ? f.color : f.inactive
-                                        }`}
-                                    >
-                                        {f.label}
-                                        <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-                                            historialFilter === f.key ? 'bg-white/20' : 'bg-slate-100 text-slate-500'
-                                        }`}>
-                                            {f.key === 'all'
-                                                ? allCycles.length
-                                                : allCycles.filter((c: any) => c.status === f.key).length
-                                            }
-                                        </span>
-                                    </button>
-                                ))}
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-wrap gap-2">
+                                    {([
+                                        { key: 'all', label: 'Todos', color: 'bg-slate-800 text-white', inactive: 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300' },
+                                        { key: 'planned', label: '📅 Planificado', color: 'bg-blue-600 text-white', inactive: 'bg-white text-blue-600 border border-blue-200 hover:border-blue-400' },
+                                        { key: 'in_progress', label: '⚡ En Curso', color: 'bg-orange-500 text-white', inactive: 'bg-white text-orange-500 border border-orange-200 hover:border-orange-400' },
+                                        { key: 'completed', label: '✅ Realizado', color: 'bg-green-600 text-white', inactive: 'bg-white text-green-600 border border-green-200 hover:border-green-400' },
+                                    ] as const).map(f => (
+                                        <button
+                                            key={f.key}
+                                            onClick={() => setHistorialFilter(f.key)}
+                                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm ${
+                                                historialFilter === f.key ? f.color : f.inactive
+                                            }`}
+                                        >
+                                            {f.label}
+                                            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+                                                historialFilter === f.key ? 'bg-white/20' : 'bg-slate-100 text-slate-500'
+                                            }`}>
+                                                {f.key === 'all'
+                                                    ? allCycles.length
+                                                    : allCycles.filter((c: any) => c.status === f.key).length
+                                                }
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest self-center mr-2">Filtrar por Área:</span>
+                                    {([
+                                        { key: 'all', label: 'Cualquiera' },
+                                        { key: 'pedagogica', label: 'Pedagógica' },
+                                        { key: 'convivencia', label: 'Convivencia' },
+                                    ]).map(f => (
+                                        <button
+                                            key={f.key}
+                                            onClick={() => setHistorialTypeFilter(f.key)}
+                                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                                historialTypeFilter === f.key 
+                                                ? 'bg-[#1B3C73] text-white shadow-md' 
+                                                : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'
+                                            }`}
+                                        >
+                                            {f.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                         <div className="overflow-x-auto p-4">
@@ -1822,7 +1846,11 @@ function DashboardContent({
                                 </thead>
                                 <tbody className="text-sm divide-y divide-slate-50">
                                     {allCycles
-                                        .filter((c: any) => historialFilter === 'all' || c.status === historialFilter)
+                                        .filter((c: any) => {
+                                            const matchesStatus = historialFilter === 'all' || c.status === historialFilter;
+                                            const matchesType = historialTypeFilter === 'all' || c.rubric_type === historialTypeFilter;
+                                            return matchesStatus && matchesType;
+                                        })
                                         .map((cycle: any) => (
                                         <tr key={cycle.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="p-3">
@@ -1866,7 +1894,11 @@ function DashboardContent({
                                     ))}
                                 </tbody>
                             </table>
-                            {allCycles.filter((c: any) => historialFilter === 'all' || c.status === historialFilter).length === 0 && (
+                            {allCycles.filter((c: any) => {
+                                const matchesStatus = historialFilter === 'all' || c.status === historialFilter;
+                                const matchesType = historialTypeFilter === 'all' || c.rubric_type === historialTypeFilter;
+                                return matchesStatus && matchesType;
+                            }).length === 0 && (
                                 <div className="text-center py-16">
                                     <p className="text-slate-400 font-bold">No hay planificaciones con este estado.</p>
                                     <button onClick={() => setHistorialFilter('all')} className="mt-3 text-[#C87533] font-black text-xs uppercase tracking-widest hover:text-[#1B3C73] transition-colors">
