@@ -58,6 +58,8 @@ export default function Dashboard360() {
     const [newCycleDateTime, setNewCycleDateTime] = useState("");
     const [newCycleSubject, setNewCycleSubject] = useState("");
     const [newCycleRubricType, setNewCycleRubricType] = useState<'pedagogica' | 'convivencia'>('pedagogica');
+    const [duplicateCycleWarning, setDuplicateCycleWarning] = useState<any>(null);
+    const [userSchoolId, setUserSchoolId] = useState<string | null>(null);
 
     // EXECUTIVE REPORT STATE
     const [showExecutiveModal, setShowExecutiveModal] = useState(false);
@@ -198,7 +200,11 @@ export default function Dashboard360() {
                 // --- MULTI-TENANCY FILTERING ---
                 let currentSchoolId = null;
                 const { data: myProfile } = await supabase.from('profiles').select('school_id').eq('id', user?.id || "").maybeSingle();
-                currentSchoolId = myProfile?.school_id;
+                
+                // Read from URL query param to support superadmin toggling school in the sidebar
+                const urlParams = new URLSearchParams(window.location.search);
+                currentSchoolId = urlParams.get('school_id') || myProfile?.school_id;
+                setUserSchoolId(currentSchoolId);
 
                 console.log("DASHBOARD_FETCH: School ID:", currentSchoolId);
 
@@ -327,11 +333,26 @@ export default function Dashboard360() {
         fetchDashboardData();
     }, []);
 
-    const handleNewCycle = async () => {
+    const handleNewCycle = async (bypassDuplicateCheck = false) => {
         if (!newCycleTeacherId) {
             toast.error("Selecciona un docente para observar.");
             return;
         }
+
+        // Find existing planned or in_progress observations for the same teacher
+        if (!bypassDuplicateCheck) {
+            const activeCycle = allCycles.find(c => 
+                c.teacher_id === newCycleTeacherId && 
+                (c.status === 'planned' || c.status === 'in_progress')
+            );
+            
+            if (activeCycle) {
+                // We found a duplicate, show the warning state
+                setDuplicateCycleWarning(activeCycle);
+                return;
+            }
+        }
+
         try {
             const { data: { user } } = await supabase.auth.getUser();
 
@@ -358,6 +379,10 @@ export default function Dashboard360() {
             } else {
                 toast.success("Nueva observación creada.");
                 setShowNewCycleModal(false);
+                setDuplicateCycleWarning(null);
+                setNewCycleTeacherId("");
+                setNewCycleDateTime("");
+                setNewCycleSubject("");
                 router.push(`/acompanamiento/observacion/${data.id}`);
             }
         } catch (err) {
@@ -777,7 +802,7 @@ export default function Dashboard360() {
                                 </h2>
                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 ml-10">Análisis de uso, eficiencia y ahorro de tiempo docente</p>
                             </div>
-                            <ProductAnalytics userEmail={currentUser?.email || ''} isCompact={true} />
+                            <ProductAnalytics userEmail={currentUser?.email || ''} schoolId={userSchoolId} isCompact={true} />
                         </div>
                     )}
                 </div>
@@ -856,75 +881,129 @@ export default function Dashboard360() {
 
             {/* NEW CYCLE MODAL */}
             {showNewCycleModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="bg-[#1B3C73] p-6 text-white relative">
-                            <button onClick={() => setShowNewCycleModal(false)} className="absolute top-4 right-4 text-white/70 hover:text-white">✕</button>
-                            <h2 className="text-xl font-bold flex items-center gap-2">
-                                <Users size={20} /> Nueva Observación
-                            </h2>
-                            <p className="text-blue-100 text-sm mt-1">Selecciona el docente que vas a acompañar</p>
-                        </div>
-                        <div className="p-6 space-y-6">
+                        {duplicateCycleWarning ? (
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Docente a Observar</label>
-                                <select
-                                    className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
-                                    value={newCycleTeacherId}
-                                    onChange={(e) => setNewCycleTeacherId(e.target.value)}
-                                >
-                                    <option value="">Seleccionar Docente...</option>
-                                    {allUsers.filter((u: any) => u.role !== 'superadmin').map((u: any) => (
-                                        <option key={u.id} value={u.id}>{u.full_name || u.email}</option>
-                                    ))}
-                                </select>
+                                <div className="bg-amber-500 p-6 text-white relative">
+                                    <button 
+                                        onClick={() => {
+                                            setDuplicateCycleWarning(null);
+                                            setShowNewCycleModal(false);
+                                        }} 
+                                        className="absolute top-4 right-4 text-white/70 hover:text-white"
+                                    >✕</button>
+                                    <h2 className="text-xl font-bold flex items-center gap-2">
+                                        <AlertTriangle size={22} className="animate-bounce" /> 
+                                        Observación Activa
+                                    </h2>
+                                    <p className="text-amber-100 text-sm mt-1">Este docente ya tiene un acompañamiento en curso o planificado</p>
+                                </div>
+                                <div className="p-6 space-y-6 text-center">
+                                    <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200 text-left">
+                                        <h4 className="text-xs font-black text-amber-800 uppercase tracking-widest mb-2">Detalles del Acompañamiento Activo:</h4>
+                                        <div className="space-y-1 text-slate-700 text-sm">
+                                            <p><strong>Docente:</strong> {allUsers.find(u => u.id === newCycleTeacherId)?.full_name || 'Docente'}</p>
+                                            <p><strong>Asignatura/Contexto:</strong> {duplicateCycleWarning.subject_context || 'No especificada'}</p>
+                                            <p><strong>Estado:</strong> <span className="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-xs border border-amber-200 uppercase">{duplicateCycleWarning.status === 'in_progress' ? 'En Curso' : 'Planificada'}</span></p>
+                                            <p><strong>Fecha de Inicio:</strong> {new Date(duplicateCycleWarning.created_at).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                                        Para evitar distorsiones en las métricas de la institución, te sugerimos continuar con la observación que ya está abierta en vez de iniciar una nueva.
+                                    </p>
+                                    <div className="space-y-2">
+                                        <button
+                                            onClick={() => {
+                                                setShowNewCycleModal(false);
+                                                const targetId = duplicateCycleWarning.id;
+                                                setDuplicateCycleWarning(null);
+                                                router.push(`/acompanamiento/observacion/${targetId}`);
+                                            }}
+                                            className="w-full py-3 bg-[#1B3C73] hover:bg-[#2A59A8] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <PlayCircle size={16} /> CONTINUAR OBSERVACIÓN EXISTENTE
+                                        </button>
+                                        <button
+                                            onClick={() => handleNewCycle(true)}
+                                            className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs transition-all"
+                                        >
+                                            Iniciar nueva observación de todos modos
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                        ) : (
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Fecha y Hora Programada</label>
-                                <input
-                                    type="datetime-local"
-                                    className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
-                                    value={newCycleDateTime}
-                                    onChange={(e) => setNewCycleDateTime(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Asignatura / Contexto (Ej: Matemática 2º Medio)</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
-                                    value={newCycleSubject}
-                                    onChange={(e) => setNewCycleSubject(e.target.value)}
-                                    placeholder="Ej: Matemática 2º Medio"
-                                />
-                            </div>
+                                <div className="bg-[#1B3C73] p-6 text-white relative">
+                                    <button onClick={() => setShowNewCycleModal(false)} className="absolute top-4 right-4 text-white/70 hover:text-white">✕</button>
+                                    <h2 className="text-xl font-bold flex items-center gap-2">
+                                        <Users size={20} /> Nueva Observación
+                                    </h2>
+                                    <p className="text-blue-100 text-sm mt-1">Selecciona el docente que vas a acompañar</p>
+                                </div>
+                                <div className="p-6 space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-2">Docente a Observar</label>
+                                        <select
+                                            className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
+                                            value={newCycleTeacherId}
+                                            onChange={(e) => setNewCycleTeacherId(e.target.value)}
+                                        >
+                                            <option value="">Seleccionar Docente...</option>
+                                            {allUsers.filter((u: any) => u.role !== 'superadmin').map((u: any) => (
+                                                <option key={u.id} value={u.id}>{u.full_name || u.email}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-2">Fecha y Hora Programada</label>
+                                        <input
+                                            type="datetime-local"
+                                            className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
+                                            value={newCycleDateTime}
+                                            onChange={(e) => setNewCycleDateTime(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-2">Asignatura / Contexto (Ej: Matemática 2º Medio)</label>
+                                        <input
+                                            type="text"
+                                            className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-900 bg-slate-50 focus:ring-2 focus:ring-[#C87533] outline-none transition-all"
+                                            value={newCycleSubject}
+                                            onChange={(e) => setNewCycleSubject(e.target.value)}
+                                            placeholder="Ej: Matemática 2º Medio"
+                                        />
+                                    </div>
 
-                            {/* RUBRIC SELECTION */}
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Instrumento a Utilizar</label>
-                                <div className="grid grid-cols-2 gap-2">
+                                    {/* RUBRIC SELECTION */}
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-2">Instrumento a Utilizar</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                onClick={() => setNewCycleRubricType('pedagogica')}
+                                                className={`p-3 rounded-xl border text-xs font-bold transition-all ${newCycleRubricType === 'pedagogica' ? 'bg-[#1B3C73] text-white border-[#1B3C73]' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                            >
+                                                Pedagógica
+                                            </button>
+                                            <button
+                                                onClick={() => setNewCycleRubricType('convivencia')}
+                                                className={`p-3 rounded-xl border text-xs font-bold transition-all ${newCycleRubricType === 'convivencia' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                            >
+                                                Convivencia
+                                            </button>
+                                        </div>
+                                    </div>
                                     <button
-                                        onClick={() => setNewCycleRubricType('pedagogica')}
-                                        className={`p-3 rounded-xl border text-xs font-bold transition-all ${newCycleRubricType === 'pedagogica' ? 'bg-[#1B3C73] text-white border-[#1B3C73]' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                        onClick={() => handleNewCycle(false)}
+                                        disabled={!newCycleTeacherId}
+                                        className="w-full py-3 bg-[#1B3C73] hover:bg-[#2A59A8] text-white font-bold rounded-xl shadow-lg transition-all disabled:opacity-50"
                                     >
-                                        Pedagógica
-                                    </button>
-                                    <button
-                                        onClick={() => setNewCycleRubricType('convivencia')}
-                                        className={`p-3 rounded-xl border text-xs font-bold transition-all ${newCycleRubricType === 'convivencia' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
-                                    >
-                                        Convivencia
+                                        INICIAR PAUTA
                                     </button>
                                 </div>
                             </div>
-                            <button
-                                onClick={handleNewCycle}
-                                disabled={!newCycleTeacherId}
-                                className="w-full py-3 bg-[#1B3C73] hover:bg-[#2A59A8] text-white font-bold rounded-xl shadow-lg transition-all disabled:opacity-50"
-                            >
-                                INICIAR PAUTA
-                            </button>
-                        </div>
+                        )}
                     </div>
                 </div>
             )}

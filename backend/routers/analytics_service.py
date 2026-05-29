@@ -1,6 +1,7 @@
 import os
 from typing import Dict, Any, List, Set
 from supabase import Client
+from datetime import datetime, timezone, timedelta
 
 SAVED_MINUTES_MAP = {
     "planificador": 85,
@@ -27,10 +28,33 @@ LIB_MAP = {
     "OMR": "omr"
 }
 
-def calculate_global_stats(supabase: Client):
+def parse_datetime_to_utc(dt_str: str) -> datetime:
+    if not dt_str:
+        return datetime.now(timezone.utc)
+    # Clean up standard formats
+    cleaned = dt_str.replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(cleaned)
+    except Exception:
+        try:
+            dt = datetime.fromisoformat(dt_str[:19].replace(" ", "T") + "+00:00")
+        except Exception:
+            try:
+                dt = datetime.strptime(dt_str[:19], "%Y-%m-%dT%H:%M:%S")
+            except Exception:
+                dt = datetime.now(timezone.utc)
+    
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    else:
+        dt = dt.astimezone(timezone.utc)
+    return dt
+
+def calculate_global_stats(supabase: Client, period: str = "all", school_id: str = None):
     """
     Core logic to calculate global engagement and impact metrics.
     Ensures consistency between Admin and Telemetry dashboards.
+    Supports period parameter ('7d', '30d', 'all') and computes inactivity radar with school isolation.
     """
     def fetch_all_rows(table_name: str, select_query: str = '*'):
         # Get real total to avoid guessing loop ends (Lighter query using limit(0))
@@ -40,7 +64,7 @@ def calculate_global_stats(supabase: Client):
         except Exception as e:
             print(f"⚠️ Error getting count for {table_name}: {e}")
             total_in_db = 1000 # Fallback 
-
+        
         all_rows = []
         page_size = 1000
         max_limit = 100000
@@ -81,8 +105,13 @@ def calculate_global_stats(supabase: Client):
 
     lib_items = fetch_all_rows('biblioteca_recursos', 'tipo, user_id, created_at')
 
-    res_profiles = supabase.table('profiles').select('id, email, full_name, school_id').execute()
+    res_profiles = supabase.table('profiles').select('id, email, full_name, school_id, updated_at').execute()
     profiles_data = res_profiles.data or []
+    
+    # Filter profiles by school_id if specified (multitenancy isolation)
+    if school_id and school_id != "all" and school_id != "undefined":
+        profiles_data = [p for p in profiles_data if p.get('school_id') == school_id]
+        
     profile_map = {p['id']: {"email": p.get('email', 'anon'), "name": p.get('full_name', 'Docente')} for p in profiles_data}
     email_to_name = {p.get('email'): p.get('full_name', 'Docente') for p in profiles_data if p.get('email')}
     user_to_school = {p['id']: p.get('school_id') or "individual" for p in profiles_data}
@@ -91,15 +120,64 @@ def calculate_global_stats(supabase: Client):
     total_saved_minutes = 0
     module_usage: Dict[str, int] = {}
     user_activity: Dict[str, int] = {}
+    user_exploration: Dict[str, int] = {}
+    user_distinct_modules: Dict[str, Set[str]] = {}
+    user_last_active: Dict[str, datetime] = {}
+    
+    # Seed user_last_active with profiles updated_at timestamp as robust login fallback
+    for p in profiles_data:
+        email = p.get('email')
+        updated_at_str = p.get('updated_at')
+        if email and updated_at_str:
+            try:
+                dt = parse_datetime_to_utc(updated_at_str)
+                if email not in user_last_active or dt > user_last_active[email]:
+                    user_last_active[email] = dt
+            except Exception:
+                pass
+                
     unique_active_users: Set[str] = set()
     friction_count = 0
+
+    # Parse period time range
+    ahora = datetime.now(timezone.utc)
+    threshold = None
+    if period == "7d":
+        threshold = ahora - timedelta(days=7)
+    elif period == "30d":
+        threshold = ahora - timedelta(days=30)
 
     # 2.1 Process Library Resources (Proven Success)
     for item in lib_items:
         tipo = str(item.get('tipo', '')).upper()
         uid = item.get('user_id')
+        
+        # Multi-tenancy filter
+        if school_id and school_id != "all" and school_id != "undefined":
+            if uid not in profile_map:
+                continue
+                
         user_info = profile_map.get(uid, {"email": "anonymous", "name": "Anónimo"})
         email = user_info["email"]
+        created_at_str = item.get('created_at', '')
+        
+        # Track absolute last active for inactivity radar (always historical)
+        if created_at_str and email != "anonymous":
+            try:
+                dt = parse_datetime_to_utc(created_at_str)
+                if email not in user_last_active or dt > user_last_active[email]:
+                    user_last_active[email] = dt
+            except Exception:
+                pass
+
+        # Apply date filter for active period stats
+        if threshold and created_at_str:
+            try:
+                dt = parse_datetime_to_utc(created_at_str)
+                if dt < threshold:
+                    continue
+            except Exception:
+                pass
         
         if email != "anonymous":
             unique_active_users.add(email)
@@ -112,20 +190,56 @@ def calculate_global_stats(supabase: Client):
 
     # 2.2 Process Telemetry Events (Interaction/Drift)
     for ev in events:
-        mod = ev.get('module', 'unknown')
+        mod = ev.get('module', 'unknown') or 'unknown'
         # Normalize: Remove paths and convert underscores to dashes
         mod_clean = (mod.split('/')[-1] if '/' in mod else mod).replace('_', '-')
         email = ev.get('email', 'anonymous')
         
+        # Multi-tenancy filter
+        if school_id and school_id != "all" and school_id != "undefined":
+            if email != "anonymous" and email not in email_to_name:
+                continue
+                
+        event_name = ev.get('event_name', '')
+        created_at_str = ev.get('created_at', '')
+        
+        # Track absolute last active for inactivity radar (always historical)
+        if created_at_str and email != "anonymous":
+            try:
+                dt = parse_datetime_to_utc(created_at_str)
+                if email not in user_last_active or dt > user_last_active[email]:
+                    user_last_active[email] = dt
+            except Exception:
+                pass
+
+        # Apply date filter for active period stats
+        if threshold and created_at_str:
+            try:
+                dt = parse_datetime_to_utc(created_at_str)
+                if dt < threshold:
+                    continue
+            except Exception:
+                pass
+        
         if email != "anonymous":
             unique_active_users.add(email)
             user_activity[email] = user_activity.get(email, 0) + 1
+            
+            # Count navigation/exploration page views
+            if event_name == 'page_view':
+                user_exploration[email] = user_exploration.get(email, 0) + 1
+                
+            # Track variety of modules accessed
+            if mod_clean and mod_clean != 'unknown':
+                if email not in user_distinct_modules:
+                    user_distinct_modules[email] = set()
+                user_distinct_modules[email].add(mod_clean)
 
-        if ev.get('event_name') == 'regenerate_question':
+        if event_name == 'regenerate_question':
             friction_count += 1
 
         # Hybrid weight for interaction success without saving
-        if 'success' in ev.get('event_name', '').lower() or 'generar' in ev.get('event_name', '').lower() or 'export' in ev.get('event_name', '').lower():
+        if 'success' in event_name.lower() or 'generar' in event_name.lower() or 'export' in event_name.lower():
             if mod_clean in SAVED_MINUTES_MAP:
                 # Add 40% (increased from 35%) weight for using the tool successfully
                 total_saved_minutes += (SAVED_MINUTES_MAP.get(mod_clean, 0) * 0.40)
@@ -138,6 +252,9 @@ def calculate_global_stats(supabase: Client):
     impactful_events = [ev for ev in events if ev.get('event_name') != 'page_view']
 
     # 3. Final Aggregations
+    if school_id and school_id != "all" and school_id != "undefined":
+        total_authorized = len(profiles_data) or 1
+        
     adoption_pct = round((len(unique_active_users) / total_authorized) * 100, 1) if total_authorized > 0 else 0
     
     top_users = []
@@ -145,6 +262,19 @@ def calculate_global_stats(supabase: Client):
     for email, count in sorted_user_activity:
         name = email_to_name.get(email, email)
         top_users.append({"email": email, "count": int(count), "name": name})
+
+    # Top Explorers (Curiosity Ranking) based on page_views and module count
+    top_explorers = []
+    sorted_user_exploration = sorted(user_exploration.items(), key=lambda x: x[1], reverse=True)[:10]
+    for email, count in sorted_user_exploration:
+        name = email_to_name.get(email, email)
+        distinct_mods = list(user_distinct_modules.get(email, set()))
+        top_explorers.append({
+            "email": email,
+            "name": name,
+            "count": int(count),
+            "modules_count": len(distinct_mods)
+        })
 
     sorted_modules = sorted(
         [{"name": k.capitalize(), "val": int(v), "value": int(v)} for k, v in module_usage.items()],
@@ -168,6 +298,45 @@ def calculate_global_stats(supabase: Client):
         reverse=True
     )
 
+    # 5. Inactive Teachers (Acompañamiento Radar)
+    inactive_teachers = []
+    for p in profiles_data:
+        email = p.get('email')
+        name = p.get('full_name', 'Docente')
+        sid = p.get('school_id') or "individual"
+        school_name = schools_name_map.get(sid, "Individual")
+        
+        if not email or email == "re.se.alvarez@gmail.com":
+            continue # Skip super admin or empty email
+            
+        last_active_dt = user_last_active.get(email)
+        
+        if last_active_dt is None:
+            # Never logged in
+            inactive_teachers.append({
+                "email": email,
+                "name": name,
+                "school_name": school_name,
+                "last_active": "Nunca ingresó",
+                "days_inactive": 999,
+                "status": "critical"
+            })
+        else:
+            days_inactive = (ahora - last_active_dt).days
+            # Filter to show those inactive for 14+ days
+            if days_inactive >= 14:
+                inactive_teachers.append({
+                    "email": email,
+                    "name": name,
+                    "school_name": school_name,
+                    "last_active": f"Hace {days_inactive} días",
+                    "days_inactive": days_inactive,
+                    "status": "warning" if days_inactive < 30 else "critical"
+                })
+                
+    # Sort inactive teachers descending by days inactive (most critical first)
+    inactive_teachers.sort(key=lambda x: x["days_inactive"], reverse=True)
+
     return {
         "summary": {
             "total_authorized": total_authorized,
@@ -181,7 +350,9 @@ def calculate_global_stats(supabase: Client):
         },
         "top_modules": sorted_modules,
         "power_users": top_users,
+        "top_explorers": top_explorers,
+        "inactive_teachers": inactive_teachers,
         "school_stats": school_stats,
         "recent_events": events[:25],
-        "last_updated": __import__('datetime').datetime.now().isoformat()
+        "last_updated": ahora.isoformat()
     }

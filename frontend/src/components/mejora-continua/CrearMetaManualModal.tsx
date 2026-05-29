@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
 import { Plus, Trash2, Save, Loader2, Target, X } from "lucide-react";
+import ValidarSmartButton from "./ValidarSmartButton";
 
 export default function CrearMetaManualModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -242,7 +243,14 @@ export default function CrearMetaManualModal() {
         <div className="p-6 space-y-6">
           <div className="space-y-4">
               <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-500 ml-1">Objetivo General</Label>
+                  <div className="flex justify-between items-center mr-1">
+                      <Label className="text-xs font-bold text-slate-500 ml-1">Objetivo General</Label>
+                      <ValidarSmartButton 
+                          texto={goal.title} 
+                          tipo="meta" 
+                          onApply={(newText) => setGoal(prev => ({ ...prev, title: newText }))}
+                      />
+                  </div>
                   <Input 
                       value={goal.title} 
                       onChange={(e) => setGoal({...goal, title: e.target.value})}
@@ -279,7 +287,14 @@ export default function CrearMetaManualModal() {
               </div>
               
               <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-500 ml-1">Descripción del Logro</Label>
+                  <div className="flex justify-between items-center mr-1">
+                      <Label className="text-xs font-bold text-slate-500 ml-1">Descripción del Logro</Label>
+                      <ValidarSmartButton 
+                          texto={goal.description} 
+                          tipo="meta" 
+                          onApply={(newText) => setGoal(prev => ({ ...prev, description: newText }))}
+                      />
+                  </div>
                   <Textarea 
                       value={goal.description}
                       onChange={(e) => setGoal({...goal, description: e.target.value})}
@@ -340,13 +355,21 @@ export default function CrearMetaManualModal() {
                           
                           <div className="space-y-2">
                               {phase.indicators.map((ind, iIdx) => (
-                                  <div key={ind.id} className="flex flex-col md:flex-row gap-3 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm relative group">
-                                      <Input 
-                                          className="h-10 text-sm font-bold text-slate-900 border-transparent bg-transparent focus:bg-slate-50 transition-all flex-1"
-                                          placeholder={`Indicador ${iIdx + 1}...`}
-                                          value={ind.description}
-                                          onChange={(e) => updateIndicator(phase.id, ind.id, 'description', e.target.value)}
-                                      />
+                                  <div key={ind.id} className="flex flex-col md:flex-row gap-3 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm relative group items-center">
+                                      <div className="flex-1 flex gap-2 items-center w-full">
+                                          <Input 
+                                              className="h-10 text-sm font-bold text-slate-900 border-transparent bg-transparent focus:bg-slate-50 transition-all flex-1"
+                                              placeholder={`Indicador ${iIdx + 1}...`}
+                                              value={ind.description}
+                                              onChange={(e) => updateIndicator(phase.id, ind.id, 'description', e.target.value)}
+                                          />
+                                          <ValidarSmartButton
+                                              texto={ind.description}
+                                              tipo="indicador"
+                                              onApply={(newText) => updateIndicator(phase.id, ind.id, 'description', newText)}
+                                              className="h-8 px-2 shrink-0"
+                                          />
+                                      </div>
                                       <div className="flex gap-2 items-center">
                                           <Input 
                                               type="number"

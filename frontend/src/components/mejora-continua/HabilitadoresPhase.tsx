@@ -21,8 +21,8 @@ interface Props {
 }
 
 export default function HabilitadoresPhase({ phaseId, enablers = [] }: Props) {
-  const { isDirectivo } = useAuth();
-  const canEdit = isDirectivo;
+  const { isLiderazgo, isSuperAdmin } = useAuth();
+  const canEdit = isLiderazgo || isSuperAdmin;
 
   if (enablers.length === 0) {
     return (

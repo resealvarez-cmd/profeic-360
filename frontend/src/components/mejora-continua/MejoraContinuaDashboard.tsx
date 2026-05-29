@@ -324,7 +324,7 @@ function KanbanColumn({
 // Main component
 // ---------------------------------------------------------------------------
 export default function MejoraContinuaDashboard() {
-  const { isDirectivo, user: authUser, currentSchoolId: authSchoolId } = useAuth();
+  const { isDirectivo, isLiderazgo, isSuperAdmin, user: authUser, currentSchoolId: authSchoolId } = useAuth();
   const [goals, setGoals] = useState<StrategicGoal[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -337,10 +337,11 @@ export default function MejoraContinuaDashboard() {
   const [pmeActions, setPmeActions] = useState<any[]>([]);
   const [evidences, setEvidences] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<"dashboard" | "analytics" | "goals" | "pme" | "reports">("dashboard");
+  const [budgetInfo, setBudgetInfo] = useState<{ budget_sep: number; budget_pie: number; budget_total: number } | null>(null);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
   const createMenuRef = useRef<HTMLDivElement>(null);
 
-  const canEdit = isDirectivo;
+  const canEdit = isLiderazgo || isSuperAdmin;
   const pmeMap = Object.fromEntries(pmeActions.map(a => [a.id, a]));
 
   // Close create menu on outside click
@@ -365,6 +366,14 @@ export default function MejoraContinuaDashboard() {
         const { data: pData } = await supabase.from("profiles").select("school_id").eq("id", authUser.id).single();
         if (pData) schoolId = pData.school_id;
       }
+
+      // Fetch budget info multitenant-safe
+      let infoQuery = supabase.from("pme_institutional_info").select("*").eq("academic_year", 2026);
+      if (schoolId) {
+        infoQuery = infoQuery.eq("school_id", schoolId);
+      }
+      const { data: info } = await infoQuery.maybeSingle();
+      setBudgetInfo(info);
 
       const { data: goalsRaw, error: goalsError } = await supabase
         .from("strategic_goals")
@@ -484,6 +493,9 @@ export default function MejoraContinuaDashboard() {
   // FIX: Include all leadership roles (new + legacy)
   const mgmtProfiles = profiles.filter(p => ALL_LEADERSHIP_ROLES.includes(p.role?.toLowerCase()));
   const totalInversion = goals.reduce((acc, g) => acc + (g.implementation_phases?.reduce((pa, p) => pa + (p.enablers?.reduce((ea, e) => ea + (e.estimated_cost || 0), 0) || 0), 0) || 0), 0);
+  const budgetLimit = budgetInfo ? (budgetInfo.budget_total || (budgetInfo.budget_sep + budgetInfo.budget_pie)) : 0;
+  const isBudgetExceeded = budgetLimit > 0 && totalInversion > budgetLimit;
+  const budgetOverdraft = totalInversion - budgetLimit;
 
   // -------------------------------------------------------------------------
   // Alert data
@@ -562,7 +574,7 @@ export default function MejoraContinuaDashboard() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <PMEGantt goals={goals} profiles={profiles} isAdminView={isDirectivo} currentUserId={authUser?.id} />
+            <PMEGantt goals={goals} profiles={profiles} isAdminView={isDirectivo} currentUserId={authUser?.id} onRefresh={fetchData} />
             <CuadroMandoScorecard goals={goals} />
             {canEdit && (
               <div className="relative" ref={createMenuRef}>
@@ -607,6 +619,20 @@ export default function MejoraContinuaDashboard() {
               </div>
               <PMEAlertBanner goals={goals} />
             </div>
+
+            {isBudgetExceeded && (
+              <div className="p-4 bg-rose-50/90 backdrop-blur border border-rose-100 rounded-2xl flex items-start gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="p-2.5 bg-rose-100 rounded-xl text-rose-600 shrink-0">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-extrabold text-rose-900 text-sm">¡Sobregiro presupuestario detectado!</h4>
+                  <p className="text-xs text-rose-700 mt-1 font-semibold leading-relaxed">
+                    Has planificado <span className="font-black text-rose-900">${totalInversion.toLocaleString('es-CL')}</span> en habilitadores de PME, lo cual supera en <span className="font-black text-rose-900">${budgetOverdraft.toLocaleString('es-CL')}</span> los recursos SEP/PIE totales asignados a la institución (${budgetLimit.toLocaleString('es-CL')}).
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* KPI Cards */}
             {loading ? (
@@ -689,7 +715,7 @@ export default function MejoraContinuaDashboard() {
                   </button>
                 </div>
               );
-              return <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} />;
+              return <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} budgetInfo={budgetInfo} />;
             })()}
 
             {/* Quick access to goals */}
@@ -781,7 +807,7 @@ export default function MejoraContinuaDashboard() {
               <h2 className="text-xl font-bold text-slate-900">Analítica Estratégica</h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5">Métricas de rendimiento por dimensión y cobertura PME</p>
             </div>
-            <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} />
+            <PMEAnalytics goals={goals} profiles={profiles} pmeMap={pmeMap} budgetInfo={budgetInfo} />
           </>
         )}
 
@@ -965,7 +991,7 @@ export default function MejoraContinuaDashboard() {
                 </div>
                 <h3 className="font-black text-slate-900">Roadmap PDF</h3>
                 <p className="text-xs text-slate-500 leading-relaxed">Copia vectorial del plan estratégico para carpetas técnicas y directivos.</p>
-                <PMEGantt goals={goals} profiles={profiles} isAdminView={isDirectivo} currentUserId={authUser?.id} />
+                <PMEGantt goals={goals} profiles={profiles} isAdminView={isDirectivo} currentUserId={authUser?.id} onRefresh={fetchData} />
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-200 hover:shadow-md transition-all space-y-4">
                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">

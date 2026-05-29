@@ -7,19 +7,70 @@ import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { exportGanttPDF, exportGanttXLSX, exportGanttPDFBackend } from "@/hooks/useGanttExport";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabaseClient";
 
 interface Props {
   goals: StrategicGoal[];
   profiles: any[];
   isAdminView?: boolean;
   currentUserId?: string;
+  onRefresh?: () => void;
 }
 
-export default function PMEGantt({ goals, profiles, isAdminView = true, currentUserId }: Props) {
+export default function PMEGantt({ goals, profiles, isAdminView = true, currentUserId, onRefresh }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [filterGoal, setFilterGoal] = useState<string>("all");
   const [filterLeader, setFilterLeader] = useState<string>("all");
   const [exporting, setExporting] = useState<"pdf" | "xlsx" | "server" | null>(null);
+
+  // Roadmap Phase Editor States
+  const [editingPhase, setEditingPhase] = useState<any | null>(null);
+  const [editStartDate, setEditStartDate] = useState("");
+  const [editEndDate, setEditEndDate] = useState("");
+  const [editStatus, setEditStatus] = useState("pending");
+  const [editLeaderId, setEditLeaderId] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handlePhaseClick = (phase: any) => {
+    setEditingPhase(phase);
+    setEditStartDate(phase.start_date || "");
+    setEditEndDate(phase.end_date || "");
+    setEditStatus(phase.status || "pending");
+    setEditLeaderId(phase.leader_id || "");
+  };
+
+  const handleSavePhase = async () => {
+    if (!editingPhase) return;
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("implementation_phases")
+        .update({
+          start_date: editStartDate,
+          end_date: editEndDate,
+          status: editStatus,
+          leader_id: editLeaderId || null
+        })
+        .eq("id", editingPhase.id);
+
+      if (error) throw error;
+
+      toast.success("¡Hito del roadmap actualizado con éxito!");
+      setEditingPhase(null);
+      
+      // Emit global update event
+      window.dispatchEvent(new Event('mejora-continua-updated'));
+      
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Error al actualizar la fase en el roadmap.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleExport = async (type: "pdf" | "xlsx" | "server") => {
     setExporting(type);
@@ -224,14 +275,20 @@ export default function PMEGantt({ goals, profiles, isAdminView = true, currentU
                         </div>
                       </foreignObject>
 
-                      <rect 
-                        x={labelWidth - 30 + x} 
-                        y={rowHeight/4} 
-                        width={width} 
-                        height={16} 
-                        rx="8"
-                        className={`${isCompleted ? 'fill-emerald-500' : 'fill-blue-500'}`}
-                      />
+                      <g 
+                        className="cursor-pointer hover:opacity-85 transition-opacity active:scale-[0.98] group/bar"
+                        onClick={() => handlePhaseClick(phase)}
+                      >
+                        <rect 
+                          x={labelWidth - 30 + x} 
+                          y={rowHeight/4} 
+                          width={width} 
+                          height={16} 
+                          rx="8"
+                          className={`${isCompleted ? 'fill-emerald-500 hover:fill-emerald-600' : 'fill-blue-500 hover:fill-blue-600'} transition-colors`}
+                        />
+                        <title>Haga clic para editar: {phase.title}</title>
+                      </g>
                     </g>
                   );
                 })}
@@ -255,6 +312,96 @@ export default function PMEGantt({ goals, profiles, isAdminView = true, currentU
                 ProfeIC 360 • Roadmap de Gestión
             </p>
         </div>
+
+        {editingPhase && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full p-6 space-y-6 animate-in zoom-in-95 duration-200">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 uppercase tracking-tight">Editar Hito de Roadmap</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{editingPhase.title}</p>
+                </div>
+                <button 
+                  onClick={() => setEditingPhase(null)} 
+                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Form Fields */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Fecha Inicio</label>
+                    <input 
+                      type="date" 
+                      value={editStartDate}
+                      onChange={(e) => setEditStartDate(e.target.value)}
+                      className="w-full h-11 px-3 text-sm font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Fecha Término</label>
+                    <input 
+                      type="date" 
+                      value={editEndDate}
+                      onChange={(e) => setEditEndDate(e.target.value)}
+                      className="w-full h-11 px-3 text-sm font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Estado de Ejecución</label>
+                  <select 
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full h-11 px-3 text-sm font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
+                  >
+                    <option value="pending">PENDIENTE</option>
+                    <option value="in_progress">EN EJECUCIÓN</option>
+                    <option value="completed">LOGRADO</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Líder Responsable</label>
+                  <select 
+                    value={editLeaderId}
+                    onChange={(e) => setEditLeaderId(e.target.value)}
+                    className="w-full h-11 px-3 text-sm font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
+                  >
+                    <option value="">SIN RESPONSABLE</option>
+                    {profiles.map(p => (
+                      <option key={p.id} value={p.id}>{p.full_name || p.email}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setEditingPhase(null)}
+                  className="flex-1 h-12 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-100"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={handleSavePhase}
+                  disabled={isUpdating}
+                  className="flex-[2] h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-500/20"
+                >
+                  {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : null}
+                  Guardar Hito
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

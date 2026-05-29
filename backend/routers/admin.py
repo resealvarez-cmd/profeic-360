@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from supabase import create_client, Client
 from .analytics_service import calculate_global_stats
+from .deps import verify_super_admin
 
 router = APIRouter(prefix="/admin", tags=["SuperAdmin"])
 
@@ -55,31 +56,8 @@ class CreateUserRequest(BaseModel):
 class DeleteUserRequest(BaseModel):
     email: str
 
-# === DEPENDECIA DE SEGURIDAD ===
-async def verify_super_admin(authorization: str = Header(...)):
-    """Verifica que quien llama sea el SuperAdmin."""
-    try:
-        token = authorization.split("Bearer ")[1]
-        
-        # Validar el token usando un cliente limpio de fastapi request 
-        anon_key = os.getenv("SUPABASE_ANON_KEY") or os.getenv("SUPABASE_KEY")
-        supabase_anon = create_client(SUPABASE_URL, anon_key)
-        
-        user_response = supabase_anon.auth.get_user(token)
-        if not user_response or not hasattr(user_response, 'user') or not user_response.user:
-            raise HTTPException(status_code=401, detail="Token inválido")
-            
-        email = user_response.user.email
-        print(f"👮 verify_super_admin: user={email}")
-        
-        # Hardcoded SuperAdmin Check or use authorized_users table
-        if email != "re.se.alvarez@gmail.com":
-            print(f"🚫 verify_super_admin: Access Denied for {email}")
-            raise HTTPException(status_code=403, detail="Acceso denegado. No eres Super Administrador.")
-            
-        return user_response.user
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Autenticación fallida: {str(e)}")
+# verify_super_admin importado desde deps.py
+
 
 
 @router.post("/invite")

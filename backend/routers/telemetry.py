@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from supabase import create_client, Client
 import os
 from .analytics_service import calculate_global_stats
+from .deps import verify_super_admin
 from fastapi.responses import JSONResponse
 
 router = APIRouter(
@@ -45,15 +46,12 @@ async def track_event(req: TelemetryTrackRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/analytics")
-async def get_product_analytics(email: str = Query(...)):
-    if email != "re.se.alvarez@gmail.com":
-        print(f"🚫 Telemetry: Denied access to {email}")
-        raise HTTPException(status_code=403, detail="Access denied. Super Admin only.")
-    
-    print(f"📊 Telemetry: Building analytics for {email} (Forced Admin Mode)")
+async def get_product_analytics(period: str = "all", school_id: Optional[str] = None, admin_user: any = Depends(verify_super_admin)):
+    email = admin_user.email
+    print(f"📊 Telemetry: Building analytics for {email} (Period: {period}, School: {school_id}, Authenticated Admin)")
     try:
         # Use supabase_admin to bypass 1000 row cap
-        stats = calculate_global_stats(supabase_admin)
+        stats = calculate_global_stats(supabase_admin, period=period, school_id=school_id)
         stats["version"] = "v1.2.6-BuildFix"
         
         return JSONResponse(

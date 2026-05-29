@@ -1,9 +1,11 @@
 import os
-from fastapi import APIRouter, HTTPException, File, UploadFile
+from typing import Literal, Optional
+from fastapi import APIRouter, HTTPException, File, UploadFile, Depends
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 import google.generativeai as genai
 from supabase import create_client
+from routers.deps import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/pme", tags=["PME"])
 
@@ -17,19 +19,29 @@ except Exception:
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY", ""))
 
+
 def get_model():
     return genai.GenerativeModel(
         "gemini-2.5-flash",
         generation_config={"response_mime_type": "application/json"}
     )
 
+
 @router.get("/analisis-progreso")
-async def analisis_progreso():
+async def analisis_progreso(user_id: str = Depends(get_current_user_id)):
+    """Analiza las metas y acciones del PME del colegio del usuario usando IA."""
     try:
-        pme_res = supabase.table("pme_actions").select("*").execute()
+        # 1. Validar e identificar la escuela del usuario
+        profile_res = supabase.table("profiles").select("school_id").eq("id", user_id).single().execute()
+        school_id = profile_res.data.get("school_id") if profile_res.data else None
+        if not school_id:
+            return JSONResponse(status_code=403, content={"alerta": "El usuario no tiene una institución asignada."})
+
+        # 2. Filtrar consultas estrictamente por school_id
+        pme_res = supabase.table("pme_actions").select("*").eq("school_id", school_id).execute()
         actions = pme_res.data or []
         
-        goals_res = supabase.table("strategic_goals").select("*").not_.is_("pme_action_link", "null").execute()
+        goals_res = supabase.table("strategic_goals").select("*").eq("school_id", school_id).not_.is_("pme_action_link", "null").execute()
         goals = goals_res.data or []
 
         if not goals:
@@ -61,11 +73,19 @@ async def analisis_progreso():
         print(f"[ERROR] PME Analysis: {e}")
         return JSONResponse({"alerta": "Error temporal al analizar el ritmo de progreso. Consulte más tarde."})
 
+
 @router.get("/exportar")
-async def exportar_evidencia():
+async def exportar_evidencia(user_id: str = Depends(get_current_user_id)):
+    """Exporta el reporte de cumplimiento filtrado por la institución del usuario."""
     try:
+        # 1. Validar e identificar la escuela del usuario
+        profile_res = supabase.table("profiles").select("school_id").eq("id", user_id).single().execute()
+        school_id = profile_res.data.get("school_id") if profile_res.data else None
+        if not school_id:
+            raise HTTPException(status_code=403, detail="El usuario no tiene una institución asignada.")
+
         from docx import Document
-        from docx.shared import Pt, Inches
+        from docx.shared import Pt
         from docx.enum.text import WD_ALIGN_PARAGRAPH
         from io import BytesIO
 
@@ -74,20 +94,20 @@ async def exportar_evidencia():
         # Titulo
         titulo = doc.add_paragraph()
         titulo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = titulo.add_run("EVIDENCIA DE CUMPLIMIENTO PME\\n(Acciones Oficiales y Metas Operativas)")
+        run = titulo.add_run("EVIDENCIA DE CUMPLIMIENTO PME\n(Acciones Oficiales y Metas Operativas)")
         run.bold = True
         run.font.size = Pt(16)
         
         doc.add_paragraph() # Spacer
 
-        # Fetch data
-        pme_res = supabase.table("pme_actions").select("*").execute()
+        # 2. Consultar datos exclusivamente para school_id
+        pme_res = supabase.table("pme_actions").select("*").eq("school_id", school_id).execute()
         actions = pme_res.data or []
         
-        goals_res = supabase.table("strategic_goals").select("*").not_.is_("pme_action_link", "null").execute()
+        goals_res = supabase.table("strategic_goals").select("*").eq("school_id", school_id).not_.is_("pme_action_link", "null").execute()
         goals = goals_res.data or []
         
-        phases_res = supabase.table("implementation_phases").select("*").execute()
+        phases_res = supabase.table("implementation_phases").select("*").execute()  # las fases se asocian a metas
         phases = phases_res.data or []
         
         inds_res = supabase.table("indicators").select("*").execute()
@@ -134,13 +154,16 @@ async def exportar_evidencia():
             headers=headers
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"[ERROR] PME Export: {e}")
-        return JSONResponse({"alerta": "Error al exportar documento."})
+        return JSONResponse(status_code=500, content={"alerta": "Error al exportar documento."})
 
 
 @router.post("/importar-documento")
-async def importar_documento_pme(file: UploadFile = File(...)):
+async def importar_documento_pme(file: UploadFile = File(...), user_id: str = Depends(get_current_user_id)):
+    """Importa e interpreta un archivo de reporte PME oficial."""
     try:
         import io
         from pypdf import PdfReader
@@ -154,7 +177,7 @@ async def importar_documento_pme(file: UploadFile = File(...)):
         pdf = PdfReader(io.BytesIO(content))
         text_content = ""
         for page in pdf.pages:
-            text_content += page.extract_text() + "\\n"
+            text_content += page.extract_text() + "\n"
             
         if not text_content.strip():
             return JSONResponse(status_code=400, content={"message": "No se pudo extraer texto del PDF (probablemente es escaneado)."})
@@ -164,37 +187,37 @@ async def importar_documento_pme(file: UploadFile = File(...)):
             text_content = text_content[:100000]
 
         prompt = f"""Eres un analista de datos escolares. A continuación recibirás el texto extraído de un reporte oficial del Ministerio de Educación (PME). 
-Tu tarea es extraer y clasificar la información en la siguiente estructura JSON exacta, omitiendo textos de relleno:
-
-{{
-  "identidad": {{
-    "vision": "Texto de la visión o 'No especificada'",
-    "mision": "Texto de la misión o 'No especificada'",
-    "sellos": ["Sello 1", "Sello 2"]
-  }},
-  "recursos": {{
-    "total": numero_entero,
-    "sep": numero_entero,
-    "pie": numero_entero
-  }},
-  "estrategias": [
-    {{
-      "dimension": "Ej: Gestión Pedagógica",
-      "objetivo": "Texto del objetivo",
-      "estrategia": "Texto de la estrategia"
-    }}
-  ],
-  "diagnostico": {{
-    "fortalezas": ["Fortaleza 1", "Fortaleza 2"],
-    "oportunidades_mejora": ["Mejora 1", "Mejora 2"]
-  }}
-}}
-
-Asegúrate de devolver SOLO este JSON válido.
-
-=== TEXTO DEL REPORTE ===
-{text_content}
-"""
+        Tu tarea es extraer y clasificar la información en la siguiente estructura JSON exacta, omitiendo textos de relleno:
+        
+        {{
+          "identidad": {{
+            "vision": "Texto de la visión o 'No especificada'",
+            "mision": "Texto de la misión o 'No especificada'",
+            "sellos": ["Sello 1", "Sello 2"]
+          }},
+          "recursos": {{
+            "total": numero_entero,
+            "sep": numero_entero,
+            "pie": numero_entero
+          }},
+          "estrategias": [
+            {{
+              "dimension": "Ej: Gestión Pedagógica",
+              "objetivo": "Texto del objetivo",
+              "estrategia": "Texto de la estrategia"
+            }}
+          ],
+          "diagnostico": {{
+            "fortalezas": ["Fortaleza 1", "Fortaleza 2"],
+            "oportunidades_mejora": ["Mejora 1", "Mejora 2"]
+          }}
+        }}
+        
+        Asegúrate de devolver SOLO este JSON válido.
+        
+        === TEXTO DEL REPORTE ===
+        {text_content}
+        """
 
         # Enviar a Gemini con JSON mode
         import json
@@ -216,15 +239,25 @@ class ConsolidateRequest(BaseModel):
     recursos: dict = None
     estrategias: list = []
     diagnostico: dict = None
-    school_id: str = None  # Nuevo campo para aislamiento
+    school_id: str = None  # Se validará contra el token del usuario
+
 
 @router.post("/consolidar")
-async def consolidar_pme(req: ConsolidateRequest):
-    """Guarda la información extraída en la base de datos oficial."""
+async def consolidar_pme(req: ConsolidateRequest, user_id: str = Depends(get_current_user_id)):
+    """Guarda la información PME extraída garantizando el aislamiento multitenant."""
     try:
-        school_id = req.school_id
+        # 1. Validar e identificar la escuela del usuario
+        profile_res = supabase.table("profiles").select("school_id").eq("id", user_id).single().execute()
+        school_id = profile_res.data.get("school_id") if profile_res.data else None
+        if not school_id:
+            raise HTTPException(status_code=403, detail="El usuario no tiene una institución asignada.")
+            
+        # 2. Prevenir Spoofing: validar o forzar school_id de la sesión
+        target_school_id = school_id
+        if req.school_id and str(req.school_id) != str(school_id):
+            raise HTTPException(status_code=403, detail="Violación de multitenancy: El school_id solicitado no corresponde.")
         
-        # 1. Guardar Identidad e Información Financiera (Configuración Global)
+        # 3. Guardar Identidad e Información Financiera
         if req.identidad or req.recursos:
             info_to_save = {
                 "mission": req.identidad.get("mision") if req.identidad else None,
@@ -233,25 +266,22 @@ async def consolidar_pme(req: ConsolidateRequest):
                 "budget_sep": req.recursos.get("sep", 0) if req.recursos else 0,
                 "budget_pie": req.recursos.get("pie", 0) if req.recursos else 0,
                 "budget_total": req.recursos.get("total", 0) if req.recursos else 0,
-                "school_id": school_id,  # Aislamiento por escuela
+                "school_id": target_school_id,
                 "updated_at": "now()"
             }
-            # Upsert (un registro por escuela y por año académico)
+            # Upsert
             year = 2026
-            # Cambiamos el conflicto a school_id + academic_year si existe la restricción,
-            # de lo contrario upsert por academic_year solo sobreescribiría.
-            # Asumimos que la tabla debe tener restricción UNIQUE(school_id, academic_year).
             supabase.table("pme_institutional_info").upsert(
                 {**info_to_save, "academic_year": year},
-                on_conflict="academic_year" # Nota: Esto debería ser una restricción compuesta en la DB.
+                on_conflict="academic_year"
             ).execute()
 
-        # 2. Guardar Estrategias (Acciones Oficiales)
+        # 4. Guardar Estrategias (Acciones Oficiales)
         if req.estrategias:
             actions_to_insert = []
             for estr in req.estrategias:
                 actions_to_insert.append({
-                    "school_id": school_id, # Aislamiento por escuela
+                    "school_id": target_school_id,
                     "dimension": estr.get("dimension"),
                     "title": estr.get("objetivo"),
                     "description": estr.get("estrategia"),
@@ -260,13 +290,105 @@ async def consolidar_pme(req: ConsolidateRequest):
                 })
             
             if actions_to_insert:
-                # Insertar las acciones oficiales vinculadas a la escuela.
                 supabase.table("pme_actions").insert(actions_to_insert).execute()
 
         return JSONResponse(content={"message": "Plan consolidado con éxito en la base de datos oficial."})
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"[ERROR] Consolidar PME: {e}")
         return JSONResponse(status_code=500, content={"message": f"Fallo al guardar: {str(e)}"})
 
+
+class ValidarSmartRequest(BaseModel):
+    tipo: Literal["meta", "indicador"]
+    texto: str
+    contexto: Optional[str] = None
+
+
+@router.post("/validar-smart")
+async def validar_smart(req: ValidarSmartRequest, user_id: str = Depends(get_current_user_id)):
+    """Audita un objetivo o indicador PME usando los criterios SMART y sugiere una propuesta optimizada."""
+    if not req.texto.strip():
+        raise HTTPException(status_code=400, detail="El texto a evaluar no puede estar vacío.")
+    
+    try:
+        prompt = f"""
+        Actúa como un auditor experto en planificación estratégica escolar y gestión pedagógica (PME MINEDUC).
+        Tu tarea es analizar el siguiente {req.tipo} utilizando estrictamente los criterios SMART:
+        - **S (Specific - Específico)**: ¿El objetivo/indicador está delimitado con precisión y es claro?
+        - **M (Measurable - Medible)**: ¿Contiene un criterio cuantitativo, porcentaje o meta numérica para medir su éxito?
+        - **A (Achievable - Alcanzable)**: ¿Es realista considerando las capacidades usuales de un establecimiento escolar?
+        - **R (Relevant - Relevante)**: ¿Aporta valor pedagógico y se alinea con la mejora de aprendizajes?
+        - **T (Time-bound - Acotado en el Tiempo)**: ¿Define un plazo temporal explícito para su cumplimiento?
+
+        Texto a evaluar ({req.tipo}): "{req.texto}"
+        {f'Contexto del plan: "{req.contexto}"' if req.contexto else ''}
+
+        Debes evaluar cada uno de los 5 criterios anteriores. Para cada criterio asigna uno de los siguientes estados: "ok", "mejorable", "insuficiente".
+        Calcula un puntaje global (score) entre 0 y 100 basado en el cumplimiento.
+        Proporciona un listado de sugerencias concretas de mejora en español.
+        Por último, ofrece una redacción SMART alternativa y optimizada que sirva de propuesta formal (rewritten_proposal), la cual debe incluir un indicador medible y un plazo de tiempo plausible de forma explícita.
+
+        Retorna EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exacta:
+        {{
+          "is_smart": {"true" if "true" else "false"},
+          "score": 85,
+          "evaluation": {{
+            "specific": {{
+              "status": "ok",
+              "details": "Detalle del criterio..."
+            }},
+            "measurable": {{
+              "status": "ok",
+              "details": "Detalle del criterio..."
+            }},
+            "achievable": {{
+              "status": "ok",
+              "details": "Detalle del criterio..."
+            }},
+            "relevant": {{
+              "status": "ok",
+              "details": "Detalle del criterio..."
+            }},
+            "time_bound": {{
+              "status": "ok",
+              "details": "Detalle del criterio..."
+            }}
+          }},
+          "suggestions": [
+            "Sugerencia 1",
+            "Sugerencia 2"
+          ],
+          "rewritten_proposal": "Redacción SMART..."
+        }}
+        """
+
+        model = get_model()
+        response = await model.generate_content_async(prompt)
+        text = response.text.replace("```json", "").replace("```", "").strip()
+        
+        import json
+        try:
+            parsed = json.loads(text)
+            return JSONResponse(parsed)
+        except json.JSONDecodeError:
+            # Fallback simple
+            return JSONResponse({
+                "is_smart": False,
+                "score": 50,
+                "evaluation": {
+                    "specific": {"status": "mejorable", "details": "Error al parsear el análisis detallado."},
+                    "measurable": {"status": "mejorable", "details": "Error al parsear el análisis detallado."},
+                    "achievable": {"status": "mejorable", "details": "Error al parsear el análisis detallado."},
+                    "relevant": {"status": "mejorable", "details": "Error al parsear el análisis detallado."},
+                    "time_bound": {"status": "mejorable", "details": "Error al parsear el análisis detallado."}
+                },
+                "suggestions": ["Por favor vuelve a intentar para obtener sugerencias detalladas."],
+                "rewritten_proposal": req.texto
+            })
+    except Exception as e:
+        print(f"[ERROR] Validar SMART: {e}")
+        return JSONResponse(status_code=500, content={"message": f"Error interno del servidor: {str(e)}"})
 

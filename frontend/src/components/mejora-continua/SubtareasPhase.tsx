@@ -25,8 +25,8 @@ interface Props {
 }
 
 export default function SubtareasPhase({ phaseId, profiles }: Props) {
-  const { isDirectivo } = useAuth();
-  const canEdit = isDirectivo;
+  const { isLiderazgo, isSuperAdmin } = useAuth();
+  const canEdit = isLiderazgo || isSuperAdmin;
   const [tasks, setTasks] = useState<PhaseTask[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [newTaskTitle, setNewTaskTitle] = useState("");

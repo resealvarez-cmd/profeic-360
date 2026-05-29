@@ -7,16 +7,31 @@ import {
     BarChart3, UserCheck, Activity, Globe, Trophy, Info, Building
 } from "lucide-react";
 
+import { supabase } from "@/lib/supabaseClient";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export default function ProductAnalytics({ userEmail, isCompact = false }: { userEmail: string, isCompact?: boolean }) {
+export default function ProductAnalytics({ userEmail, schoolId, isCompact = false }: { userEmail: string, schoolId?: string | null, isCompact?: boolean }) {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [period, setPeriod] = useState<string>("all");
 
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const res = await fetch(`${API_URL}/telemetry/analytics?email=${encodeURIComponent(userEmail)}&t=${Date.now()}`);
+                const session = await supabase.auth.getSession();
+                const token = session.data.session?.access_token;
+                if (!token) {
+                    console.warn("📊 Analytics Auth: No token found");
+                    setLoading(false);
+                    return;
+                }
+
+                const res = await fetch(`${API_URL}/telemetry/analytics?email=${encodeURIComponent(userEmail)}&period=${period}&school_id=${schoolId || ""}&t=${Date.now()}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 if (res.ok) {
                     const json = await res.json();
                     console.log("📊 Analytics Data:", json);
@@ -33,7 +48,7 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
         };
 
         if (userEmail) fetchAnalytics();
-    }, [userEmail]);
+    }, [userEmail, period, schoolId]);
 
     if (loading) return (
         <div className="flex flex-col items-center justify-center p-12 text-slate-400">
@@ -47,6 +62,23 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
     if (isCompact) {
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Period filter select */}
+                <div className="flex justify-between items-center px-2 mb-2">
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sincronizado con Base de Datos</span>
+                    </div>
+                    <select 
+                        value={period}
+                        onChange={(e) => setPeriod(e.target.value)}
+                        className="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-400 transition-all cursor-pointer shadow-sm"
+                    >
+                        <option value="all">Histórico (Todo)</option>
+                        <option value="30d">Últimos 30 Días</option>
+                        <option value="7d">Últimos 7 Días</option>
+                    </select>
+                </div>
+
                 {/* Compact KPI Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <Card
@@ -79,7 +111,7 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Compact Chart */}
                     <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -126,6 +158,32 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                             ))}
                         </div>
                     </div>
+
+                    {/* Compact Top Exploradores */}
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <Globe size={12} className="text-emerald-500 animate-pulse" /> Top Exploradores
+                        </h3>
+                        <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                            {data.top_explorers?.map((user: any, i: number) => (
+                                <div key={i} className={`flex justify-between items-center p-2 rounded-xl border transition-colors ${i === 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
+                                    <div className="flex items-center gap-2 overflow-hidden text-left">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i === 0 ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-200 text-slate-700'}`}>
+                                            {i + 1}
+                                        </div>
+                                        <div className="flex flex-col overflow-hidden leading-tight">
+                                            <span className="text-[11px] text-slate-750 truncate max-w-[100px] font-bold">{user.name}</span>
+                                            <span className="text-[9px] text-slate-400 truncate max-w-[100px]">{user.email}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <span className="text-[10px] font-bold text-emerald-600 block leading-none">{user.count} vistas</span>
+                                        <span className="text-[8px] text-slate-400 font-medium">{user.modules_count} tools</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* School Totals (Only in Compact for SuperAdmin view) */}
@@ -144,23 +202,63 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                         </div>
                     </div>
                 )}
+
+                {/* Radar de Acompañamiento / Inactividad Docente */}
+                {data.inactive_teachers && data.inactive_teachers.length > 0 && (
+                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <AlertTriangle size={14} className="text-orange-500 animate-bounce" /> 
+                            Docentes sin Uso Reciente (Radar de Acompañamiento)
+                        </h3>
+                        <p className="text-[9px] text-slate-400 font-bold mb-4 uppercase tracking-wider">
+                            Listado de docentes con inactividad crítica. Utiliza este radar para revisar sus planificaciones y evaluaciones manuales para asegurar el estándar pedagógico.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                            {data.inactive_teachers.map((teacher: any, i: number) => (
+                                <div key={i} className={`flex justify-between items-center p-3 rounded-xl border transition-colors ${teacher.status === 'critical' ? 'bg-red-50/50 border-red-100 hover:bg-red-50' : 'bg-amber-50/40 border-amber-100 hover:bg-amber-50'}`}>
+                                    <div className="flex flex-col text-left overflow-hidden">
+                                        <span className="text-xs font-black text-slate-800 truncate">{teacher.name}</span>
+                                        <span className="text-[9px] text-slate-500 truncate">{teacher.email}</span>
+                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{teacher.school_name}</span>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg border uppercase tracking-wider ${teacher.status === 'critical' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>
+                                            {teacher.last_active}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Version and Timestamp */}
-            <div className="flex justify-between items-center px-4">
-                <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronizado con Base de Datos</span>
+            {/* Version, Timestamp and Period Selector */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 py-3 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizado con Base de Datos</span>
+                    </div>
+                    {data.last_updated && (
+                        <span className="text-[9px] font-medium text-slate-500">
+                            Refrescado a las {new Date(data.last_updated).toLocaleTimeString()}
+                        </span>
+                    )}
                 </div>
-                {data.last_updated && (
-                    <span className="text-[9px] font-medium text-slate-300">
-                        Refrescado a las {new Date(data.last_updated).toLocaleTimeString()}
-                    </span>
-                )}
+                <select 
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
+                    className="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-xl outline-none focus:ring-2 focus:ring-indigo-400 transition-all cursor-pointer shadow-sm"
+                >
+                    <option value="all">Histórico (Todo)</option>
+                    <option value="30d">Últimos 30 Días</option>
+                    <option value="7d">Últimos 7 Días</option>
+                </select>
             </div>
 
             {/* KPI Cards */}
@@ -238,6 +336,32 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                     </div>
                 </div>
 
+                {/* Top Exploradores (Curiosity Panel) */}
+                <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <Globe size={16} className="text-emerald-400 animate-pulse" /> Top Exploradores (Navegación e Interés)
+                    </h3>
+                    <div className="space-y-3 max-h-[260px] overflow-y-auto pr-2 custom-scrollbar">
+                        {data.top_explorers?.map((user: any, i: number) => (
+                            <div key={i} className={`flex justify-between items-center p-3 rounded-xl transition-all border ${i === 0 ? 'bg-emerald-500/10 border-emerald-500/30 shadow-lg shadow-emerald-500/5' : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/5'}`}>
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-white'}`}>
+                                        {i + 1}
+                                    </div>
+                                    <div className="flex flex-col overflow-hidden text-left">
+                                        <span className="text-sm text-slate-200 truncate max-w-[160px] font-bold">{user.name}</span>
+                                        <span className="text-[10px] text-slate-400 truncate max-w-[160px]">{user.email}</span>
+                                    </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <span className={`text-xs font-bold block ${i === 0 ? 'text-emerald-300' : 'text-emerald-400'}`}>{user.count} vistas</span>
+                                    <span className="text-[9px] text-slate-400 font-medium">{user.modules_count} herramientas</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* School Breakdown */}
                 <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -261,6 +385,35 @@ export default function ProductAnalytics({ userEmail, isCompact = false }: { use
                     </div>
                 </div>
             </div>
+
+            {/* Radar de Acompañamiento / Inactividad Docente */}
+            {data.inactive_teachers && data.inactive_teachers.length > 0 && (
+                <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <AlertTriangle size={16} className="text-orange-400 animate-bounce" /> 
+                        Docentes sin Uso Reciente (Radar de Acompañamiento)
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-medium mb-4">
+                        Listado de docentes con inactividad crítica. Utiliza este radar para revisar sus planificaciones y evaluaciones manuales para asegurar el estándar pedagógico de la institución.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {data.inactive_teachers.map((teacher: any, i: number) => (
+                            <div key={i} className={`flex justify-between items-center p-4 rounded-2xl border transition-all ${teacher.status === 'critical' ? 'bg-red-500/10 border-red-500/30 hover:bg-red-500/25' : 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/25'}`}>
+                                <div className="flex flex-col text-left overflow-hidden">
+                                    <span className="text-sm font-bold text-slate-200 truncate">{teacher.name}</span>
+                                    <span className="text-xs text-slate-400 truncate">{teacher.email}</span>
+                                    <span className="text-[9px] font-bold text-indigo-400 uppercase mt-1">{teacher.school_name}</span>
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-xl border uppercase tracking-wider ${teacher.status === 'critical' ? 'bg-red-500/20 text-red-300 border-red-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'}`}>
+                                        {teacher.last_active}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Audit Log (Minimalist) */}
             <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-xl">

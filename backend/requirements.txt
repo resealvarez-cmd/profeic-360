@@ -21,3 +21,4 @@ qrcode
 pillow
 google-genai
 matplotlib
+pyjwt

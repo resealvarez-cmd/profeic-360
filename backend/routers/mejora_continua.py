@@ -1,5 +1,6 @@
 import google.generativeai as genai
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
+from routers.deps import get_current_user_id
 from pydantic import BaseModel
 import json
 import io
@@ -20,9 +21,22 @@ class CopilotoRequest(BaseModel):
     school_id: str | None = None
 
 @router.post("/copiloto")
-async def estructurar_problema_ia(req: CopilotoRequest):
+async def estructurar_problema_ia(req: CopilotoRequest, user_id: str = Depends(get_current_user_id)):
     if not req.desafio.strip():
         raise HTTPException(status_code=400, detail="El desafío no puede estar vacío.")
+
+    # Validar multitenancy
+    if req.school_id:
+        try:
+            from app.db.supabase import supabase as db_supabase
+            profile_res = db_supabase.table("profiles").select("school_id").eq("id", user_id).single().execute()
+            user_school_id = profile_res.data.get("school_id") if profile_res.data else None
+            if not user_school_id or str(user_school_id) != str(req.school_id):
+                raise HTTPException(status_code=403, detail="Acceso denegado. No perteneces a esta institución.")
+        except HTTPException:
+            raise
+        except Exception as e_ctx:
+            print(f"⚠️ Error validando multitenancy en Copiloto: {e_ctx}")
 
     try:
         model = genai.GenerativeModel(
@@ -374,13 +388,19 @@ async def descargar_informe_word(payload: dict):
         doc = Document()
         
         # --- PORTADA ---
-        # Logo Centrado
-        logo_path = "/Users/renealvarezpinones/Downloads/PROFEIC_GITHUB_01_2/backend/assets/logo_profeic..png"
-        if os.path.exists(logo_path):
+        # Logo Centrado (Ruta Relativa Dinámica)
+        from pathlib import Path
+        CURRENT_DIR = Path(__file__).resolve().parent
+        PROJECT_ROOT = CURRENT_DIR.parent
+        logo_path = PROJECT_ROOT / "assets" / "logo_profeic.svg.png"
+        if not logo_path.exists():
+            logo_path = PROJECT_ROOT / "assets" / "logo.png"
+            
+        if logo_path.exists():
             p_logo = doc.add_paragraph()
             p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
             r_logo = p_logo.add_run()
-            r_logo.add_picture(logo_path, width=Inches(2.5))
+            r_logo.add_picture(str(logo_path), width=Inches(2.5))
         
         doc.add_paragraph("\n\n\n")
         

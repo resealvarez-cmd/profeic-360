@@ -10,6 +10,7 @@ interface PMEAnalyticsProps {
   goals: StrategicGoal[];
   profiles: any[];
   pmeMap?: Record<string, any>;
+  budgetInfo?: { budget_sep: number; budget_pie: number; budget_total: number } | null;
 }
 
 const BRAND_COLORS = ['#1B3C73', '#C87533', '#10b981', '#f59e0b', '#8b5cf6', '#3b82f6'];
@@ -61,7 +62,7 @@ function StatCard({ label, value, sub, color }: { label: string; value: string |
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
-export default function PMEAnalytics({ goals, profiles, pmeMap }: PMEAnalyticsProps) {
+export default function PMEAnalytics({ goals, profiles, pmeMap, budgetInfo }: PMEAnalyticsProps) {
   if (!goals || goals.length === 0) return null;
 
   // ── Aggregate indicator data ────────────────────────────────────────────
@@ -167,6 +168,94 @@ export default function PMEAnalytics({ goals, profiles, pmeMap }: PMEAnalyticsPr
           color={criticalActions > 0 ? 'text-amber-600' : 'text-slate-400'}
         />
       </div>
+
+      {budgetInfo && (budgetInfo.budget_total > 0 || budgetInfo.budget_sep > 0 || budgetInfo.budget_pie > 0) && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900">Gestión de Inversión y Presupuesto PME</h3>
+              <p className="text-xs text-slate-400 mt-0.5 font-medium">Control financiero de habilitadores para el año académico 2026</p>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-wider">
+              Recursos SEP / PIE
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Total Budget Progress */}
+            {budgetInfo.budget_total > 0 && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-600">
+                  <span>Presupuesto Total Institucional</span>
+                  <span>{budgetInfo.budget_total > 0 ? Math.round((totalCost / budgetInfo.budget_total) * 100) : 0}%</span>
+                </div>
+                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden relative">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      totalCost > budgetInfo.budget_total 
+                        ? 'bg-gradient-to-r from-rose-500 to-red-600' 
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                    }`}
+                    style={{ width: `${Math.min((totalCost / budgetInfo.budget_total) * 100, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                  <span>Asignado: ${budgetInfo.budget_total.toLocaleString('es-CL')}</span>
+                  <span>Planificado: ${totalCost.toLocaleString('es-CL')}</span>
+                </div>
+              </div>
+            )}
+
+            {/* SEP Budget Progress */}
+            {budgetInfo.budget_sep > 0 && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-600">
+                  <span>Inversión en Recursos SEP</span>
+                  <span>{budgetInfo.budget_sep > 0 ? Math.round((totalCost / budgetInfo.budget_sep) * 100) : 0}%</span>
+                </div>
+                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden relative">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      totalCost > budgetInfo.budget_sep 
+                        ? 'bg-gradient-to-r from-amber-500 to-rose-500' 
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                    }`}
+                    style={{ width: `${Math.min((totalCost / budgetInfo.budget_sep) * 100, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                  <span>Asignado: ${budgetInfo.budget_sep.toLocaleString('es-CL')}</span>
+                  <span>Disponible: ${(Math.max(0, budgetInfo.budget_sep - totalCost)).toLocaleString('es-CL')}</span>
+                </div>
+              </div>
+            )}
+
+            {/* PIE Budget Progress */}
+            {budgetInfo.budget_pie > 0 && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-600">
+                  <span>Fondo de Inclusión PIE</span>
+                  <span>{budgetInfo.budget_pie > 0 ? Math.round((totalCost / budgetInfo.budget_pie) * 100) : 0}%</span>
+                </div>
+                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden relative">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      totalCost > budgetInfo.budget_pie 
+                        ? 'bg-gradient-to-r from-rose-400 to-red-500' 
+                        : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+                    }`}
+                    style={{ width: `${Math.min((totalCost / budgetInfo.budget_pie) * 100, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                  <span>Asignado: ${budgetInfo.budget_pie.toLocaleString('es-CL')}</span>
+                  <span>PIE Restante: ${(Math.max(0, budgetInfo.budget_pie - totalCost)).toLocaleString('es-CL')}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
