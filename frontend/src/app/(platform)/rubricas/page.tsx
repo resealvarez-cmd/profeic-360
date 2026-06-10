@@ -15,7 +15,7 @@ interface RubricCriteria { criterio: string; porcentaje: number; niveles: { insu
 interface RubricResult { titulo: string; descripcion: string; tabla: RubricCriteria[]; }
 import { trackEvent } from "@/lib/telemetry";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://profeic-backend-484019506864.us-central1.run.app";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const NIVEL_ORDER = ["NT1", "NT2", "1° Básico", "2° Básico", "3° Básico", "4° Básico", "5° Básico", "6° Básico", "7° Básico", "8° Básico", "1° Medio", "2° Medio", "3° Medio", "4° Medio", "3° y 4° Medio"];
 
 const ModernSelect = ({ label, value, options, onChange, placeholder = "Seleccionar...", disabled = false }: any) => {

@@ -73,7 +73,7 @@ export default function NeePage() {
         trackEvent({ eventName: 'page_view', module: 'nee' });
         async function fetchGrades() {
             try {
-                const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/curriculum/options`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({})
                 });
                 const data = await res.json();
@@ -91,7 +91,7 @@ export default function NeePage() {
         if (!form.grade) return;
         async function fetchSubjects() {
             try {
-                const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/curriculum/options`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: form.grade })
                 });
                 const data = await res.json();
@@ -120,7 +120,7 @@ export default function NeePage() {
         setLoading(true);
         setResult(null);
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/nee/generate", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/nee/generate`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form)
             });
             if (!res.ok) throw new Error("Error");
@@ -146,9 +146,15 @@ export default function NeePage() {
         setDownloading(true);
         try {
             const payload = { ...form, ...result };
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/nee/download", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/nee/download`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
             });
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("Error backend NEE DOCX:", errorText);
+                toast.error("El servidor no pudo generar el documento. Intenta de nuevo.");
+                return;
+            }
             const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -157,6 +163,7 @@ export default function NeePage() {
             document.body.appendChild(a);
             a.click();
             a.remove();
+            window.URL.revokeObjectURL(url);
         } catch (e) { toast.error("Error al descargar."); }
         finally { setDownloading(false); }
     };
