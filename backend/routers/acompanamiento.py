@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict, Any
+import csv
 import google.generativeai as genai
 import os
 import io
@@ -1256,4 +1257,127 @@ async def get_executive_metrics(req: MetricsRequest):
         
     except Exception as e:
         print(f"Error Executive Metrics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/acompanamiento/export-dataset-csv")
+async def export_acompanamiento_dataset_csv(user_id: str):
+    try:
+        # 1. Obtener Institución
+        profile_res = supabase.table('profiles').select('school_id').eq('id', user_id).single().execute()
+        school_id = profile_res.data.get('school_id') if profile_res.data else None
+        if not school_id:
+            raise HTTPException(status_code=403, detail="Sin institución asignada")
+
+        # 2. Obtener Perfiles de Profesores
+        teachers_res = supabase.table('profiles').select('id, full_name, email').eq('school_id', school_id).execute()
+        teachers = teachers_res.data or []
+        teacher_map = {t['id']: t for t in teachers}
+        teacher_ids = list(teacher_map.keys())
+
+        if not teacher_ids:
+            raise HTTPException(status_code=404, detail="No hay docentes en esta institución")
+
+        # 3. Obtener Ciclos
+        cycles_res = supabase.table('observation_cycles')\
+            .select('*, observer:observer_id(full_name)')\
+            .in_('teacher_id', teacher_ids).execute()
+        cycles = cycles_res.data or []
+        
+        if not cycles:
+            raise HTTPException(status_code=404, detail="No hay ciclos de observación")
+            
+        cycle_ids = [c['id'] for c in cycles]
+
+        # 4. Obtener Datos de Observación
+        obs_res = supabase.table('observation_data').select('cycle_id, stage, content').in_('cycle_id', cycle_ids).execute()
+        obs_data = obs_res.data or []
+
+        from collections import defaultdict
+        data_by_cycle = defaultdict(dict)
+        for row in obs_data:
+            data_by_cycle[row['cycle_id']][row['stage']] = row.get('content', {})
+
+        # 5. Generar CSV
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        headers = [
+            "ID_Observacion", "Fecha_Creacion", "Estado", 
+            "ID_Docente", "Nombre_Docente", "Email_Docente",
+            "Nombre_Observador", "Foco_Declarado", "Tipo_Rubrica",
+            "Puntaje_Total", "Docente_Firma_Acuerdo",
+            # Scores Curriculares
+            "Score_Gestion_Aula", "Score_Rigor_Autonomia", "Score_Calidad_Feedback",
+            "Score_Clima_Contencion", "Score_Andamiaje_Modelaje", "Score_Monitoreo_Formativo",
+            "Score_Recursos_Didacticos", "Score_Activacion_Cognitiva",
+            # Scores Convivencia
+            "Score_Promocion_Respeto", "Score_Abordaje_Discriminacion",
+            "Score_Habilidades_Convivir", "Score_Claridad_Responsabilidades",
+            "Score_Prevencion_Distracciones", "Score_Vinculos_Contencion",
+            "Score_Practica_Habilidades",
+            "Tags_Seleccionados", "Acuerdos_Reflexion", "Metacognicion_Docente", "Contexto_Previo"
+        ]
+        writer.writerow(headers)
+
+        for c in cycles:
+            tid = c.get('teacher_id')
+            t_info = teacher_map.get(tid, {})
+            
+            c_data = data_by_cycle.get(c['id'], {})
+            exec_data = c_data.get('execution', {})
+            ref_data = c_data.get('reflection', {})
+            pre_data = c_data.get('pre', {})
+
+            scores = exec_data.get('scores', {})
+            tags = exec_data.get('tags_selected', [])
+            
+            pre_tags = pre_data.get('selected_tags', [])
+            all_tags = list(set(tags + pre_tags))
+
+            row = [
+                c.get('id', ''),
+                c.get('created_at', '')[:10] if c.get('created_at') else '',
+                c.get('status', ''),
+                tid,
+                t_info.get('full_name', ''),
+                t_info.get('email', ''),
+                c.get('observer', {}).get('full_name', '') if c.get('observer') else '',
+                c.get('teacher_declared_focus', ''),
+                c.get('rubric_type', ''),
+                c.get('total_score', ''),
+                "Si" if c.get('teacher_agreed') else "No",
+                
+                scores.get('gestion_aula', ''),
+                scores.get('rigor_autonomia', ''),
+                scores.get('calidad_feedback', ''),
+                scores.get('clima_contencion', ''),
+                scores.get('andamiaje_modelaje', ''),
+                scores.get('monitoreo_formativo', ''),
+                scores.get('recursos_didacticos', ''),
+                scores.get('activacion_cognitiva', ''),
+
+                scores.get('promocion_respeto', ''),
+                scores.get('abordaje_discriminacion', ''),
+                scores.get('habilidades_convivir', ''),
+                scores.get('claridad_responsabilidades', ''),
+                scores.get('prevencion_distracciones', ''),
+                scores.get('vinculos_contencion', ''),
+                scores.get('practica_habilidades', ''),
+
+                " | ".join(all_tags),
+                ref_data.get('agreements', '').replace('\n', ' ') if ref_data.get('agreements') else '',
+                ref_data.get('metacognition', '').replace('\n', ' ') if ref_data.get('metacognition') else '',
+                pre_data.get('context_note', '').replace('\n', ' ') if pre_data.get('context_note') else ''
+            ]
+            writer.writerow(row)
+
+        output_str = "\ufeff" + output.getvalue()
+        return StreamingResponse(
+            iter([output_str]), 
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=Dataset_Acompanamiento_ProfeIC.csv"}
+        )
+
+    except Exception as e:
+        print(f"Error Export Dataset CSV: {e}")
         raise HTTPException(status_code=500, detail=str(e))

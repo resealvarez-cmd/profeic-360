@@ -1552,31 +1552,33 @@ function DashboardContent({
 
                                     {/* CSV EXPORT BUTTON */}
                                     <button
-                                        onClick={() => {
+                                        onClick={async () => {
                                             if (!allCycles || allCycles.length === 0) {
                                                 toast.error("No hay datos para exportar");
                                                 return;
                                             }
-                                            const headers = ["ID_Observacion", "Fecha", "Estado", "ID_Docente", "Nombre_Docente", "ID_Observador", "Puntaje_Total_Generado"];
-                                            const csvRows = allCycles.map((c: any) => {
-                                                const date = new Date(c.created_at).toLocaleDateString() || "";
-                                                const status = c.status || "";
-                                                const teacherId = c.teacher_id || "";
-                                                const teacherName = (usersMap[c.teacher_id] || "Desconocido").replace(/,/g, " ");
-                                                const obsId = c.observer_id || "";
-                                                const score = c.total_score || 0;
-                                                return [c.id, date, status, teacherId, teacherName, obsId, score].join(",");
-                                            });
-                                            const csvContent = "\uFEFF" + [headers.join(","), ...csvRows].join("\n");
-                                            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                                            const url = URL.createObjectURL(blob);
-                                            const link = document.createElement("a");
-                                            link.href = url;
-                                            link.setAttribute("download", "Dataset_Observaciones_ProfeIC.csv");
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            toast.success("Dataset exportado correctamente");
+                                            const toastId = toast.loading("Generando dataset crudo avanzado...");
+                                            try {
+                                                const API_URL_LOCAL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+                                                const userId = currentUser?.id;
+                                                const res = await fetch(`${API_URL_LOCAL}/acompanamiento/export-dataset-csv?user_id=${userId}`, {
+                                                    method: 'GET'
+                                                });
+                                                if (!res.ok) throw new Error("Error export");
+                                                const blob = await res.blob();
+                                                const url = window.URL.createObjectURL(blob);
+                                                const link = document.createElement("a");
+                                                link.href = url;
+                                                link.setAttribute("download", "Dataset_Acompanamiento_ProfeIC.csv");
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                                window.URL.revokeObjectURL(url);
+                                                toast.success("Dataset exportado correctamente", { id: toastId });
+                                            } catch (e) {
+                                                console.error(e);
+                                                toast.error("Error al exportar dataset", { id: toastId });
+                                            }
                                         }}
                                         className={"w-full py-3 mt-3 bg-white text-[#1B3C73] border-2 border-[#1B3C73] text-sm font-bold rounded-xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2"}
                                     >
