@@ -1103,6 +1103,7 @@ function DashboardContent({
 
     const [historialFilter, setHistorialFilter] = useState<'all' | 'planned' | 'in_progress' | 'completed'>('all');
     const [historialTypeFilter, setHistorialTypeFilter] = useState<string>("all");
+    const [historialObserverFilter, setHistorialObserverFilter] = useState<string>("all");
 
     // C: Ciclos pendientes de cierre (ejecucion lista, sin reflexion)
     const [pendingCloseCycles, setPendingCloseCycles] = useState<any[]>([]);
@@ -1846,7 +1847,7 @@ function DashboardContent({
                     <div className="bg-white rounded-3xl border border-slate-200/60 overflow-hidden flex flex-col shadow-sm">
                         <div className="p-6 border-b border-slate-50 bg-slate-50/50">
                             <div className="flex justify-between items-center mb-5">
-                                <h3 className="font-bold text-[#1B3C73] text-lg">Historial de Planificaciones</h3>
+                                <h3 className="font-bold text-[#1B3C73] text-lg">Historial de Acompañamientos</h3>
                                 <button onClick={() => router.push('/acompanamiento/dashboard')} className="text-sm font-bold text-slate-500 hover:text-[#1B3C73]">
                                     Volver al Dashboard
                                 </button>
@@ -1872,8 +1873,8 @@ function DashboardContent({
                                                 historialFilter === f.key ? 'bg-white/20' : 'bg-slate-100 text-slate-500'
                                             }`}>
                                                 {f.key === 'all'
-                                                    ? allCycles.length
-                                                    : allCycles.filter((c: any) => c.status === f.key).length
+                                                    ? allCycles.filter((c: any) => historialObserverFilter === 'all' || c.observer_id === historialObserverFilter).length
+                                                    : allCycles.filter((c: any) => c.status === f.key && (historialObserverFilter === 'all' || c.observer_id === historialObserverFilter)).length
                                                 }
                                             </span>
                                         </button>
@@ -1899,6 +1900,18 @@ function DashboardContent({
                                             {f.label}
                                         </button>
                                     ))}
+                                    
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest self-center ml-4 mr-2">Observador:</span>
+                                    <select 
+                                        value={historialObserverFilter} 
+                                        onChange={(e) => setHistorialObserverFilter(e.target.value)}
+                                        className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase bg-white text-slate-600 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#1B3C73]"
+                                    >
+                                        <option value="all">Cualquiera</option>
+                                        {Array.from(new Set(allCycles.map((c: any) => c.observer_id))).filter(Boolean).map(obsId => (
+                                            <option key={obsId as string} value={obsId as string}>{usersMap[obsId as string] || 'Desconocido'}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -1917,7 +1930,8 @@ function DashboardContent({
                                         .filter((c: any) => {
                                             const matchesStatus = historialFilter === 'all' || c.status === historialFilter;
                                             const matchesType = historialTypeFilter === 'all' || c.rubric_type === historialTypeFilter;
-                                            return matchesStatus && matchesType;
+                                            const matchesObserver = historialObserverFilter === 'all' || c.observer_id === historialObserverFilter;
+                                            return matchesStatus && matchesType && matchesObserver;
                                         })
                                         .map((cycle: any) => (
                                         <tr key={cycle.id} className="hover:bg-slate-50 transition-colors group">
@@ -1965,7 +1979,8 @@ function DashboardContent({
                             {allCycles.filter((c: any) => {
                                 const matchesStatus = historialFilter === 'all' || c.status === historialFilter;
                                 const matchesType = historialTypeFilter === 'all' || c.rubric_type === historialTypeFilter;
-                                return matchesStatus && matchesType;
+                                const matchesObserver = historialObserverFilter === 'all' || c.observer_id === historialObserverFilter;
+                                return matchesStatus && matchesType && matchesObserver;
                             }).length === 0 && (
                                 <div className="text-center py-16">
                                     <p className="text-slate-400 font-bold">No hay planificaciones con este estado.</p>
