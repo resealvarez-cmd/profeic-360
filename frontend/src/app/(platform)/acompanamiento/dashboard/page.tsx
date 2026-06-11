@@ -1346,7 +1346,7 @@ function DashboardContent({
                                                     const metricsData = latestInsight.metrics || latestInsight.heatmap || {};
                                                     const analysisData = latestInsight.analysis || latestInsight || {};
                                                     const body = {
-                                                        systemic_summary: String(analysisData.systemic_summary || ""),
+                                                        systemic_summary: analysisData.systemic_summary || "",
                                                         top_3_gaps: Array.isArray(analysisData.top_3_gaps) ? analysisData.top_3_gaps : (analysisData.top_3_gaps ? [analysisData.top_3_gaps] : []),
                                                         recommended_training: analysisData.recommended_training || "",
                                                         rigor_audit: metricsData.rigor_audit || null,
@@ -1512,7 +1512,7 @@ function DashboardContent({
                                                 const metricsData = executiveData.metrics || {};
                                                 const analysisData = executiveData.analysis || {};
                                                 const body = {
-                                                    systemic_summary: String(analysisData.systemic_summary || ""),
+                                                    systemic_summary: analysisData.systemic_summary || "",
                                                     top_3_gaps: Array.isArray(analysisData.top_3_gaps) ? analysisData.top_3_gaps : (analysisData.top_3_gaps ? [analysisData.top_3_gaps] : []),
                                                     recommended_training: analysisData.recommended_training || "",
                                                     rigor_audit: metricsData.rigor_audit || null,
@@ -1775,7 +1775,7 @@ function DashboardContent({
                                         <div className="bg-white/5 p-5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-inner relative group/box">
                                             <p className="text-blue-50 text-sm leading-relaxed font-medium line-clamp-2 italic">
                                                 {latestInsight
-                                                    ? (latestInsight.analysis || latestInsight).systemic_summary || `Se detectaron ${(latestInsight.analysis || latestInsight).top_3_gaps?.length || 0} oportunidades de mejora sistémica.`
+                                                    ? (typeof (latestInsight.analysis || latestInsight).systemic_summary === 'string' ? (latestInsight.analysis || latestInsight).systemic_summary : "Análisis sistémico disponible (Ver detalles)") || `Se detectaron ${(latestInsight.analysis || latestInsight).top_3_gaps?.length || 0} oportunidades de mejora sistémica.`
                                                     : "El analizador neuronal está procesando los datos de acompañamiento. Genera un nuevo informe para obtener una visión profunda."}
                                             </p>
                                             <div className="absolute bottom-2 right-2 opacity-0 group-hover/box:opacity-10 transition-opacity">
@@ -2106,7 +2106,7 @@ function DashboardContent({
                                                 {userRole === 'teacher'
                                                     ? '"Tu práctica destaca en el Modelamiento, pero podrías potenciar el Cierre de Clase. Conoce estrategias prácticas aquí."'
                                                     : latestInsight
-                                                        ? String((latestInsight.analysis || latestInsight).systemic_summary || "")
+                                                        ? (typeof (latestInsight.analysis || latestInsight).systemic_summary === 'string' ? (latestInsight.analysis || latestInsight).systemic_summary : "Resumen estructurado disponible. Haz clic en detalles.") || ""
                                                         : '"Genera tu primer Reporte Ejecutivo para ver insights en tiempo real aquí."'
                                                 }
                                             </p>
