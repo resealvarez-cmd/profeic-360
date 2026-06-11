@@ -295,7 +295,7 @@ async def _get_teacher_trajectory_data(teacher_id: str):
         score_keys = content_dict.get('scores', {})
         if "promocion_respeto" in score_keys or "habilidades_convivir" in score_keys:
             has_convivencia = True
-        if "monitoreo_aula" in score_keys or "calidad_retroalimentacion" in score_keys:
+        if any(k in score_keys for k in ["andamiaje_modelaje", "rigor_autonomia", "monitoreo_formativo", "calidad_feedback", "recursos_didacticos", "activacion_cognitiva"]):
             has_curricular = True
 
     # AI Prompt
