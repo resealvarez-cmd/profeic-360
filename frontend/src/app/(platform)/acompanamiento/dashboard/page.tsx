@@ -154,10 +154,8 @@ export default function Dashboard360() {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
-            console.log("DASHBOARD_FETCH: Starting fetch...");
             try {
                 const { data: { user } } = await supabase.auth.getUser();
-                console.log("DASHBOARD_FETCH: User verified:", user?.email);
                 setCurrentUser(user);
 
                 let currentRole = 'teacher';
@@ -195,8 +193,6 @@ export default function Dashboard360() {
                     }
                 }
 
-                console.log("DASHBOARD_FETCH: Determined Role:", currentRole);
-
                 // --- MULTI-TENANCY FILTERING ---
                 let currentSchoolId = null;
                 const { data: myProfile } = await supabase.from('profiles').select('school_id').eq('id', user?.id || "").maybeSingle();
@@ -205,8 +201,6 @@ export default function Dashboard360() {
                 const urlParams = new URLSearchParams(window.location.search);
                 currentSchoolId = urlParams.get('school_id') || myProfile?.school_id;
                 setUserSchoolId(currentSchoolId);
-
-                console.log("DASHBOARD_FETCH: School ID:", currentSchoolId);
 
                 // 1. Fetch Profiles of the SCHOOL
                 let profileQuery = supabase.from('profiles').select('id, email, full_name');
@@ -271,7 +265,6 @@ export default function Dashboard360() {
                 }
 
                 const { data: cycles } = await cyclesQuery;
-                console.log("DASHBOARD_FETCH: Cycles fetched:", cycles?.length);
 
                 if (cycles) {
                     const active = cycles.filter(c => c.status === 'in_progress' || c.status === 'planned').length;
@@ -400,7 +393,6 @@ export default function Dashboard360() {
             const fetchMetrics = async () => {
                 setLoadingMetrics(true);
                 try {
-                    console.log("SUPERADMIN_FETCH: Requesting metrics for author:", currentUser?.id);
                     const res = await fetch(`${API_URL}/acompanamiento/executive-metrics`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -412,11 +404,8 @@ export default function Dashboard360() {
                         })
                     });
 
-                    console.log("SUPERADMIN_FETCH: Status Code:", res.status);
-
                     if (res.ok) {
                         const data = await res.json();
-                        console.log("SUPERADMIN_FETCH: Data received:", data);
                         setMetrics(data);
                     } else {
                         const errData = await res.text();
@@ -1839,7 +1828,7 @@ function DashboardContent({
                                     <div className="flex items-center gap-3">
                                         <div className="p-1.5 bg-amber-100 rounded-lg"><Clock size={13} className="text-amber-600" /></div>
                                         <div>
-                                            <p className="text-sm font-bold text-slate-800">{cycle.teacher?.full_name || cycle.teacher_name || 'Docente'}</p>
+                                            <p className="text-sm font-bold text-slate-800">{usersMap[cycle.teacher_id] || cycle.teacher?.full_name || cycle.teacher_name || 'Docente'}</p>
                                             <p className="text-xs text-amber-600 font-medium">{cycle.days_blocked} día{cycle.days_blocked !== 1 ? 's' : ''} bloqueado</p>
                                         </div>
                                     </div>
