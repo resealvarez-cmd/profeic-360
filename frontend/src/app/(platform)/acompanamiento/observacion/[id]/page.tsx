@@ -158,10 +158,16 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
 
                 // --- TRIGGER AI FLASH FEEDBACK ---
                 try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const token = session?.access_token;
+
                     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
                     const response = await fetch(`${API_URL}/acompanamiento/flash-feedback`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                         body: JSON.stringify({
                             cycle_id: cycle.id,
                             reflection_text: data.metacognition
