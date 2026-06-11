@@ -1328,10 +1328,10 @@ async def export_acompanamiento_dataset_csv(user_id: str):
             ref_data = c_data.get('reflection', {})
             pre_data = c_data.get('pre', {})
 
-            scores = exec_data.get('scores', {})
-            tags = exec_data.get('tags_selected', [])
+            scores = exec_data.get('scores', {}) or {}
+            tags = exec_data.get('tags_selected', []) or []
             
-            pre_tags = pre_data.get('selected_tags', [])
+            pre_tags = pre_data.get('selected_tags', []) or []
             all_tags = list(set(tags + pre_tags))
 
             row = [
