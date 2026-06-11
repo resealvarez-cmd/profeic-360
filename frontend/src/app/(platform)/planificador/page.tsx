@@ -153,7 +153,6 @@ export default function PlanificadorWizard() {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (user?.user_metadata) {
                     setUserProfile(user.user_metadata);
-                    console.log("👤 Perfil cargado para contexto:", user.user_metadata.full_name);
                 }
                 setVerificando(false);
             }

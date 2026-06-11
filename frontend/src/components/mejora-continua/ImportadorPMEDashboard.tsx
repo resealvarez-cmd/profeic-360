@@ -22,6 +22,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabaseClient";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 

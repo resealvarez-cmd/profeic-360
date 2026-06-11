@@ -65,7 +65,6 @@ export function TeacherProfiler({ teacherId, isOpen, onClose, userRole = 'direct
     setData(null);
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      console.log(`[Profiler] Fetching trajectory for ${teacherId} at ${API_URL}`);
       
       // 1. Fetch Trajectory Analysis (IA)
       const response = await fetch(`${API_URL}/acompanamiento/trajectory-report`, {
@@ -73,8 +72,6 @@ export function TeacherProfiler({ teacherId, isOpen, onClose, userRole = 'direct
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ teacher_id: teacherId })
       });
-
-      console.log(`[Profiler] AI Status: ${response.status}`);
 
       // 2. Fetch Gamification Skills (Supabase)
       const { data: skillsData, error: skillsError } = await supabase

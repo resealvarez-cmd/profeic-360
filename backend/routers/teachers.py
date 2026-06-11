@@ -43,7 +43,7 @@ async def get_teachers(user_id: str = Depends(get_current_user_id)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{teacher_id}/courses")
-async def get_teacher_courses(teacher_id: str):
+async def get_teacher_courses(teacher_id: str, user_id: str = Depends(get_current_user_id)):
     """
     Devuelve los IDs de los cursos asignados a un profesor.
     """
@@ -58,7 +58,7 @@ async def get_teacher_courses(teacher_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{teacher_id}/assignments")
-async def save_teacher_assignments(teacher_id: str, req: AssignmentRequest):
+async def save_teacher_assignments(teacher_id: str, req: AssignmentRequest, user_id: str = Depends(get_current_user_id)):
     """
     Reemplazo total de asignaciones (Transaccional lógico).
     """

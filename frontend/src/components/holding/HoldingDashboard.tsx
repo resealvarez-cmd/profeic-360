@@ -42,7 +42,9 @@ interface HoldingSchool {
   attendance_avg: number;
   enrollment_count: number;
   priority_pct: number;
+  priority_count: number;
   preferred_pct: number;
+  preferred_count: number;
   pie_neet_count: number;
   pie_neep_count: number;
   socioeconomic_level: string;
@@ -98,7 +100,9 @@ const HoldingDashboard: React.FC = () => {
               attendance_avg: s.attendance_avg || 0,
               enrollment_count: s.enrollment_count || 0,
               priority_pct: s.priority_pct || 0,
+              priority_count: s.priority_count || 0,
               preferred_pct: s.preferred_pct || 0,
+              preferred_count: s.preferred_count || 0,
               pie_neet_count: s.pie_neet_count || 0,
               pie_neep_count: s.pie_neep_count || 0,
               socioeconomic_level: s.socioeconomic_level || "",

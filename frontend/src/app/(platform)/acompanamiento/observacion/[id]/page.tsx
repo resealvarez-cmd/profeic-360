@@ -106,7 +106,6 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
 
     const handleSave = async (stage: string, data: any) => {
         setLoading(true);
-        console.log(`Saving ${stage}:`, data);
 
         try {
             // 1. Save Stage Data
@@ -236,7 +235,6 @@ export default function ObservationPage({ params }: { params: { id: string } }) 
                             }]);
                         }
                     }
-                    console.log("Gamification processed.");
                 } catch (err) {
                     console.error("Gamification error (ignored):", err);
                 }

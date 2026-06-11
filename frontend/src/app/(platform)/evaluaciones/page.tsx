@@ -234,10 +234,6 @@ export default function GeneradorEvaluaciones() {
                 } : {}),
             };
 
-            // Debug para confirmar
-            if (payload.context_text) console.log("✅ Enviando contexto:", payload.context_text.substring(0, 50));
-            else console.log("⚠️ Contexto vacío en payload");
-
             const res = await fetch(`${API_URL}/generate-assessment`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
             });

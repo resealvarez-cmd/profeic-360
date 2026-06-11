@@ -30,6 +30,7 @@ from typing import Any, Literal
 from urllib.parse import quote
 
 import google.generativeai as genai
+from PIL import Image
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import parse_xml
@@ -612,6 +613,29 @@ def _docx_headers(filename: str) -> dict:
     }
 
 
+def _add_image_safely(paragraph_or_run, image_path: Path, width=None, height=None) -> bool:
+    """
+    Safely opens an image using PIL, converts it to standard PNG in memory,
+    and adds it to the docx paragraph/run using add_picture.
+    This bypasses python-docx's native parser bug (UnrecognizedImageError)
+    for progressive JPEGs or EXIF-variant images.
+    """
+    try:
+        if not image_path.exists():
+            logger.error("ERROR: Archivo de imagen no encontrado: %s", image_path)
+            return False
+        
+        with Image.open(image_path) as img:
+            stream = io.BytesIO()
+            img.save(stream, format="PNG")
+            stream.seek(0)
+            paragraph_or_run.add_picture(stream, width=width, height=height)
+            return True
+    except Exception as e:
+        logger.error("Error crítico insertando imagen %s: %s", image_path, e)
+        return False
+
+
 def _add_profeic_header(doc: Document, asignatura: str, nivel: str, tipo: str) -> None:
     """Encabezado ProfeIC estándar en tabla de 2 columnas."""
     t = doc.add_table(rows=1, cols=2)
@@ -626,9 +650,7 @@ def _add_profeic_header(doc: Document, asignatura: str, nivel: str, tipo: str) -
     p_logo = cell_logo.paragraphs[0]
     run_logo = p_logo.add_run()
     if os.path.exists(logo_path):
-        try:
-            run_logo.add_picture(logo_path, width=Inches(1.0))
-        except Exception:
+        if not _add_image_safely(run_logo, Path(logo_path), width=Inches(1.0)):
             run_logo.add_text("ProfeIC")
     else:
         run_logo.add_text("ProfeIC")
@@ -736,14 +758,11 @@ async def download_cuadernillo(
         # Diagramación Multimodal
         if req.estimulo_imagen:
             imagen_path = Path(__file__).parent.parent.parent / "frontend" / "public" / "imgs_estimulos" / req.estimulo_imagen
-            try:
-                if imagen_path.exists():
-                    p_img = doc.add_paragraph()
-                    p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    run_img = p_img.add_run()
-                    run_img.add_picture(str(imagen_path), width=Inches(5.0))
-            except Exception as e:
-                logger.warning(f"No se pudo insertar la imagen {req.estimulo_imagen}: {e}")
+            if imagen_path.exists():
+                p_img = doc.add_paragraph()
+                p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run_img = p_img.add_run()
+                _add_image_safely(run_img, imagen_path, width=Inches(5.0))
 
         if req.estimulo_texto:
             t_est = doc.add_table(rows=1, cols=1)

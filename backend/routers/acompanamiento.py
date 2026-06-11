@@ -2,7 +2,7 @@ from typing import List, Optional, Dict, Any
 import google.generativeai as genai
 import os
 import io
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from pydantic import BaseModel
 from supabase import create_client, Client
 from docx import Document
@@ -12,6 +12,7 @@ import io
 import time
 import json
 from fastapi.responses import StreamingResponse
+from routers.deps import get_current_user_id
 
 router = APIRouter()
 
@@ -45,7 +46,7 @@ def sanitize_text(text: str) -> str:
 
 # --- ENDPOINT: FLASH FEEDBACK (NIVEL 1) ---
 @router.post("/acompanamiento/flash-feedback")
-async def generate_flash_feedback(req: FlashFeedbackRequest):
+async def generate_flash_feedback(req: FlashFeedbackRequest, user_id: str = Depends(get_current_user_id)):
     try:
         # 1. Obtener Datos del Ciclo
         # Fetch Cycle & Profile
@@ -353,7 +354,7 @@ FORMATO JSON ESPERADO (NO USAR COMILLAS TRIPLES, SÓLO JSON VÁLIDO):
     }
 
 @router.post("/acompanamiento/trajectory-report")
-async def generate_trajectory_report(req: TrajectoryRequest):
+async def generate_trajectory_report(req: TrajectoryRequest, user_id: str = Depends(get_current_user_id)):
     try:
         data = await _get_teacher_trajectory_data(req.teacher_id)
         teacher_obj = data.get("teacher") or {}
@@ -394,7 +395,7 @@ async def generate_trajectory_report(req: TrajectoryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/acompanamiento/export-trajectory")
-async def export_teacher_trajectory(req: TrajectoryRequest):
+async def export_teacher_trajectory(req: TrajectoryRequest, user_id: str = Depends(get_current_user_id)):
     try:
         data = await _get_teacher_trajectory_data(req.teacher_id)
         teacher = data.get("teacher") or {}
@@ -727,7 +728,7 @@ async def generate_executive_report(req: ExecutiveRequest):
         observed_teachers_count = len(unique_teachers)
         coverage_percent = round(
             (observed_teachers_count / total_teachers_real * 100), 1
-        ) if total_teachers_real > 0 else 0.0
+        ) if total_teachers_real > 0 else 0.0  # Guard: evita ZeroDivisionError
 
         # ── TOP TEACHERS (avg score across all their completed cycles) ─────────
         teacher_scores_map: Dict[str, Dict] = {}

@@ -27,7 +27,8 @@ export default function ContextoPage() {
         formData.append("file", file);
 
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/upload-contexto", {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const res = await fetch(`${API_URL}/upload-contexto`, {
                 method: "POST",
                 body: formData,
             });

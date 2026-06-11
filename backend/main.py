@@ -49,6 +49,7 @@ from routers import (
     mejora_continua,
     pme
 )
+from app.api.v1.endpoints import motor
 from simce_router import router as simce_router
 
 app = FastAPI(title="API ProfeIC", version="4.0.0")
@@ -97,6 +98,7 @@ app.include_router(teachers.router)
 app.include_router(mejora_continua.router)
 app.include_router(pme.router)
 app.include_router(simce_router) # Nuevo router híbrido
+app.include_router(motor.router, prefix="/api/v1/motor", tags=["motor"])
 
 
 @app.get("/")

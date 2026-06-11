@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Body, Header
+from fastapi import APIRouter, HTTPException, Body, Header, Depends
 from typing import List, Optional, Union
 from pydantic import BaseModel
 from supabase import create_client, Client, ClientOptions
+from routers.deps import get_current_user_id
 import os
 
 
@@ -44,7 +45,7 @@ class CloneRequest(BaseModel):
 # --- ENDPOINTS ---
 
 @router.get("/community/feed", response_model=List[CommunityItem])
-async def get_community_feed():
+async def get_community_feed(user_id: str = Depends(get_current_user_id)):
     """
     Retorna las últimas 20 publicaciones públicas de biblioteca_recursos.
     """
@@ -164,7 +165,7 @@ async def share_resource(req: ShareRequest, authorization: Optional[str] = Heade
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/community/clone")
-async def clone_resource(req: CloneRequest):
+async def clone_resource(req: CloneRequest, user_id: str = Depends(get_current_user_id)):
     """
     Clona un recurso público de biblioteca_recursos a la biblioteca personal del usuario.
     """
@@ -182,7 +183,7 @@ async def clone_resource(req: CloneRequest):
         del data['created_at']
         
         # 3. Asignar nuevo dueño y resetear público
-        data['user_id'] = req.new_author_id
+        data['user_id'] = user_id
         data['is_public'] = False 
         
         # Añadir marca de clonado al título y actualizar autor

@@ -53,7 +53,8 @@ export default function ElevadorPage() {
     useEffect(() => {
         async function fetchGrades() {
             try {
-                const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                const res = await fetch(`${API_URL}/curriculum/options`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({})
                 });
                 const data = await res.json();
@@ -71,7 +72,8 @@ export default function ElevadorPage() {
         if (!form.grade) return;
         async function fetchSubjects() {
             try {
-                const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/curriculum/options", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                const res = await fetch(`${API_URL}/curriculum/options`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nivel: form.grade })
                 });
                 const data = await res.json();
@@ -100,7 +102,8 @@ export default function ElevadorPage() {
         setLoading(true);
         setResult(null);
         try {
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/elevate", {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const res = await fetch(`${API_URL}/elevate`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form)
             });
             if (!res.ok) throw new Error("Error");
@@ -114,8 +117,9 @@ export default function ElevadorPage() {
         if (!result) return;
         setDownloading(true);
         try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const payload = { ...form, ...result };
-            const res = await fetch("https://profeic-backend-484019506864.us-central1.run.app/export/elevador-docx", {
+            const res = await fetch(`${API_URL}/export/elevador-docx`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
             });
 

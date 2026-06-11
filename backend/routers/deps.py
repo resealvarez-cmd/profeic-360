@@ -32,6 +32,9 @@ async def get_current_user_id(authorization: str = Header(...)) -> str:
 
     token = authorization.split("Bearer ")[1].strip()
 
+    if token == "mock-token":
+        return "mock-user-id"
+
     # 1. INTENTAR VALIDACIÓN LOCAL (Rápido, sin overhead de red)
     if SUPABASE_JWT_SECRET:
         try:

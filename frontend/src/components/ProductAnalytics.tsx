@@ -34,7 +34,6 @@ export default function ProductAnalytics({ userEmail, schoolId, isCompact = fals
                 });
                 if (res.ok) {
                     const json = await res.json();
-                    console.log("📊 Analytics Data:", json);
                     setData(json);
                 } else {
                     const err = await res.json().catch(() => ({ detail: "Error desconocido" }));

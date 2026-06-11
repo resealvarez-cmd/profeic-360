@@ -118,8 +118,6 @@ export default function TeacherCourseAssignment() {
         // Simulación de API
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        console.log(`Guardando asignaciones para ${selectedTeacher?.full_name}:`, Array.from(currentAssignedIds));
-
         setSaving(false);
         alert(`¡Éxito! Asignaciones guardadas para ${selectedTeacher?.full_name}`);
     };

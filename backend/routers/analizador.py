@@ -108,7 +108,7 @@ def build_analysis_prompt(oa: str, evaluacion: str, contexto_escenario: str) -> 
 
 
 @router.post("/audit")
-async def auditar_instrumento(request: AnalisisRequest):
+async def auditar_instrumento(request: AnalisisRequest, user_id: str = Depends(get_current_user_id)):
     try:
         print(f"🧠 Analizando DOK con {MODEL_NAME} (temperatura=0, Webb+Mentoría)...")
 

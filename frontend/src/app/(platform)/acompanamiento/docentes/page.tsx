@@ -23,7 +23,7 @@ function TeachersList() { // Converted to inner component to usage Suspense in p
     const [viewMode, setViewMode] = useState<'grid' | 'grouped'>('grid');
 
     const [hideNoObservations, setHideNoObservations] = useState(false);
-    const [observationStats, setObservationStats] = useState<Record<string, number>>({});
+    const [observationStats, setObservationStats] = useState<Record<string, { total: number; pedagogica: number; convivencia: number }>>({});
     const [selectedSkill, setSelectedSkill] = useState<string>("all");
     const [teacherSkillsMap, setTeacherSkillsMap] = useState<Record<string, string[]>>({});
     const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);

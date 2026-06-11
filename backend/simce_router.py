@@ -18,6 +18,7 @@ from google import genai
 from google.genai import types
 
 # Para exportación DOCX
+from PIL import Image
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import parse_xml
@@ -212,6 +213,28 @@ def _get_random_stimulus(asignatura: str, nivel: str) -> dict:
 
 # --- Helpers Exportación ---
 
+def _add_image_safely(paragraph_or_run, image_path: Path, width=None, height=None) -> bool:
+    """
+    Safely opens an image using PIL, converts it to standard PNG in memory,
+    and adds it to the docx paragraph/run using add_picture.
+    This bypasses python-docx's native parser bug (UnrecognizedImageError)
+    for progressive JPEGs or EXIF-variant images.
+    """
+    try:
+        if not image_path.exists():
+            print(f"ERROR: Archivo de imagen no encontrado: {image_path}")
+            return False
+        
+        with Image.open(image_path) as img:
+            stream = io.BytesIO()
+            img.save(stream, format="PNG")
+            stream.seek(0)
+            paragraph_or_run.add_picture(stream, width=width, height=height)
+            return True
+    except Exception as e:
+        print(f"Error crítico insertando imagen {image_path}: {e}")
+        return False
+
 def _safe_filename(name: str) -> str:
     ascii_name = unicodedata.normalize("NFKD", name).encode("ASCII", "ignore").decode()
     return re.sub(r"[^\w\s.-]", "", ascii_name).replace(" ", "_") or "documento"
@@ -230,12 +253,15 @@ def _add_profeic_header(doc: Document, asignatura: str, nivel: str, tipo: str) -
     t.columns[0].width = Inches(1.2)
     t.columns[1].width = Inches(5.3)
     cell_logo = t.cell(0, 0)
-    logo_path = _ASSETS_DIR / "logo_profeic..png"
+    logo_path = _ASSETS_DIR / "logo_profeic.svg.png"
+    if not logo_path.exists():
+        logo_path = _ASSETS_DIR / "logo.png"
+        
     p_logo = cell_logo.paragraphs[0]
     run_logo = p_logo.add_run()
     if logo_path.exists():
-        try: run_logo.add_picture(str(logo_path), width=Inches(1.0))
-        except: run_logo.add_text("ProfeIC")
+        if not _add_image_safely(run_logo, logo_path, width=Inches(1.0)):
+            run_logo.add_text("ProfeIC")
     else: run_logo.add_text("ProfeIC")
     
     cell_info = t.cell(0, 1)
@@ -350,7 +376,7 @@ async def generar_un_bloque(index: int, block_skills: List[str], nivel: str, asi
     es_lenguaje = "lengua" in asignatura.lower() or "lenguaje" in asignatura.lower()
 
     if estimulo_seleccionado:
-        # --- NUEVO: BYPASS PARA TEXTOS REALES ---
+        # --- NUEVO: BYPASS PARA TEXTOS REALES CON SOPORTE MULTIMODAL ---
         if "contenido_real" in estimulo_seleccionado and estimulo_seleccionado["contenido_real"]:
             # Si hay contenido_real, usamos el texto directo (Bypass Fase 1)
             titulo = estimulo_seleccionado.get("titulo_interno", "Texto")
@@ -359,10 +385,16 @@ async def generar_un_bloque(index: int, block_skills: List[str], nivel: str, asi
             
             texto_base = f"{titulo} - {autor}\n\n{contenido}"
             tipo_base = estimulo_seleccionado.get("tipo", "texto_literario_real")
-            ruta_img = None
+            
+            # Extraer imagen asociada si es un estímulo multimodal
+            img_file = estimulo_seleccionado.get("imagen_adjunta") or estimulo_seleccionado.get("nombre_archivo_imagen")
+            ruta_img = f"imgs/{img_file}" if img_file else None
+            
             contexto_referencia = f"TEXTO REAL PARA GENERAR PREGUNTAS: '{texto_base}'"
+            if img_file:
+                contexto_referencia += f" | IMAGEN ASOCIADA (Usa esta descripción para contextualizar las preguntas): '{estimulo_seleccionado.get('descripcion_oculta_ia', '')}'"
         else:
-            # Lógica existente para estímulos basados en imágenes
+            # Lógica existente para estímulos basados únicamente en imágenes
             tipo_base = estimulo_seleccionado.get("tipo", "imagen_educativa")
             texto_base = "Observa la siguiente imagen y responde las preguntas:"
             descripcion_ia = estimulo_seleccionado.get("descripcion_oculta_ia", "")
@@ -561,15 +593,13 @@ async def download_cuadernillo(req: DescargaCuadernilloRequest, current_user_id:
         # 1.5 Estímulo GLOBAL (si se envía en el request)
         if req.estimulo_imagen:
             imagen_path = project_root / "frontend" / "public" / "imgs_estimulos" / req.estimulo_imagen
-            try:
-                if imagen_path.exists():
-                    p_img = doc.add_paragraph()
-                    p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    doc.add_paragraph().add_run().add_picture(str(imagen_path), width=Inches(5.0))
-                else:
-                    print(f"ERROR: Imagen global no encontrada en {imagen_path}")
-            except Exception as e:
-                print(f"Error imagen global: {e}")
+            if imagen_path.exists():
+                p_img = doc.add_paragraph()
+                p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                r_img = p_img.add_run()
+                _add_image_safely(r_img, imagen_path, width=Inches(5.0))
+            else:
+                print(f"ERROR: Imagen global no encontrada en {imagen_path}")
 
         if req.estimulo_texto:
             t_est = doc.add_table(rows=1, cols=1)
@@ -591,7 +621,8 @@ async def download_cuadernillo(req: DescargaCuadernilloRequest, current_user_id:
                 if ruta_img.exists():
                     p_img = doc.add_paragraph()
                     p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    p_img.add_run().add_picture(str(ruta_img), width=Inches(5.0))
+                    r_img = p_img.add_run()
+                    _add_image_safely(r_img, ruta_img, width=Inches(5.0))
                     doc.add_paragraph()
                 else:
                     print(f"ERROR: Imagen pregunta no encontrada en {ruta_img}")
@@ -638,7 +669,10 @@ async def download_cuadernillo(req: DescargaCuadernilloRequest, current_user_id:
         doc.save(buf)
         buf.seek(0)
         return StreamingResponse(buf, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers=_docx_headers(f"Cuadernillo_{req.asignatura}.docx"))
-    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 import uuid
 from services.omr_template_service import OMRTemplateGenerator
@@ -652,7 +686,10 @@ async def download_omr(req: DescargaOMRRequest, current_user_id: Optional[str] =
         generator = OMRTemplateGenerator()
         buf = io.BytesIO()
         
-        logo_path = _ASSETS_DIR / "logo_profeic..png"
+        logo_path = _ASSETS_DIR / "logo_profeic.svg.png"
+        if not logo_path.exists():
+            logo_path = _ASSETS_DIR / "logo.png"
+            
         if not logo_path.exists():
             logo_path = None
         else:
