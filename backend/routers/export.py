@@ -5,8 +5,9 @@ from typing import List, Dict, Any, Optional, Union
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml.ns import nsdecls
-from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls, qn
+from docx.oxml import parse_xml, OxmlElement
+import matplotlib.pyplot as plt
 import io
 import os
 import re
@@ -831,7 +832,7 @@ async def render_export_paquete_docx(req: PaqueteExportRequest):
 # EXECUTIVE REPORT RENDERER (PREMIUM)
 # ==========================================
 class ExecutiveDocxRequest(BaseModel):
-    systemic_summary: str
+    systemic_summary: Union[str, Dict[str, Any]]
     top_3_gaps: Union[List[str], List[Dict[str, Any]], List[Any]]
     recommended_training: Union[str, List[Dict[str, Any]]]
     rigor_audit: Optional[Dict[str, Any]] = None
@@ -873,28 +874,56 @@ def renderizar_reporte_ejecutivo(doc, data):
     
     if data.global_metrics:
         t_cover = doc.add_table(rows=1, cols=3)
-        t_cover.style = 'Table Grid'
         t_cover.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
         c1, c2, c3 = t_cover.rows[0].cells
         style_header_cell(c1, "DOCENTES EN PLANTA", "1B3C73", "FFFFFF")
         c1.add_paragraph(str(data.global_metrics.get('total_teachers', 0))).alignment = WD_ALIGN_PARAGRAPH.CENTER
-        c1.paragraphs[1].runs[0].font.size = Pt(18); c1.paragraphs[1].runs[0].bold = True
+        c1.paragraphs[1].runs[0].font.size = Pt(24); c1.paragraphs[1].runs[0].bold = True
         
         style_header_cell(c2, "COBERTURA", "A1C969", "FFFFFF")
         c2.add_paragraph(f"{data.global_metrics.get('coverage_percent', 0)}%").alignment = WD_ALIGN_PARAGRAPH.CENTER
-        c2.paragraphs[1].runs[0].font.size = Pt(18); c2.paragraphs[1].runs[0].bold = True
+        c2.paragraphs[1].runs[0].font.size = Pt(24); c2.paragraphs[1].runs[0].bold = True
         
         style_header_cell(c3, "CICLOS CERRADOS", "C87533", "FFFFFF")
         c3.add_paragraph(str(data.global_metrics.get('total_completed', 0))).alignment = WD_ALIGN_PARAGRAPH.CENTER
-        c3.paragraphs[1].runs[0].font.size = Pt(18); c3.paragraphs[1].runs[0].bold = True
+        c3.paragraphs[1].runs[0].font.size = Pt(24); c3.paragraphs[1].runs[0].bold = True
         
+    sys_summary = data.systemic_summary
+    is_structured = isinstance(sys_summary, dict)
+
+    if is_structured:
+        doc.add_paragraph()
+        doc.add_heading("Resumen Estratégico (At-a-Glance)", level=2)
+        
+        doc.add_heading("Top Fortalezas Institucionales", level=3)
+        for f in sys_summary.get("fortalezas_clave", []):
+            doc.add_paragraph(f"✓ {f}", style='List Bullet')
+            
+        doc.add_heading("Áreas Críticas de Intervención", level=3)
+        for b in sys_summary.get("brechas_criticas", []):
+            doc.add_paragraph(f"⚠ {b}", style='List Bullet')
+
     doc.add_page_break()
 
     # --- PÁGINA 2: DIAGNÓSTICO Y HEATMAP ---
     doc.add_heading("I. Diagnóstico Sistémico", level=2)
-    p = doc.add_paragraph(data.systemic_summary)
-    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    if is_structured:
+        doc.add_paragraph("Análisis cualitativo basado en el volumen de observaciones registradas.")
+        doc.add_heading("Fortalezas Operativas", level=3)
+        for f in sys_summary.get("fortalezas_clave", []):
+            doc.add_paragraph(str(f), style='List Bullet')
+        
+        doc.add_heading("Brechas y Deficiencias", level=3)
+        for b in data.top_3_gaps if data.top_3_gaps else sys_summary.get("brechas_criticas", []):
+            doc.add_paragraph(str(b), style='List Bullet')
+            
+        doc.add_heading("Conclusión Directiva", level=3)
+        p = doc.add_paragraph(str(sys_summary.get("direccion_estrategica", "")))
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    else:
+        p = doc.add_paragraph(str(sys_summary))
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     # --- PÁGINA 3: ESTRUCTURA DE ACOMPAÑAMIENTO Y DEPARTAMENTOS ---
     if data.global_metrics and "structural" in data.global_metrics:
@@ -927,22 +956,33 @@ def renderizar_reporte_ejecutivo(doc, data):
             doc.add_heading("Distribución por Departamentos", level=3)
             doc.add_paragraph("Volumen de observaciones completadas según el departamento al que pertenece el docente.")
             
-            t_dept = doc.add_table(rows=1, cols=2)
-            t_dept.style = 'Table Grid'
-            t_dept.autofit = False
-            t_dept.columns[0].width = Inches(4.0)
-            t_dept.columns[1].width = Inches(1.5)
-            
-            hdr_dept = t_dept.rows[0].cells
-            style_header_cell(hdr_dept[0], "Departamento", "A1C969", "FFFFFF")
-            style_header_cell(hdr_dept[1], "Nº Obs.", "A1C969", "FFFFFF")
-            
-            # Sort by count descending
-            for d_name, count in sorted(depts.items(), key=lambda x: x[1], reverse=True):
-                r_dept = t_dept.add_row().cells
-                r_dept[0].text = str(d_name).title()
-                r_dept[1].text = str(count)
-                r_dept[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            try:
+                import matplotlib.pyplot as plt
+                import io
+                sorted_depts = sorted(depts.items(), key=lambda x: x[1], reverse=False)
+                labels = [str(k).title() for k, v in sorted_depts]
+                counts = [v for k, v in sorted_depts]
+                
+                fig, ax = plt.subplots(figsize=(6, max(3, len(labels)*0.4)))
+                ax.barh(labels, counts, color='#1B3C73')
+                ax.set_xlabel('Nº de Observaciones')
+                ax.set_title('Observaciones por Departamento')
+                
+                for i, v in enumerate(counts):
+                    ax.text(v + 0.1, i, str(v), va='center', fontweight='bold')
+                
+                plt.tight_layout()
+                
+                img_stream = io.BytesIO()
+                plt.savefig(img_stream, format='png', dpi=150)
+                img_stream.seek(0)
+                plt.close(fig)
+                
+                doc.add_picture(img_stream, width=Inches(5.0))
+            except Exception as e:
+                print(f"Error generando gráfico de departamentos: {e}")
+                for d_name, count in sorted(depts.items(), key=lambda x: x[1], reverse=True):
+                    doc.add_paragraph(f"{str(d_name).title()}: {count} observaciones")
 
     if data.heatmap:
         doc.add_page_break()
@@ -965,28 +1005,41 @@ def renderizar_reporte_ejecutivo(doc, data):
         def add_metrics_table(doc, title, metrics_dict):
             if not metrics_dict: return
             doc.add_heading(title, level=3)
-            table = doc.add_table(rows=1, cols=2)
-            table.style = 'Table Grid'
-            table.autofit = False
-            table.columns[0].width = Inches(4.0)
-            table.columns[1].width = Inches(1.5)
             
-            hdr_cells = table.rows[0].cells
-            style_header_cell(hdr_cells[0], "Dimensión", "1B3C73", "FFFFFF")
-            style_header_cell(hdr_cells[1], "Puntaje (1-4)", "1B3C73", "FFFFFF")
-            
-            sorted_m = sorted(metrics_dict.items(), key=lambda x: x[1], reverse=True)
-            for k_m, v_m in sorted_m:
-                row_cells = table.add_row().cells
-                row_cells[0].text = k_m
-                row_cells[0].paragraphs[0].runs[0].bold = True
+            try:
+                import matplotlib.pyplot as plt
+                import io
+                sorted_m = sorted(metrics_dict.items(), key=lambda x: x[1], reverse=False)
+                labels = [k for k, v in sorted_m]
+                values = [v for k, v in sorted_m]
                 
-                row_cells[1].text = f"{v_m:.1f}"
-                row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-                row_cells[1].paragraphs[0].runs[0].bold = True
+                colors = []
+                for v in values:
+                    if v >= 3.5: colors.append('#A1C969')
+                    elif v >= 3.0: colors.append('#F2C94C')
+                    else: colors.append('#EB5757')
+                    
+                fig, ax = plt.subplots(figsize=(6, max(3, len(labels)*0.4)))
+                ax.barh(labels, values, color=colors)
+                ax.set_xlim(0, 4.0)
+                ax.set_xlabel('Puntaje Institucional Promedio')
+                ax.set_title(title)
                 
-                bg_color = get_color_for_score(v_m)
-                set_cell_background(row_cells[1], bg_color)
+                for i, v in enumerate(values):
+                    ax.text(v + 0.1, i, f'{v:.1f}', va='center', fontweight='bold')
+                
+                plt.tight_layout()
+                
+                img_stream = io.BytesIO()
+                plt.savefig(img_stream, format='png', dpi=150)
+                img_stream.seek(0)
+                plt.close(fig)
+                
+                doc.add_picture(img_stream, width=Inches(5.5))
+            except Exception as e:
+                print(f"Error generando gráfico de pulso: {e}")
+                for k, v in sorted(metrics_dict.items(), key=lambda x: x[1], reverse=True):
+                    doc.add_paragraph(f"{k}: {v:.1f}")
             doc.add_paragraph()
 
         add_metrics_table(doc, "Gestión Pedagógica", ped_metrics)
@@ -1020,10 +1073,10 @@ def renderizar_reporte_ejecutivo(doc, data):
         t_action = doc.add_table(rows=1, cols=4)
         t_action.style = 'Table Grid'
         t_action.autofit = False
-        t_action.columns[0].width = Inches(1.6)
-        t_action.columns[1].width = Inches(1.4)
-        t_action.columns[2].width = Inches(2.0)
-        t_action.columns[3].width = Inches(1.0)
+        t_action.columns[0].width = Inches(1.2)
+        t_action.columns[1].width = Inches(1.2)
+        t_action.columns[2].width = Inches(2.8)
+        t_action.columns[3].width = Inches(0.8)
         
         h = t_action.rows[0].cells
         style_header_cell(h[0], "Foco de Mejora", "1B3C73", "FFFFFF")

@@ -844,11 +844,10 @@ async def generate_executive_report(req: ExecutiveRequest):
         2. CONSISTENCIA LÓGICA: El análisis narrativo (fortalezas/debilidades) DEBE basarse estrictamente en los DATOS CUANTITATIVOS (1-4) y la Evidencia Cualitativa proveída. NUNCA contradigas los puntajes (ej. si el puntaje en Cierre de Clase es bajo, el texto de las debilidades y el resumen sistémico deben reflejar la gravedad exacta de ese dato sin suavizarlo).
 
         INSTRUCCIONES DE SECCIONES:
-        1. "systemic_summary": Escribe 3 PÁRRAFOS LARGOS de Diagnóstico Sistémico. 
-           - Párrafo 1: Resumen de fortalezas operativas.
-           - Párrafo 2: Exposición ineludible de las deficiencias (mirando los puntajes más bajos).
-           - Párrafo 3: Conclusión directiva.
-           (Usa saltos de línea \n\n entre párrafos).
+        1. "systemic_summary": Estructura el Diagnóstico Sistémico de forma analítica en 3 partes. 
+           - "fortalezas_clave": Array con 2 a 3 fortalezas clave institucionales.
+           - "brechas_criticas": Array con 2 a 3 brechas críticas, yendo al grano.
+           - "direccion_estrategica": Un solo párrafo directivo de conclusión estratégica.
            
         2. "top_3_gaps": Lista las 3 brechas más críticas detectadas en la data. Empieza con una frase fuerte, ej: "Ausencia de Cierre Pedagógico: No se evidencia consolidación del aprendizaje al final del bloque..."
         
@@ -865,7 +864,11 @@ async def generate_executive_report(req: ExecutiveRequest):
 
         FORMATO JSON EXIGIDO ABSOLUTAMENTE Y SIN MARCADORES MARKDOWN:
         {{
-            "systemic_summary": "Párrafo 1... \\n\\nPárrafo 2... \\n\\nPárrafo 3...",
+            "systemic_summary": {{
+                "fortalezas_clave": ["...", "..."],
+                "brechas_criticas": ["...", "..."],
+                "direccion_estrategica": "..."
+            }},
             "top_3_gaps": ["Brecha 1 con detalle", "Brecha 2 con detalle", "Brecha 3 con detalle"],
             "recommended_training": [
                 {{
@@ -896,7 +899,11 @@ async def generate_executive_report(req: ExecutiveRequest):
             print(f"ERROR PARSING GEMINI JSON: {e}")
             print(f"RAW TEXT: {response.text}")
             ai_result = {
-                "systemic_summary": "Error procesando análisis complejo.",
+                "systemic_summary": {
+                    "fortalezas_clave": [],
+                    "brechas_criticas": [],
+                    "direccion_estrategica": "Error procesando análisis complejo."
+                },
                 "top_3_gaps": [],
                 "recommended_training": "Revisión manual requerida."
             }
