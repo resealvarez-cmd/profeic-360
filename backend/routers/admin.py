@@ -151,33 +151,53 @@ async def create_user(req: CreateUserRequest, _ = Depends(verify_super_admin)):
 @router.post("/delete-user")
 async def delete_user(req: DeleteUserRequest, _ = Depends(verify_super_admin)):
     """
-    1. Administrador elimina a un usuario completamente.
-    2. Se borra de Supabase Auth (Identity Provider).
-    3. Se borra de `authorized_users`.
+    1. Busca al usuario en Supabase Auth (con paginación completa).
+    2. Si existe en Auth: lo elimina de Auth y de profiles.
+    3. Siempre elimina de authorized_users (usuarios pendientes incluidos).
     """
     if not supabase_admin:
         raise HTTPException(status_code=500, detail="Falta Service Role Key")
 
     try:
-        # Supabase API python no tiene admin.delete_user_by_email, buscamos su ID primero
-        # o en este caso, podemos sacar el ID buscando en Auth. Para más simplificación, 
-        # consultaremos la db interna (profiles/authorized_users si tuviéramos id)
-        
-        # Estrategia: Listar usuarios auth (limite de 50 o paginar) y buscarlo
-        # (Idealmente, el front nos pasaría el ID, pero como a veces no lo tiene si solo está en authorized_users...)
-        users_resp = supabase_admin.auth.admin.list_users()
-        user_to_delete = next((u for u in users_resp.users if u.email == req.email), None)
+        # 1. Buscar el user_id en Auth con paginación completa
+        user_id_to_delete = None
+        page = 1
+        per_page = 50
 
-        if user_to_delete:
-            supabase_admin.auth.admin.delete_user(user_to_delete.id)
-        
-        # Eliminar de las tablas DB
-        supabase_admin.table('authorized_users').delete().eq("email", req.email).execute()
+        while True:
+            users_resp = supabase_admin.auth.admin.list_users(page=page, per_page=per_page)
+            batch = users_resp.users if hasattr(users_resp, 'users') else []
 
-        return {"message": f"Usuario {req.email} eliminado de Auth y BD."}
+            match = next((u for u in batch if u.email and u.email.lower() == req.email.lower()), None)
+            if match:
+                user_id_to_delete = match.id
+                break
 
+            # Si la página vino vacía o con menos usuarios que el límite, ya no hay más
+            if len(batch) < per_page:
+                break
+            page += 1
+
+        # 2. Eliminar de Supabase Auth (solo si existe como usuario registrado)
+        if user_id_to_delete:
+            supabase_admin.auth.admin.delete_user(user_id_to_delete)
+            # También limpiar la tabla profiles para evitar registros huérfanos
+            try:
+                supabase_admin.table('profiles').delete().eq('id', user_id_to_delete).execute()
+            except Exception:
+                pass  # Si no tiene perfil, ignoramos
+
+        # 3. Siempre eliminar de authorized_users (cubre usuarios 'pending' que nunca crearon cuenta)
+        supabase_admin.table('authorized_users').delete().eq("email", req.email.lower()).execute()
+
+        scope = "Auth + BD" if user_id_to_delete else "BD (usuario pre-autorizado sin cuenta)"
+        return {"message": f"Usuario {req.email} eliminado de {scope}."}
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error eliminando usuario: {str(e)}")
+
 
 
 @router.post("/school-plan")
