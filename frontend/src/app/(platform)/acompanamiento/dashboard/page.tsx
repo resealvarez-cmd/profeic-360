@@ -39,10 +39,16 @@ const METRICS_MAP: any = {
 
 export default function Dashboard360() {
     const router = useRouter();
-    const [stats, setStats] = useState({ active: 0, completed: 0, total: 0 });
 
     const [recentCycles, setRecentCycles] = useState<any[]>([]);
     const [allCycles, setAllCycles] = useState<any[]>([]);
+    
+    const stats = {
+        active: allCycles.filter(c => c.status === 'in_progress' || c.status === 'planned').length,
+        completed: allCycles.filter(c => c.status === 'completed').length,
+        total: allCycles.length
+    };
+
     const [usersMap, setUsersMap] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
 
@@ -142,10 +148,6 @@ export default function Dashboard360() {
             // Refresh data
             setRecentCycles(prev => prev.filter(c => c.id !== cycleId));
             setAllCycles(prev => prev.filter(c => c.id !== cycleId));
-            setStats(prev => ({
-                ...prev,
-                total: prev.total - 1
-            }));
         } catch (error: any) {
             console.error("Error deleting observation:", error);
             toast.error("Error al eliminar: " + error.message);
@@ -267,10 +269,6 @@ export default function Dashboard360() {
                 const { data: cycles } = await cyclesQuery;
 
                 if (cycles) {
-                    const active = cycles.filter(c => c.status === 'in_progress' || c.status === 'planned').length;
-                    const completed = cycles.filter(c => c.status === 'completed').length;
-
-                    setStats({ active, completed, total: cycles.length });
                     setRecentCycles(cycles.slice(0, 5));
                     setAllCycles(cycles);
 
