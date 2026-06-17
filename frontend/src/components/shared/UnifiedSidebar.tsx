@@ -240,7 +240,7 @@ export default function UnifiedSidebar() {
               <NavItem href="/acompanamiento/dashboard" icon={LayoutDashboard} label="Dashboard 360°" isActive={isActive("/acompanamiento/dashboard")} show={show} onClick={closeMobile} />
               <NavItem href="/acompanamiento/docentes" icon={Users} label="Mis Docentes" isActive={isActive("/acompanamiento/docentes")} show={show} onClick={closeMobile} />
                <NavItem href="/mejora-continua" icon={Target} label="Mejorando Juntos" isActive={isActive("/mejora-continua")} show={show} onClick={closeMobile} />
-               <NavItem href="/motor" icon={Shield} label="Motor Preventivo" isActive={isActive("/motor")} show={show} onClick={closeMobile} />
+               {/* <NavItem href="/motor" icon={Shield} label="Motor Preventivo" isActive={isActive("/motor")} show={show} onClick={closeMobile} /> */}
                <NavItem href="/inteligencia" icon={Brain} label="Observatorio" isActive={isActivePrefix("/inteligencia")} show={show} onClick={closeMobile} />
                <NavItem href="/simce" icon={BarChart3} label="SIMCE" isActive={isActivePrefix("/simce")} show={show} onClick={closeMobile} />
                {(isSuperAdmin || isDirectivo) && <NavItem href="/acompanamiento/admin/users" icon={Users} label="Gestión Usuarios" isActive={isActive("/acompanamiento/admin/users")} show={show} onClick={closeMobile} />}
